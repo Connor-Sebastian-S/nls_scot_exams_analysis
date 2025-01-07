@@ -4,7 +4,9 @@ import csv
 import textstat
 import matplotlib.pyplot as plt
 import numpy as np
-  
+from genbit.genbit_metrics import GenBitMetrics
+import pprint
+
 def process_exam_text(file_path):
     """
     Process an exam text file to extract metadata and questions.
@@ -49,6 +51,8 @@ def Analyse_and_save_questions(metadata, output_file):
 
     textstat.set_lang("en_GB")
     rows = []
+    
+    #genbit_metrics_object = GenBitMetrics("EN", context_window=5, distance_weight=0.95, percentile_cutoff=80)
 
     for q in metadata["questions"]:
         main_question_number = q[0]  # e.g., "1.", "2."
@@ -98,6 +102,10 @@ def Analyse_and_save_questions(metadata, output_file):
                 "flesch_kincaid": sub_flesch_kincaid_grade,
                 "gunning_fog": sub_gunning_fog
             })
+            
+    #for idx, q in enumerate([row['text'] for row in rows]): 
+
+
         
     # Write to CSV
     with open(f"{output_file}_results.csv", 'w', newline='', encoding='utf-8') as csvfile:
