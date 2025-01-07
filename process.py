@@ -2,8 +2,9 @@ import os
 import re
 import csv
 import textstat
-from genbit.genbit_metrics import GenBitMetrics
-
+import matplotlib.pyplot as plt
+import numpy as np
+  
 def process_exam_text(file_path):
     """
     Process an exam text file to extract metadata and questions.
@@ -58,6 +59,14 @@ def Analyse_and_save_questions(metadata, output_file):
         flesch_kincaid_grade = textstat.flesch_kincaid_grade(main_question_text)
         gunning_fog = textstat.gunning_fog(main_question_text)
         
+        def remove_format(text):
+            # Regular expression pattern to match "number. (letter)"
+            cleaned_text = re.sub(r'(\d+)\.\s?\([a-zA-Z]\)', r'\1', text)
+
+            return cleaned_text
+            
+        main_question_number = remove_format(main_question_number)
+        
         
         rows.append({
             "year": metadata["year"],
@@ -91,10 +100,22 @@ def Analyse_and_save_questions(metadata, output_file):
             })
         
     # Write to CSV
-    with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
+    with open(f"{output_file}_results.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["year", "level", "subject", "question", "text", "coleman_liau", "flesch_kincaid", "gunning_fog"])
         writer.writeheader()
         writer.writerows(rows)
+        
+    score_value = np.array([row['gunning_fog'] for row in rows])
+    question_id = np.arange(0,len(score_value))
+    question_labels = [row['question'] for row in rows]
+
+    plt.plot(question_id, score_value, 'o-')
+    plt.xticks(question_id, question_labels)
+    plt.xlabel('Question')
+    plt.ylabel('Gunning Fog score')
+    plt.title(f"{metadata["year"]} - {metadata["level"]} - {metadata["subject"]} - Gunning Fog score")
+    plt.savefig(f"{output_file}_fog.png")
+    plt.clf()
 
     print(f"Saved results to {output_file}")
 
@@ -111,7 +132,7 @@ def process_all_files(folder_path, output_dir):
         if not metadata:
             continue
 
-        output_file = os.path.join(output_dir, f"{os.path.splitext(file_name)[0]}_results.csv")
+        output_file = os.path.join(output_dir, f"{os.path.splitext(file_name)[0]}")
         Analyse_and_save_questions(metadata, output_file)
 
 # Example usage
