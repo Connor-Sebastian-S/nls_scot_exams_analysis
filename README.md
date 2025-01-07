@@ -17,7 +17,7 @@ Another dimension of the analysis focuses on inclusivity in language. Historical
   * Output to CSV
   * Create and save labelled plots of "gunning fog" score per paper
 
-
+## Testing and development ##
 The first test uses English papers from 1901, 1961, and 2024 and calculates their per-question Gunning Fog Index.
 
 The Gunning Fog Index is a metric used to measure the readability of a text, developed by Robert Gunning, an American businessman, in 1952.
