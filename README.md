@@ -13,8 +13,9 @@ Another dimension of the analysis focuses on inclusivity in language. Historical
   * Read NLS text files
   * Split into question (1, 2, 3, etc.)
   * Split into subquestions (a, b, c, etc.)
-  * Perform "coleman liau", "flesch kincaid", and"gunning fog" analysis on questions and subquestions
+  * Perform "coleman liau", "flesch kincaid", and "gunning fog" analysis on questions and subquestions
   * Output to CSV
+  * Create and save labelled plots of "gunning fog" score per paper
 
 An example output for a 1901 English Higher exam paper:
 
