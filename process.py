@@ -18,7 +18,91 @@ import numpy as np
 from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk.stem import WordNetLemmatizer
 
+from bertopic import BERTopic
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
+from rake_nltk import Rake
+from bertopic import BERTopic
+
+from gpt4all import GPT4All
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+from transformers import BertTokenizer, BertModel, BertForSequenceClassification
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+from transformers import pipeline
+from sklearn.cluster import KMeans
+from sentence_transformers import SentenceTransformer
+from transformers import pipeline
+from sklearn.cluster import KMeans
+from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+import numpy as np
+from sklearn.cluster import KMeans
+from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+from transformers import pipeline
+import numpy as np
+from sklearn.cluster import DBSCAN
+import re
+from collections import defaultdict
+import spacy
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import DBSCAN
+from rake_nltk import Rake
+from bertopic import BERTopic
+from sklearn.feature_extraction.text import CountVectorizer
+from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from transformers import BartTokenizer, BartForConditionalGeneration
+import spacy
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from kneed import KneeLocator
+from transformers import RobertaTokenizerFast, RobertaForSequenceClassification, TextClassificationPipeline
+
+
+
+# Load the base LLaMA model
+def get_intent(question):
+    classifier = pipeline("text-classification", model="gokuls/distilbert-emotion-intent")
+    text = question
+    result = classifier(text)
+    print(result)
+
+
+def get_themes(question):
+    
+    nlp = spacy.load("en_core_web_sm")
+    
+    # Process the text with spaCy
+    doc = nlp(question)
+    
+    # Extract intent dynamically using dependency parsing and POS tagging
+    intent = None
+    for token in doc:
+        if token.pos_ == "VERB" and token.dep_ == "ROOT":  # Focus on the main verb/root
+            # Capture the root verb and its modifiers for multi-word intents
+            intent = token.text
+            # Add related modifiers (e.g., "compare and contrast")
+            #intent_phrase = " ".join([child.text for child in token.children])# if child.dep_ in {"prep", "conj", "cc"}])
+            #if intent_phrase:
+            #    intent += f" {intent_phrase}"
+            break
+    
+    # Extract named entities
+    named_entities = [ent.text for ent in doc.ents]
+    
+    # Extract thematic keywords (noun chunks)
+    thematic_keywords = []
+    for chunk in doc.noun_chunks:
+        # Simple filter for thematic relevance: contains at least one noun
+        if any(token.pos_ == "NOUN" for token in chunk):
+            thematic_keywords.append(chunk.text)
+    
+    return {"intent": intent, "named_entities": named_entities, "thematic_keywords": thematic_keywords}
+
+  
 def tokenize_text(text: str):
     
     # lowercase the text
@@ -179,38 +263,33 @@ def Analyse_and_save_questions(metadata, output_file):
     """
     Analyse questions and save results to a CSV file.
     """
-    question_pattern = r'\([a-z]\.?'
+    question_pattern = r'\([a-z]\.?'  # Matches subquestion patterns like (a)
 
     textstat.set_lang("en_GB")
     rows = []
     
-    def print_pred(texts, pred):
-        for txt, p in zip(texts, pred):
-            print("formal: ", txt) if p == 0 else print("informal: ", txt)
-            
-
+    def clean_question_number(number):
+        """
+        Cleans up the question identifier, removing errant parentheses or formatting issues.
+        """
+        #return re.sub(r'(\d+)\s*\(\w\)', r'\1', number)  # Matches cases like "1 (b)" and cleans to "1"
+        return re.sub(r'\(\w\)', '', number)
 
     for q in metadata["questions"]:
-        main_question_number = q[0]  # e.g., "1.", "2."
-        main_question_text = re.split(question_pattern, q[1], maxsplit=1)[0].strip()
+        main_question_number = clean_question_number(q[0])  # Clean main question number
+        main_question_text = re.split(question_pattern, q[1], maxsplit=1)[0].strip(')')
         
         # Analyse main question
         main_score = textstat.dale_chall_readability_score(main_question_text)
         flesch_kincaid_grade = textstat.flesch_kincaid_grade(main_question_text)
         gunning_fog = textstat.gunning_fog(main_question_text)
         
-        def remove_format(text):
-            # Regular expression pattern to match "number. (letter)"
-            cleaned_text = re.sub(r'(\d+)\.\s?\([a-zA-Z]\)', r'\1', text)
-
-            return cleaned_text
-            
-        main_question_number = remove_format(main_question_number)
+        tokens = tokenize_text(main_question_text)
+        lemmatized_tokens = lemmatize_tokens(tokens)
+        sentiment_df = return_sentiment_df(lemmatized_tokens)
         
-        tokens = tokenize_text(text = main_question_text)
-        from nltk.stem import WordNetLemmatizer
-        lemmatized_tokens = lemmatize_tokens(tokens = tokens)
-        sentiment_df = return_sentiment_df(tokens = lemmatized_tokens)
+        #topics = get_themes(main_question_text)
+        #get_intent(main_question_text)
         
         rows.append({
             "year": metadata["year"],
@@ -221,11 +300,14 @@ def Analyse_and_save_questions(metadata, output_file):
             "coleman_liau": main_score,
             "flesch_kincaid": flesch_kincaid_grade,
             "gunning_fog": gunning_fog,
-            "total_tokens" : sentiment_df["total_tokens"],
-            "positive_tokens" : sentiment_df["positive_tokens"],
-            "negative_tokens" : sentiment_df["negative_tokens"],
-            "neutral_tokens" : sentiment_df["neutral_tokens"],
-            "compound_sentiment_score" : sentiment_df["compound_sentiment_score"]
+            "total_tokens": int(sentiment_df["total_tokens"].iloc[0]),  # Extract scalar value
+            "positive_tokens": int(sentiment_df["positive_tokens"].iloc[0]),
+            "negative_tokens": int(sentiment_df["negative_tokens"].iloc[0]),
+            "neutral_tokens": int(sentiment_df["neutral_tokens"].iloc[0]),
+            "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0])#,  
+            #"intent": topics["intent"],
+            #"named_entities": topics["named_entities"], 
+            #"thematic_keywords": topics["thematic_keywords"]
         })
 
         # Analyse subquestions
@@ -237,54 +319,47 @@ def Analyse_and_save_questions(metadata, output_file):
             sub_score = textstat.coleman_liau_index(subtext.strip()) 
             sub_flesch_kincaid_grade = textstat.flesch_kincaid_grade(subtext.strip())
             sub_gunning_fog = textstat.gunning_fog(subtext.strip())
+            subtext = re.sub(r'^\)', '', subtext)
             
-            tokens = tokenize_text(text = subtext)
-            from nltk.stem import WordNetLemmatizer
-            lemmatized_tokens = lemmatize_tokens(tokens = tokens)
-            sentiment_df = return_sentiment_df(tokens = lemmatized_tokens)     
+            tokens = tokenize_text(subtext)
+            lemmatized_tokens = lemmatize_tokens(tokens)
+            sentiment_df = return_sentiment_df(lemmatized_tokens)
+            questionText = subtext.strip()
+            #topics = get_themes(questionText)
+            
+            #get_intent(questionText)
 
             rows.append({
                 "year": metadata["year"],
                 "level": metadata["level"],
                 "subject": metadata["subject"],
                 "question": f"{main_question_number.rstrip('.')}{marker}",
-                "text": subtext.strip(),
+                "text": questionText,
                 "coleman_liau": sub_score,
                 "flesch_kincaid": sub_flesch_kincaid_grade,
                 "gunning_fog": sub_gunning_fog,
-                "total_tokens" : sentiment_df["total_tokens"],
-                "positive_tokens" : sentiment_df["positive_tokens"],
-                "negative_tokens" : sentiment_df["negative_tokens"],
-                "neutral_tokens" : sentiment_df["neutral_tokens"],
-                "compound_sentiment_score" : sentiment_df["compound_sentiment_score"]
+                "total_tokens": int(sentiment_df["total_tokens"].iloc[0]),  # Extract scalar value
+                "positive_tokens": int(sentiment_df["positive_tokens"].iloc[0]),
+                "negative_tokens": int(sentiment_df["negative_tokens"].iloc[0]),
+                "neutral_tokens": int(sentiment_df["neutral_tokens"].iloc[0]),
+                "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0])#, 
+                #"intent": topics["intent"],
+                #"named_entities": topics["named_entities"], 
+                #"thematic_keywords": topics["thematic_keywords"]
             })
             
-    #for idx, q in enumerate([row['text'] for row in rows]): 
-        #print(q)
-        #tokens = tokenize_text(text = q)
-
-        #from nltk.stem import WordNetLemmatizer
-       # lemmatized_tokens = lemmatize_tokens(tokens = tokens)
-
-        #top_tokens = return_top_tokens(tokens = lemmatized_tokens,
-                               #top_N = 10)
-        #print(top_tokens)
-
-        # run the return_top_bigrams function and print the results
-        #bigram_df = return_top_bigrams(tokens = lemmatized_tokens,
-                               #top_N = 10)
-        #print(bigram_df)
-
-        #sentiment_df = return_sentiment_df(tokens = lemmatized_tokens)
-        #print(sentiment_df)
-
-
-        
     # Write to CSV
     with open(f"{output_file}_results.csv", 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=["year", "level", "subject", "question", "text", "coleman_liau", "flesch_kincaid", "gunning_fog", "total_tokens", "positive_tokens", "negative_tokens", "neutral_tokens", "compound_sentiment_score"])
+        writer = csv.DictWriter(csvfile, fieldnames=[
+            "year", "level", "subject", "question", "text", 
+            "coleman_liau", "flesch_kincaid", "gunning_fog",
+            "total_tokens", "positive_tokens", "negative_tokens", 
+            "neutral_tokens", "compound_sentiment_score", "intent", "named_entities", "thematic_keywords"
+        ])
         writer.writeheader()
         writer.writerows(rows)
+        
+    
         
     score_value = np.array([row['gunning_fog'] for row in rows])
     question_id = np.arange(0,len(score_value))
@@ -310,6 +385,9 @@ def Analyse_and_save_questions(metadata, output_file):
     plt.clf()
 
     print(f"Saved results to {output_file}")
+    
+    
+    
 
 def process_all_files(folder_path, output_dir):
     """
@@ -321,6 +399,7 @@ def process_all_files(folder_path, output_dir):
             continue  # Skip non-text files
         
         metadata = process_exam_text(file_path)
+        #test(file_path)
         if not metadata:
             continue
 
@@ -330,6 +409,10 @@ def process_all_files(folder_path, output_dir):
 # Example usage
 
 #nltk.download()
+
+# Summarizer pipeline
+
+
 folder_path = './data/text/test/'  # Directory containing exam text files
 output_dir = './output/'     # Directory to save CSV files
 os.makedirs(output_dir, exist_ok=True)

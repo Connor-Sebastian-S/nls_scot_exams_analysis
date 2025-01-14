@@ -1,127 +1,17 @@
-year,level,subject,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score
-1961,Higher II,ENGLISH,1,"Select any one of Shakespeare’s comedies. To what extent is it a comedy of situation, and to what extent a comedy of character ?",8.33,5.4,8.08,"0    10
-Name: total_tokens, dtype: int64","0    3
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    7
-Name: neutral_tokens, dtype: int64","0    0.3612
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,1b,") “ In reading a tragedy of Shakespeare’s we are left with an overwhelming impression of the essential greatness of human character, and we are also conscious of a profound feeling of waste.” Discuss this statement with reference to one, or more than one, of Shakespeare’s tragedies.",12.25,9.7,13.44,"0    22
-Name: total_tokens, dtype: int64","0    2
-Name: positive_tokens, dtype: int64","0    3
-Name: negative_tokens, dtype: int64","0    17
-Name: neutral_tokens, dtype: int64","0   -0.27732
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,1c,") Discuss the element of patriotism in one, or more than one, of Shakespeare’s history plays.",10.37,6.8,8.67,"0    8
-Name: total_tokens, dtype: int64","0    1
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    7
-Name: neutral_tokens, dtype: int64","0    0.34
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,1d,") From your reading of Shakespeare’s plays, choose a comic scene from a comedy and a comic scene from a tragedy ;' describe each briefly, and show in a paragraph how they serve different purposes.",10.57,12.6,13.2,"0    17
-Name: total_tokens, dtype: int64","0    2
-Name: positive_tokens, dtype: int64","0    1
-Name: negative_tokens, dtype: int64","0    14
-Name: neutral_tokens, dtype: int64","0    0.013833
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,2,"Deriving your information from the Prologue to The Canterbury Tales, compare and contrast the pilgrims in one of the following pairs :— the Monk and the Poor Parson ; the Wife of Bath and the Prioress ; the Squire and the Clerk of Oxenford ; the Knight and the Franklin.",11.07,18.9,22.75,"0    22
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    1
-Name: negative_tokens, dtype: int64","0    21
-Name: neutral_tokens, dtype: int64","0   -0.4767
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,2b,) Choose any one of The Canterbury Tales and show in what ways it was calculated to appeal to the interests of its audience.,7.96,8.7,12.68,"0    10
-Name: total_tokens, dtype: int64","0    1
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    9
-Name: neutral_tokens, dtype: int64","0    0.4588
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,2c,) Here and there in the Prologue to The Canterbury Tales one finds evidence that Chaucer was alive to the growing wealth and importance of the English middle classes. Show that this is so.,9.16,6.2,9.02,"0    15
-Name: total_tokens, dtype: int64","0    4
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    11
-Name: neutral_tokens, dtype: int64","0    0.3537
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,3,""" Bums, the Ballads, Scott—these are the supreme expressions in literature of Lowland Scotland.” How far do you agree with this judgment ? Indicate, with reasons, which of the three appeals most to you personally. (6) Show, with reference to any poem by Dunbar, or Henryson, or Fergusson, or Bums, or any more recent Scottish poet, how the poet success- fully combines humour and realism in his work.",10.44,7.4,10.24,"0    34
-Name: total_tokens, dtype: int64","0    4
-Name: positive_tokens, dtype: int64","0    1
-Name: negative_tokens, dtype: int64","0    29
-Name: neutral_tokens, dtype: int64","0    0.38828
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,4,"Choose any one of the following prose works, and write a brief critical account of it, dealing with such aspects as the author’s method of presenting his subject matter, and, where this is relevant, his intention in writing it. What light does the work throw on the author’s personality or attitude towards life? Bunyan’s Pilgrim s Progress ; Defoe’s Robinson Crusoe ; Swift’s Voyage to Brobdingnag ; Boswell’s Journal of a Tour to the Hebrides ; Macaulay’s Essay on Clive ; Stevenson’s Travels with a Donkey in the Cevennes; Orwell’s Animal Farm ; H. Trevor-Roper’s Last Days of Hitler ; Laurie Lee’s Cider with Rosie. (15)",11.88,10.6,12.34,"0    60
-Name: total_tokens, dtype: int64","0    3
-Name: positive_tokens, dtype: int64","0    1
-Name: negative_tokens, dtype: int64","0    56
-Name: neutral_tokens, dtype: int64","0    0.08285
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,5,"Show, with apposite quotation if you can, what qualities of thought, emotion and expression distinguish any one of the following poems :— Lycidas ; Elegy written in a Country Churchyard ; The Deserted Village ; Lines composed a few miles above Tintern Abbey ; Ode to Autumn ; ' Ulysses ; My Last Duchess ; Among School Children ; Fern Hill.",12.67,22.0,25.89,"0    33
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    33
-Name: neutral_tokens, dtype: int64","0    0
-Name: compound_sentiment_score, dtype: int64"
-1961,Higher II,ENGLISH,6,"If you were compiling an anthology of essays, in which you were limited to two essays by each author, which essays would you choose to represent any two of the following authors ? In each case, give briefly your reasons for your choice. Bacon, Addison, Steele, Goldsmith, Lamb, Hazlitt, Stevenson, Chesterton, Max Beerbohm.",9.35,8.9,10.77,"0    29
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    1
-Name: negative_tokens, dtype: int64","0    28
-Name: neutral_tokens, dtype: int64","0   -0.2263
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,7,"Write a critical account of any modern poem you have read, showing in what ways it differs from or resembles the poetry of the past with which you are familiar.",9.34,12.6,14.67,"0    13
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    1
-Name: negative_tokens, dtype: int64","0    12
-Name: neutral_tokens, dtype: int64","0   -0.3182
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,8,"Write a character sketch of any one of the following :— Mrs. Bennet, Balfour of Burley, David Deans, Catherine Linton, Mr. Rochester, Becky Sharp, Uriah Keep, Miss Havisham, Sergeant Troy, Ebenezer Balfour, Almayer, Stephen Dedalus, Mrs. Dalloway, Solly Jimson.",14.08,5.8,8.01,"0    32
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    1
-Name: negative_tokens, dtype: int64","0    31
-Name: neutral_tokens, dtype: int64","0   -0.1531
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,9,"Which novel, written by a reputable twentieth-century novelist, has most appealed to you ? Show what you found interesting in such matters as the author’s characterization, technique and style.",10.53,11.1,9.89,"0    14
-Name: total_tokens, dtype: int64","0    3
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    11
-Name: neutral_tokens, dtype: int64","0    0.248633
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,10,Write a brief critical essay on one of the following topics :—,9.92,6.4,8.04,"0    7
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    1
-Name: negative_tokens, dtype: int64","0    6
-Name: neutral_tokens, dtype: int64","0   -0.3182
-Name: compound_sentiment_score, dtype: float64"
-1961,Higher II,ENGLISH,10a,") Burns, or Blake, or Shelley as a lyric poet ;",2.23,2.1,3.6,"0    5
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    5
-Name: neutral_tokens, dtype: int64","0    0
-Name: compound_sentiment_score, dtype: int64"
-1961,Higher II,ENGLISH,10b,) Pope or W. H. Auden as a social satirist ;,-3.01,1.5,6.24,"0    6
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    6
-Name: neutral_tokens, dtype: int64","0    0
-Name: compound_sentiment_score, dtype: int64"
-1961,Higher II,ENGLISH,10c,) Coleridge or Walter de la Mare as a poet of the mysterious and the supernatural ;,7.24,9.1,11.33,"0    8
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    8
-Name: neutral_tokens, dtype: int64","0    0
-Name: compound_sentiment_score, dtype: int64"
-1961,Higher II,ENGLISH,10d,) Wordsworth’s treatment of common life ;,15.4,2.9,2.0,"0    4
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    4
-Name: neutral_tokens, dtype: int64","0    0
-Name: compound_sentiment_score, dtype: int64"
-1961,Higher II,ENGLISH,10e,) Arnold’s imitation of the epic style ;,8.17,4.5,9.07,"0    4
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    4
-Name: neutral_tokens, dtype: int64","0    0
-Name: compound_sentiment_score, dtype: int64"
-1961,Higher II,ENGLISH,10f,) John Betjeman’s treatment of suburban life.,13.97,6.8,9.07,"0    5
-Name: total_tokens, dtype: int64","0    0
-Name: positive_tokens, dtype: int64","0    0
-Name: negative_tokens, dtype: int64","0    5
-Name: neutral_tokens, dtype: int64","0    0
-Name: compound_sentiment_score, dtype: int64"
+year,level,subject,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,named_entities,thematic_keywords
+1961,Higher II,ENGLISH,1. ,"Select any one of Shakespeare’s comedies. To what extent is it a comedy of situation, and to what extent a comedy of character ? ",8.33,5.4,8.08,10,3,0,7,0.3612,,,
+1961,Higher II,ENGLISH,1. b,"“ In reading a tragedy of Shakespeare’s we are left with an overwhelming impression of the essential greatness of human character, and we are also conscious of a profound feeling of waste.” Discuss this statement with reference to one, or more than one, of Shakespeare’s tragedies.",12.25,9.7,13.44,22,2,3,17,-0.27731999999999996,,,
+1961,Higher II,ENGLISH,1. c,"Discuss the element of patriotism in one, or more than one, of Shakespeare’s history plays.",10.37,6.8,8.67,8,1,0,7,0.34,,,
+1961,Higher II,ENGLISH,1. d,"From your reading of Shakespeare’s plays, choose a comic scene from a comedy and a comic scene from a tragedy ;' describe each briefly, and show in a paragraph how they serve different purposes.",10.57,12.6,13.2,17,2,1,14,0.013833333333333364,,,
+1961,Higher II,ENGLISH,2. ,"Deriving your information from the Prologue to The Canterbury Tales, compare and contrast the pilgrims in one of the following pairs :— the Monk and the Poor Parson ; the Wife of Bath and the Prioress ; the Squire and the Clerk of Oxenford ; the Knight and the Franklin. ",11.07,18.9,22.75,22,0,1,21,-0.4767,,,
+1961,Higher II,ENGLISH,2. b,Choose any one of The Canterbury Tales and show in what ways it was calculated to appeal to the interests of its audience.,7.96,8.7,12.68,10,1,0,9,0.4588,,,
+1961,Higher II,ENGLISH,2. c,Here and there in the Prologue to The Canterbury Tales one finds evidence that Chaucer was alive to the growing wealth and importance of the English middle classes. Show that this is so.,9.16,6.2,9.02,15,4,0,11,0.3537,,,
+1961,Higher II,ENGLISH,3. ,""" Bums, the Ballads, Scott—these are the supreme expressions in literature of Lowland Scotland.” How far do you agree with this judgment ? Indicate, with reasons, which of the three appeals most to you personally. ",10.4,6.4,9.25,16,2,1,13,0.29760000000000003,,,
+1961,Higher II,ENGLISH,3. b,"Show, with reference to any poem by Dunbar, or Henryson, or Fergusson, or Bums, or any more recent Scottish poet, how the poet success- fully combines humour and realism in his work.",9.24,12.2,15.3,17,2,0,15,0.5243,,,
+1961,Higher II,ENGLISH,4,"Choose any one of the following prose works, and write a brief critical account of it, dealing with such aspects as the author’s method of presenting his subject matter, and, where this is relevant, his intention in writing it. What light does the work throw on the author’s personality or attitude towards life? Bunyan’s Pilgrim s Progress ; Defoe’s Robinson Crusoe ; Swift’s Voyage to Brobdingnag ; Boswell’s Journal of a Tour to the Hebrides ; Macaulay’s Essay on Clive ; Stevenson’s Travels with a Donkey in the Cevennes; Orwell’s Animal Farm ; H. Trevor-Roper’s Last Days of Hitler ; Laurie Lee’s Cider with Rosie.",11.78,10.5,12.25,59,3,1,55,0.08285000000000001,,,
+1961,Higher II,ENGLISH,5,"Show, with apposite quotation if you can, what qualities of thought, emotion and expression distinguish any one of the following poems :— Lycidas ; Elegy written in a Country Churchyard ; The Deserted Village ; Lines composed a few miles above Tintern Abbey ; Ode to Autumn ; ' Ulysses ; My Last Duchess ; Among School Children ; Fern Hill.",12.67,22.0,25.89,33,0,0,33,0.0,,,
+1961,Higher II,ENGLISH,6,"If you were compiling an anthology of essays, in which you were limited to two essays by each author, which essays would you choose to represent any two of the following authors? In each case, give briefly your reasons for your choice. Bacon, Addison, Steele, Goldsmith, Lamb, Hazlitt, Stevenson, Chesterton, Max Beerbohm.",9.35,8.9,10.77,29,0,1,28,-0.2263,,,
+1961,Higher II,ENGLISH,7,"Write a critical account of any modern poem you have read, showing in what ways it differs from or resembles the poetry of the past with which you are familiar.",9.34,12.6,14.67,13,0,1,12,-0.3182,,,
+1961,Higher II,ENGLISH,8,"Write a character sketch of any one of the following :— Mrs. Bennet, Balfour of Burley, David Deans, Catherine Linton, Mr. Rochester, Becky Sharp, Uriah Keep, Miss Havisham, Sergeant Troy, Ebenezer Balfour, Almayer, Stephen Dedalus, Mrs. Dalloway, Solly Jimson.",14.08,5.8,8.01,32,0,1,31,-0.1531,,,
+1961,Higher II,ENGLISH,9,"Which novel, written by a reputable twentieth-century novelist, has most appealed to you ? Show what you found interesting in such matters as the author’s characterization, technique and style.",10.53,11.1,9.89,14,3,0,11,0.24863333333333335,,,
+1961,Higher II,ENGLISH,10,"Write a brief critical essay on one of the following topics :— Burns, or Blake, or Shelley as a lyric poet ; Pope or W. H. Auden as a social satirist ; Coleridge or Walter de la Mare as a poet of the mysterious and the supernatural ; Wordsworth’s treatment of common life ; Arnold’s imitation of the epic style ; John Betjeman’s treatment of suburban life.",13.17,14.0,16.13,39,0,1,38,-0.3182,,,
