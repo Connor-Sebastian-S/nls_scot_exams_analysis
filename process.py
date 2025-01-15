@@ -265,7 +265,8 @@ def Analyse_and_save_questions(metadata, output_file):
             })
             
     # Write to CSV
-    with open(f"{output_file}_results.csv", 'w', newline='', encoding='utf-8') as csvfile:
+    with open(output_file + re.sub(r"[^\w\s]", "", metadata["subject"]) + 
+    ".csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=[
             "year", "level", "subject", 
             "question", "text", 
@@ -291,8 +292,17 @@ def process_all_files(folder_path, output_dir):
         metadata = process_exam_text(file_path)
         if not metadata:
             continue
-
-        output_file = os.path.join(output_dir, f"{os.path.splitext(file_name)[0]}")
+        
+        csv_file_name = (
+            metadata["year"] + 
+            "/" + 
+            re.sub(r"[^\w\s]", "", metadata["level"]) + 
+            "/")
+        print (csv_file_name)
+        
+        output_file = os.path.join(output_dir, csv_file_name)
+        print (output_file)
+        os.makedirs(output_file)
         Analyse_and_save_questions(metadata, output_file)
 
 # directory containing exam text files
