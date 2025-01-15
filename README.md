@@ -125,4 +125,24 @@ Scottish secondary education has evolved significantly since 1900, with changes 
    - **Advanced Highers**.
 
 ---
-
+#### The mapping itself
+```
+    # Mapping of historical grades to modern equivalents
+    mapping = {
+        "Lower Grade": "National 4",
+        "Intermediate Grade": "National 5",
+        "Higher Grade": "Higher",
+        "Ordinary Grade": "National 5",
+        "Foundation Standard Grade": "National 3",
+        "General Standard Grade": "National 4",
+        "Credit Standard Grade": "National 5",
+        "CSYS": "Advanced Higher",
+        "National 1": "National 1",
+        "National 2": "National 2",
+        "National 3": "National 3",
+        "National 4": "National 4",
+        "National 5": "National 5",
+        "Higher": "Higher",
+        "Advanced Higher": "Advanced Higher",
+    }
+```
