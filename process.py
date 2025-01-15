@@ -9,10 +9,10 @@ from nltk.stem import WordNetLemmatizer
 from nltk.collocations import BigramCollocationFinder
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, pipeline
 
-# load tokenizer and model
-tokenizer = DistilBertTokenizer.from_pretrained("./results/checkpoint-final")
+# load tokeniser and model
+tokeniser = DistilBertTokenizer.from_pretrained("./results/checkpoint-final")
 model = DistilBertForSequenceClassification.from_pretrained("./results/checkpoint-final")
-classifier = pipeline("text-classification", model=model, tokenizer=tokenizer)    
+classifier = pipeline("text-classification", model=model, tokenizer=tokeniser)    
 label_mapping = {
     0: "discuss",
     1: "describe",
@@ -25,14 +25,16 @@ label_mapping = {
 
 def get_intent(question):
 
-    # Get predictions
+    # get predictions
     predictions = classifier(question)
     
+    # return prediction
     for pred in predictions:
-        pred['label'] = label_mapping[int(pred['label'].split('_')[-1])]  # Map label ID to name
+        # map label ID to name
+        pred['label'] = label_mapping[int(pred['label'].split('_')[-1])]
         return (pred)
 
-def tokenize_text(text: str):
+def tokenise_text(text: str):
     
     # lowercase the text
     text = text.lower()
@@ -40,7 +42,7 @@ def tokenize_text(text: str):
     # remove punctuation from text
     text = re.sub(r"[^\w\s]", "", text)
     
-    # tokenize the text
+    # tokenise the text
     tokens = nltk.word_tokenize(text)
     
     # remove stopwords from txt_tokens and word_tokens
@@ -51,17 +53,17 @@ def tokenize_text(text: str):
     # return your tokens
     return tokens
 
-def lemmatize_tokens(tokens):
+def lemmatise_tokens(tokens):
     
-    # initiate lemmatizer
-    lemmatizer = WordNetLemmatizer()
+    # initiate lemmatiser
+    lemmatiser = WordNetLemmatizer()
     
-    # lemmatize tokens
-    lemmatizer = WordNetLemmatizer()
-    lemmatized_tokens = [lemmatizer.lemmatize(word) for word in tokens]
+    # lemmatise tokens
+    lemmatiser = WordNetLemmatizer()
+    lemmatised_tokens = [lemmatiser.lemmatize(word) for word in tokens]
     
-    # return your lemmatized tokens
-    return lemmatized_tokens
+    # return your lemmatised tokens
+    return lemmatised_tokens
 
 # return the most common tokens
 def return_top_tokens(tokens, top_N = 10):
@@ -98,7 +100,7 @@ def return_top_bigrams(tokens, top_N = 10):
 
 def return_sentiment_df(tokens):
 
-	# initialize sentiment analyzer
+	# initialise sentiment analyzer
 	sia = SentimentIntensityAnalyzer()
 	
 	# create some counters for sentiment of each token
@@ -200,9 +202,9 @@ def Analyse_and_save_questions(metadata, output_file):
         flesch_kincaid_grade = textstat.flesch_kincaid_grade(main_question_text)
         gunning_fog = textstat.gunning_fog(main_question_text)
         
-        tokens = tokenize_text(main_question_text)
-        lemmatized_tokens = lemmatize_tokens(tokens)
-        sentiment_df = return_sentiment_df(lemmatized_tokens)
+        tokens = tokenise_text(main_question_text)
+        lemmatised_tokens = lemmatise_tokens(tokens)
+        sentiment_df = return_sentiment_df(lemmatised_tokens)
         intent_ = get_intent(main_question_text)
 
         rows.append({
@@ -236,9 +238,9 @@ def Analyse_and_save_questions(metadata, output_file):
             sub_gunning_fog = textstat.gunning_fog(subtext.strip())
             subtext = re.sub(r'^\)', '', subtext)
             
-            tokens = tokenize_text(subtext)
-            lemmatized_tokens = lemmatize_tokens(tokens)
-            sentiment_df = return_sentiment_df(lemmatized_tokens)
+            tokens = tokenise_text(subtext)
+            lemmatised_tokens = lemmatise_tokens(tokens)
+            sentiment_df = return_sentiment_df(lemmatised_tokens)
             questionText = subtext.strip()
             intent_ = get_intent(subtext)
 

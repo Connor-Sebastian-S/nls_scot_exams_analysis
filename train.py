@@ -1,5 +1,3 @@
-# File: train_distilbert_exam.py
-
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, Trainer, TrainingArguments
 from datasets import Dataset, DatasetDict
 from sklearn.model_selection import train_test_split
