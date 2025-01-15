@@ -23,6 +23,7 @@ The first test uses English papers from 1901, 1961, and 2024 and calculates thei
 The text files for the exam papers don't need a particular name, however their structure must be specific.
 
 The folder structure of the outputted CSV files are as follows:
+```
 ├── 1945
 │   ├── National 5
 │       ├── ENGLISH.csv
@@ -40,6 +41,7 @@ The folder structure of the outputted CSV files are as follows:
 │   └── Higher
 │       ├── HISTORY.csv
 │       ├── ENGLISH.csv
+```
 
 * process.py - reads the text files, splits into questions, calculates the aforementioned data, and saves as a CSV per exam paper.
 * train.py - trains our model for intent calculation.
