@@ -1,13 +1,13 @@
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, pipeline
 
 label_mapping = {
-    0: "Discuss",
-    1: "Describe",
-    2: "Compare",
-    3: "Explain",
-    4: "Argue",
-    6: "Reason",
-    7: "Other"
+    0: "discuss",
+    1: "describe",
+    2: "compare",
+    3: "explain",
+    4: "argue",
+    5: "reason",
+    6: "other"
 }
 
 # Load tokenizer and model

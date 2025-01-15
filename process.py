@@ -2,107 +2,36 @@ import os
 import re
 import csv
 import textstat
-import matplotlib.pyplot as plt
-import numpy as np
-from genbit.genbit_metrics import GenBitMetrics
-import pprint
-import requests
-import nltk
-import regex as re
 import pandas as pd
-from wordcloud import WordCloud
-from PIL import Image
-import matplotlib.pyplot as plt
-import numpy as np
-
+import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk.stem import WordNetLemmatizer
+from nltk.collocations import BigramCollocationFinder
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, pipeline
 
-from bertopic import BERTopic
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+# load tokenizer and model
+tokenizer = DistilBertTokenizer.from_pretrained("./results/checkpoint-final")
+model = DistilBertForSequenceClassification.from_pretrained("./results/checkpoint-final")
+classifier = pipeline("text-classification", model=model, tokenizer=tokenizer)    
+label_mapping = {
+    0: "discuss",
+    1: "describe",
+    2: "compare",
+    3: "explain",
+    4: "argue",
+    5: "reason",
+    6: "other"
+}
 
-from rake_nltk import Rake
-from bertopic import BERTopic
-
-from gpt4all import GPT4All
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
-from transformers import BertTokenizer, BertModel, BertForSequenceClassification
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation
-from transformers import pipeline
-from sklearn.cluster import KMeans
-from sentence_transformers import SentenceTransformer
-from transformers import pipeline
-from sklearn.cluster import KMeans
-from sentence_transformers import SentenceTransformer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-import numpy as np
-from sklearn.cluster import KMeans
-from sentence_transformers import SentenceTransformer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
-from transformers import pipeline
-import numpy as np
-from sklearn.cluster import DBSCAN
-import re
-from collections import defaultdict
-import spacy
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import DBSCAN
-from rake_nltk import Rake
-from bertopic import BERTopic
-from sklearn.feature_extraction.text import CountVectorizer
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
-from transformers import BartTokenizer, BartForConditionalGeneration
-import spacy
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from kneed import KneeLocator
-from transformers import RobertaTokenizerFast, RobertaForSequenceClassification, TextClassificationPipeline
-
-
-
-# Load the base LLaMA model
 def get_intent(question):
-    classifier = pipeline("text-classification", model="gokuls/distilbert-emotion-intent")
-    text = question
-    result = classifier(text)
-    print(result)
 
+    # Get predictions
+    predictions = classifier(question)
+    
+    for pred in predictions:
+        pred['label'] = label_mapping[int(pred['label'].split('_')[-1])]  # Map label ID to name
+        return (pred)
 
-def get_themes(question):
-    
-    nlp = spacy.load("en_core_web_sm")
-    
-    # Process the text with spaCy
-    doc = nlp(question)
-    
-    # Extract intent dynamically using dependency parsing and POS tagging
-    intent = None
-    for token in doc:
-        if token.pos_ == "VERB" and token.dep_ == "ROOT":  # Focus on the main verb/root
-            # Capture the root verb and its modifiers for multi-word intents
-            intent = token.text
-            # Add related modifiers (e.g., "compare and contrast")
-            #intent_phrase = " ".join([child.text for child in token.children])# if child.dep_ in {"prep", "conj", "cc"}])
-            #if intent_phrase:
-            #    intent += f" {intent_phrase}"
-            break
-    
-    # Extract named entities
-    named_entities = [ent.text for ent in doc.ents]
-    
-    # Extract thematic keywords (noun chunks)
-    thematic_keywords = []
-    for chunk in doc.noun_chunks:
-        # Simple filter for thematic relevance: contains at least one noun
-        if any(token.pos_ == "NOUN" for token in chunk):
-            thematic_keywords.append(chunk.text)
-    
-    return {"intent": intent, "named_entities": named_entities, "thematic_keywords": thematic_keywords}
-
-  
 def tokenize_text(text: str):
     
     # lowercase the text
@@ -135,8 +64,7 @@ def lemmatize_tokens(tokens):
     return lemmatized_tokens
 
 # return the most common tokens
-def return_top_tokens(tokens,
-                      top_N = 10):
+def return_top_tokens(tokens, top_N = 10):
 
     # first, count the frequency of every unique token
     word_token_distribution = nltk.FreqDist(tokens)
@@ -150,11 +78,7 @@ def return_top_tokens(tokens,
     return top_tokens
 
 
-# return the most common bi-grams
-from nltk.collocations import BigramCollocationFinder
-
-def return_top_bigrams(tokens,
-                       top_N = 10):
+def return_top_bigrams(tokens, top_N = 10):
     
     # collect bigrams
     bcf = BigramCollocationFinder.from_words(tokens)
@@ -171,8 +95,6 @@ def return_top_bigrams(tokens,
     
     # return the bigram dataframe
     return bigram_df
-
-from nltk.sentiment import SentimentIntensityAnalyzer
 
 def return_sentiment_df(tokens):
 
@@ -202,9 +124,7 @@ def return_sentiment_df(tokens):
 			
 			neutral_tokens += 1
 			compound_scores.append(sia.polarity_scores(token)["compound"])
-      
-	
-			
+		
 	# put sentiment results into a dataframe
 	compound_score_numbers = [num for num in compound_scores if num != 0]
 	csc = 0
@@ -217,9 +137,7 @@ def return_sentiment_df(tokens):
 										"compound_sentiment_score" : csc},
 								index = [0])
 
-	# return sentiment_df
 	return sentiment_df
-
 
 def process_exam_text(file_path):
     """
@@ -256,14 +174,13 @@ def process_exam_text(file_path):
     except Exception as e:
         print(f"Error processing file {file_path}: {e}")
         return None
-
-
-    
+ 
 def Analyse_and_save_questions(metadata, output_file):
     """
     Analyse questions and save results to a CSV file.
     """
-    question_pattern = r'\([a-z]\.?'  # Matches subquestion patterns like (a)
+    # matches subquestion patterns like (a)
+    question_pattern = r'\([a-z]\.?'
 
     textstat.set_lang("en_GB")
     rows = []
@@ -272,14 +189,13 @@ def Analyse_and_save_questions(metadata, output_file):
         """
         Cleans up the question identifier, removing errant parentheses or formatting issues.
         """
-        #return re.sub(r'(\d+)\s*\(\w\)', r'\1', number)  # Matches cases like "1 (b)" and cleans to "1"
         return re.sub(r'\(\w\)', '', number)
 
     for q in metadata["questions"]:
         main_question_number = clean_question_number(q[0])  # Clean main question number
         main_question_text = re.split(question_pattern, q[1], maxsplit=1)[0].strip(')')
         
-        # Analyse main question
+        # analyse main question
         main_score = textstat.dale_chall_readability_score(main_question_text)
         flesch_kincaid_grade = textstat.flesch_kincaid_grade(main_question_text)
         gunning_fog = textstat.gunning_fog(main_question_text)
@@ -287,10 +203,8 @@ def Analyse_and_save_questions(metadata, output_file):
         tokens = tokenize_text(main_question_text)
         lemmatized_tokens = lemmatize_tokens(tokens)
         sentiment_df = return_sentiment_df(lemmatized_tokens)
-        
-        #topics = get_themes(main_question_text)
-        #get_intent(main_question_text)
-        
+        intent_ = get_intent(main_question_text)
+
         rows.append({
             "year": metadata["year"],
             "level": metadata["level"],
@@ -304,13 +218,14 @@ def Analyse_and_save_questions(metadata, output_file):
             "positive_tokens": int(sentiment_df["positive_tokens"].iloc[0]),
             "negative_tokens": int(sentiment_df["negative_tokens"].iloc[0]),
             "neutral_tokens": int(sentiment_df["neutral_tokens"].iloc[0]),
-            "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0])#,  
-            #"intent": topics["intent"],
+            "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0]),  
+            "intent": intent_["label"],
+            "intent_certainty": intent_["score"]      
             #"named_entities": topics["named_entities"], 
             #"thematic_keywords": topics["thematic_keywords"]
         })
 
-        # Analyse subquestions
+        # analyse subquestions
         subquestions = re.split(question_pattern, q[1])
         subquestion_markers = re.findall(question_pattern, q[1])
 
@@ -325,9 +240,7 @@ def Analyse_and_save_questions(metadata, output_file):
             lemmatized_tokens = lemmatize_tokens(tokens)
             sentiment_df = return_sentiment_df(lemmatized_tokens)
             questionText = subtext.strip()
-            #topics = get_themes(questionText)
-            
-            #get_intent(questionText)
+            intent_ = get_intent(subtext)
 
             rows.append({
                 "year": metadata["year"],
@@ -342,8 +255,9 @@ def Analyse_and_save_questions(metadata, output_file):
                 "positive_tokens": int(sentiment_df["positive_tokens"].iloc[0]),
                 "negative_tokens": int(sentiment_df["negative_tokens"].iloc[0]),
                 "neutral_tokens": int(sentiment_df["neutral_tokens"].iloc[0]),
-                "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0])#, 
-                #"intent": topics["intent"],
+                "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0]), 
+                "intent": intent_["label"],
+                "intent_certainty": intent_["score"]
                 #"named_entities": topics["named_entities"], 
                 #"thematic_keywords": topics["thematic_keywords"]
             })
@@ -351,43 +265,16 @@ def Analyse_and_save_questions(metadata, output_file):
     # Write to CSV
     with open(f"{output_file}_results.csv", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=[
-            "year", "level", "subject", "question", "text", 
+            "year", "level", "subject", 
+            "question", "text", 
             "coleman_liau", "flesch_kincaid", "gunning_fog",
-            "total_tokens", "positive_tokens", "negative_tokens", 
-            "neutral_tokens", "compound_sentiment_score", "intent", "named_entities", "thematic_keywords"
+            "total_tokens", "positive_tokens", "negative_tokens", "neutral_tokens", 
+            "compound_sentiment_score", 
+            "intent", "intent_certainty",
+            "named_entities", "thematic_keywords"
         ])
         writer.writeheader()
         writer.writerows(rows)
-        
-    
-        
-    score_value = np.array([row['gunning_fog'] for row in rows])
-    question_id = np.arange(0,len(score_value))
-    question_labels = [row['question'] for row in rows]
-
-    plt.plot(question_id, score_value, 'o-')
-    plt.xticks(question_id, question_labels)
-    plt.xlabel('Question')
-    plt.ylabel('Gunning Fog score')
-    plt.title(f"{metadata["year"]} - {metadata["level"]} - {metadata["subject"]} - Gunning Fog score")
-    plt.savefig(f"{output_file}_fog.png")
-    plt.clf()
-
-    print(f"Saved results to {output_file}")
-    
-    compound_sentiment_value = np.array([row['compound_sentiment_score'] for row in rows])
-    plt.plot(question_id, compound_sentiment_value, 'o-')
-    plt.xticks(question_id, question_labels)
-    plt.xlabel('Question')
-    plt.ylabel('Compound Sentiment score')
-    plt.title(f"{metadata["year"]} - {metadata["level"]} - {metadata["subject"]} - Compound Sentiment score")
-    plt.savefig(f"{output_file}_css.png")
-    plt.clf()
-
-    print(f"Saved results to {output_file}")
-    
-    
-    
 
 def process_all_files(folder_path, output_dir):
     """
@@ -396,25 +283,20 @@ def process_all_files(folder_path, output_dir):
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
         if not file_name.endswith('.txt'):
-            continue  # Skip non-text files
+            # skip non-text files
+            continue  
         
         metadata = process_exam_text(file_path)
-        #test(file_path)
         if not metadata:
             continue
 
         output_file = os.path.join(output_dir, f"{os.path.splitext(file_name)[0]}")
         Analyse_and_save_questions(metadata, output_file)
 
-# Example usage
-
-#nltk.download()
-
-# Summarizer pipeline
-
-
-folder_path = './data/text/test/'  # Directory containing exam text files
-output_dir = './output/'     # Directory to save CSV files
+# directory containing exam text files
+folder_path = './data/text/test/'  
+# directory to save CSV files
+output_dir = './output/'     
 os.makedirs(output_dir, exist_ok=True)
         
 process_all_files(folder_path, output_dir)

@@ -1,9 +1,9 @@
-year,level,subject,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,named_entities,thematic_keywords
-2024,Higher,ENGLISH.,1,Identify two feelings the writer had as she watched the tree in her garden being cut back. Use your own words in your answer.,7.52,3.3,4.8,12,1,1,10,-0.0726,,,
-2024,Higher,ENGLISH.,2,"By referring to at least two examples, analyse how the writer uses language to convey the importance of trees.",11.23,8.3,11.81,11,1,0,10,0.3612,,,
-2024,Higher,ENGLISH.,3,Explain fully in what way the protestors are different from how we might expect them to be. Use your own words in your answer.,5.55,4.4,4.8,10,0,0,10,0.0,,,
-2024,Higher,ENGLISH.,4,"By referring to at least two examples, analyse how the writer uses language to create a tone of despair about the Hastings development.",10.96,11.1,12.68,13,1,1,11,-0.022499999999999992,,,
-2024,Higher,ENGLISH.,5,Explain fully the government’s claims about the people who oppose their plans. Use your own words in your answer.,8.26,3.5,5.91,10,0,0,10,0.0,,,
-2024,Higher,ENGLISH.,6,"By referring to at least two examples, analyse how the writer uses both imagery and sentence structure to convey her opposition to the destruction of trees.",11.61,12.3,15.02,14,1,1,12,-0.24735,,,
-2024,Higher,ENGLISH.,7,Explain any three reasons why organisations and/or people choose to cut down trees. Use your own words in your answer.,7.29,3.7,6.0,12,0,1,11,-0.2732,,,
-2024,Higher,ENGLISH.,8,"By referring to at least two examples, analyse how the writer uses language to convey differing attitudes towards trees.",12.06,10.7,13.92,13,0,0,13,0.0,,,
+year,level,subject,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities,thematic_keywords
+2024,Higher,ENGLISH.,1,Identify two feelings the writer had as she watched the tree in her garden being cut back. Use your own words in your answer.,7.52,3.3,4.8,12,1,1,10,-0.0726,compare,0.6907073855400085,,
+2024,Higher,ENGLISH.,2,"By referring to at least two examples, analyse how the writer uses language to convey the importance of trees.",11.23,8.3,11.81,11,1,0,10,0.3612,reason,0.9248188138008118,,
+2024,Higher,ENGLISH.,3,Explain fully in what way the protestors are different from how we might expect them to be. Use your own words in your answer.,5.55,4.4,4.8,10,0,0,10,0.0,reason,0.663581907749176,,
+2024,Higher,ENGLISH.,4,"By referring to at least two examples, analyse how the writer uses language to create a tone of despair about the Hastings development.",10.96,11.1,12.68,13,1,1,11,-0.022499999999999992,reason,0.8541073203086853,,
+2024,Higher,ENGLISH.,5,Explain fully the government’s claims about the people who oppose their plans. Use your own words in your answer.,8.26,3.5,5.91,10,0,0,10,0.0,reason,0.7333020567893982,,
+2024,Higher,ENGLISH.,6,"By referring to at least two examples, analyse how the writer uses both imagery and sentence structure to convey her opposition to the destruction of trees.",11.61,12.3,15.02,14,1,1,12,-0.24735,reason,0.6539310812950134,,
+2024,Higher,ENGLISH.,7,Explain any three reasons why organisations and/or people choose to cut down trees. Use your own words in your answer.,7.29,3.7,6.0,12,0,1,11,-0.2732,reason,0.36190661787986755,,
+2024,Higher,ENGLISH.,8,"By referring to at least two examples, analyse how the writer uses language to convey differing attitudes towards trees.",12.06,10.7,13.92,13,0,0,13,0.0,reason,0.9190529584884644,,
