@@ -23,10 +23,23 @@ The first test uses English papers from 1901, 1961, and 2024 and calculates thei
 The text files for the exam papers don't need a particular name, however their structure must be specific.
 
 The folder structure of the outputted CSV files are as follows:
-* Output
- * Year
-  * Level
-   * SUBJECT_NAME.csv
+├── 1945
+│   ├── National 5
+│       ├── ENGLISH.csv
+│   └── Higher
+│       ├── HISTORY.csv
+│       ├── MODERN_STUDIES.csv
+├── 1985
+│   ├── National 4
+│       ├── HISTORY.csv
+│   ├── National 5
+│       ├── HISTORY.csv
+│   └── Higher
+│       ├── ENGLISH.csv
+├── 2024
+│   └── Higher
+│       ├── HISTORY.csv
+│       ├── ENGLISH.csv
 
 * process.py - reads the text files, splits into questions, calculates the aforementioned data, and saves as a CSV per exam paper.
 * train.py - trains our model for intent calculation.
@@ -34,3 +47,82 @@ The folder structure of the outputted CSV files are as follows:
 * analyse.py - presents the data in various forms, compares trends over time, etc. (makes pretty plots)
 
 The trained model is too big to upload here :(
+
+## Qualification History ##
+
+I've attempted to map any of the old-style grade names to their modern equivalent under the Curriculum for Excellence.
+
+Scottish secondary education has evolved significantly since 1900, with changes reflecting broader educational reforms, societal shifts, and the establishment of a standardized curriculum. Here's a summary of the key levels and stages over time:
+
+---
+
+### **1900-1947: Pre-WWII to Post-War Period**
+1. **Primary Education** (Ages 5-12):  
+   Primary school was the main form of education until the introduction of secondary stages.
+
+2. **Secondary Education** (Ages 12-14/15):  
+   - Junior Secondary: For students not pursuing academic qualifications.
+   - Senior Secondary: For students aiming for formal qualifications like the **Scottish Leaving Certificate** (introduced in 1888, expanded over time).
+
+---
+
+### **1947-1960: Post-War Reforms**
+1. **Primary Education**: Extended until age 12.  
+2. **Secondary Education**: Divided based on academic or vocational paths:
+   - **Junior Secondary Schools**: Focused on vocational training.
+   - **Senior Secondary Schools**: Prepared students for higher education or professional careers.  
+
+   Key qualification: **Scottish Leaving Certificate** (updated with new subjects and grades).
+
+---
+
+### **1960s-1970s: Comprehensive Education System**
+1. **Introduction of Comprehensive Schools**:  
+   The move towards a non-selective, comprehensive system reduced the division between junior and senior secondary schools.
+
+2. **Scottish Certificate of Education (SCE)**:  
+   Replaced the Leaving Certificate in 1962.  
+   Levels:
+   - **O-Grades** (Ordinary): General qualifications taken at age 16.  
+   - **H-Grades** (Higher): Advanced qualifications for students aged 17-18.
+
+---
+
+### **1980s-1990s: Standard Grades Era**
+1. **Primary Education**: Ages 5-12.  
+2. **Secondary Education** (Ages 12-18):  
+   Levels introduced with the **Standard Grades** (1986):  
+   - Foundation Level.  
+   - General Level.  
+   - Credit Level.  
+   
+   Higher qualifications included:  
+   - **Highers**: Advanced qualifications (post-16).  
+   - **Certificate of Sixth Year Studies (CSYS)**: Optional advanced level post-Highers.
+
+---
+
+### **2000s: Curriculum for Excellence (CfE)**
+1. **Broad General Education (BGE)** (Ages 3-15):  
+   - Covers early years, primary, and the first three years of secondary education (S1-S3).  
+   
+2. **Senior Phase (S4-S6)** (Ages 15-18):  
+   Replaces Standard Grades with:
+   - **National 1-5**: Basic to more advanced qualifications.  
+   - **Highers**: Intermediate advanced level.  
+   - **Advanced Highers**: Pre-university qualifications.
+
+---
+
+### **Current Levels (2025)**  
+**Primary School**: P1-P7 (Ages 5-12).  
+**Secondary School**: S1-S6 (Ages 12-18).  
+- **Broad General Education (BGE)**: S1-S3.  
+- **Senior Phase**: S4-S6.  
+   Key qualifications:
+   - **National 1-5**.  
+   - **Highers**.  
+   - **Advanced Highers**.
+
+---
+
