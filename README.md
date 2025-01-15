@@ -20,9 +20,17 @@ Another dimension of the analysis focuses on inclusivity in language. Historical
 ## Testing and development ##
 The first test uses English papers from 1901, 1961, and 2024 and calculates their per-question Gunning Fog Index, Coleman Liau score, and their Flesch Kincaid score. It also calculates the total tokens per question, positive tokens, negative tokens , and neutral_tokens. It then calculates the Compound Sentiment Score. Finally it uses a custom trained BART model to determine the "intent" of each question, this represents what the question is asking the reader to do. Labels for this are "discuss", "describe", "compare", "explain", "argue",  "reason",  or "other". 
 
+The text files for the exam papers don't need a particular name, however their structure must be specific.
+
+The folder structure of the outputted CSV files are as follows:
+* Output
+ * Year
+  * Level
+   * SUBJECT_NAME.csv
+
 * process.py - reads the text files, splits into questions, calculates the aforementioned data, and saves as a CSV per exam paper.
 * train.py - trains our model for intent calculation.
 * eval.py - test the model on a single sentence.
 * analyse.py - presents the data in various forms, compares trends over time, etc. (makes pretty plots)
 
-The traine dmodel is too big to upload here :(
+The trained model is too big to upload here :(
