@@ -18,11 +18,11 @@ Another dimension of the analysis focuses on inclusivity in language. Historical
   * Create and save labelled plots of "gunning fog" score per paper
 
 ## Testing and development ##
-The first test uses English papers from 1901, 1961, and 2024 and calculates their per-question Gunning Fog Index, Coleman Liau score, and their Flesch Kincaid score. It also calculates the total tokens per question, positive tokens, negative tokens , and neutral_tokens. It then calculates the Compound Sentiment Score. Finally it uses a custom trained BART model to determine the "intent" of each question, this represents what the questio is asking the reader to do. Labels for this are "discuss", "describe", "compare", "explain", "argue",  "reason",  or "other". 
+The first test uses English papers from 1901, 1961, and 2024 and calculates their per-question Gunning Fog Index, Coleman Liau score, and their Flesch Kincaid score. It also calculates the total tokens per question, positive tokens, negative tokens , and neutral_tokens. It then calculates the Compound Sentiment Score. Finally it uses a custom trained BART model to determine the "intent" of each question, this represents what the question is asking the reader to do. Labels for this are "discuss", "describe", "compare", "explain", "argue",  "reason",  or "other". 
 
-process.py - reads the text files, splits into questions, calculates the aforementioned data, and saves as a CSV per exam paper.
-train.py - trains our model for intent calculation.
-eval.py - test the model on a single sentence.
-analyse.py - presents the data in various forms, compares trends over time, etc. (makes pretty plots)
+* process.py - reads the text files, splits into questions, calculates the aforementioned data, and saves as a CSV per exam paper.
+* train.py - trains our model for intent calculation.
+* eval.py - test the model on a single sentence.
+* analyse.py - presents the data in various forms, compares trends over time, etc. (makes pretty plots)
 
 The traine dmodel is too big to upload here :(
