@@ -1,174 +1,237 @@
-import io
-import base64
-import dash
-from dash import dcc, html, Input, Output, State, dash_table
+import os
 import pandas as pd
+import dash
+from dash import dcc, html, Input, Output, dash_table
+import plotly.express as px
+import dash_bootstrap_components as dbc
+import numpy as np
+import os
+import pandas as pd
+from dash import dcc, html, Input, Output, State, dash_table
+import dash
+import plotly.express as px
 
 # Initialize Dash app
-app = dash.Dash(__name__, suppress_callback_exceptions=True)
-app.title = "Scottish Exam Data Dashboard"
+app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.SOLAR])
+app.title = "Scottish Examination Analysis Dashboard"
 
-# Global variable to hold the uploaded data
-global_df = pd.DataFrame()
+# Directory containing CSV files
+DATA_DIR = "output"
 
-# App Layout with Tabs
+# Parse directory for available options
+def parse_directory(data_dir):
+    directory_info = {}
+    for year in os.listdir(data_dir):
+        year_path = os.path.join(data_dir, year)
+        if os.path.isdir(year_path):
+            directory_info[year] = {}
+            for level in os.listdir(year_path):
+                level_path = os.path.join(year_path, level)
+                if os.path.isdir(level_path):
+                    directory_info[year][level] = [
+                        os.path.splitext(file)[0] for file in os.listdir(level_path) if file.endswith(".csv")
+                    ]
+    return directory_info
+
+directory_info = parse_directory(DATA_DIR)
+
+# App layout
 app.layout = html.Div([
-    html.H1("Scottish Exam Data Dashboard", style={"textAlign": "center"}),
+    html.H1("Scottish Examination Analysis Dashboard", style={"textAlign": "center"}),
 
-    # Tabs for different sections
-    dcc.Tabs(id="tabs", value="data_exploration", children=[
-        dcc.Tab(label="Data Exploration", value="data_exploration"),
+    # Filters
+    html.Div([
+        html.Label("Select Year (Optional):"),
+        dcc.Dropdown(
+            id="year-dropdown",
+            options=[{"label": year, "value": year} for year in directory_info.keys()] + [{"label": "All Years", "value": "all"}],
+            placeholder="Select a Year",
+            style={"width": "90%"}
+        ),
+        html.Label("Select Level:"),
+        dcc.Dropdown(
+            id="level-dropdown",
+            options=[{"label": level, "value": level} for level in set(l for levels in directory_info.values() for l in levels)],
+            placeholder="Select a Level",
+            style={"width": "90%"}
+        ),
+        html.Label("Select Subject:"),
+        dcc.Dropdown(
+            id="subject-dropdown",
+            options=[{"label": subj, "value": subj} for subj in set(s for levels in directory_info.values() for subs in levels.values() for s in subs)],
+            placeholder="Select a Subject",
+            style={"width": "90%"}
+        ),
+    ], style={"marginBottom": "20px"}),
+
+    # Tabs for different views
+    dcc.Tabs(id="tabs", value="statistics", children=[
+        dcc.Tab(label="Statistics", value="statistics"),
+        dcc.Tab(label="Intent Trend", value="intent_trend"),
     ]),
 
-    # Content will be updated dynamically
+    # Content for tabs
     html.Div(id="tabs-content")
 ])
 
-# Callback for Tabs Content
 @app.callback(
     Output("tabs-content", "children"),
-    Input("tabs", "value")
+    [
+        Input("tabs", "value"),
+        Input("year-dropdown", "value"),
+        Input("level-dropdown", "value"),
+        Input("subject-dropdown", "value"),
+    ]
 )
-def render_tab_content(tab_name):
-    if tab_name == "data_exploration":
-        return html.Div([
-            html.H3("Data Exploration"),
-            html.P("Upload a CSV file to explore its content."),
-            dcc.Upload(
-                id="upload-data",
-                children=html.Div(["Drag and Drop or ", html.A("Select Files")]),
-                style={
-                    "width": "100%",
-                    "height": "60px",
-                    "lineHeight": "60px",
-                    "borderWidth": "1px",
-                    "borderStyle": "dashed",
-                    "borderRadius": "5px",
-                    "textAlign": "center",
-                    "margin": "10px",
-                },
-                multiple=False  # Single file upload
-            ),
-            html.Div(id="file-info"),
-            html.Div(id="filter-controls", style={"margin": "20px 0"}),
-            html.Div(id="table-container"),
-            html.Div(id="stats-container", style={"marginTop": "30px"}),
-        ])
-    return None
+def render_tab_content(tab_name, selected_year, selected_level, selected_subject):
+    if not (selected_level and selected_subject):
+        return html.Div(["Please select at least Level and Subject to continue."])
 
-# Callback to handle file upload
-@app.callback(
-    [Output("file-info", "children"), Output("filter-controls", "children"), Output("table-container", "children")],
-    Input("upload-data", "contents"),
-    State("upload-data", "filename"),
-    State("upload-data", "last_modified")
-)
-def update_table(contents, filename, last_modified):
-    global global_df
-    if contents is not None:
-        # Parse the contents of the uploaded file
-        content_type, content_string = contents.split(",")
-        decoded = base64.b64decode(content_string)
-        decoded_file = io.StringIO(decoded.decode("utf-8"))
+    # Load data
+    file_paths = []
+    if selected_year and selected_year != "all":
+        year_dir = directory_info.get(selected_year, {})
+        if selected_level in year_dir and selected_subject in year_dir[selected_level]:
+            file_paths.append(os.path.join(DATA_DIR, selected_year, selected_level, f"{selected_subject}.csv"))
+    else:
+        for year, levels in directory_info.items():
+            if selected_level in levels and selected_subject in levels[selected_level]:
+                file_paths.append(os.path.join(DATA_DIR, year, selected_level, f"{selected_subject}.csv"))
 
+    if not file_paths:
+        return html.Div(["No matching files found."])
+
+    # Combine data
+    dataframes = []
+    for path in file_paths:
         try:
-            global_df = pd.read_csv(decoded_file)
+            df = pd.read_csv(path)
+            year = os.path.basename(os.path.dirname(os.path.dirname(path)))  # Extract year
+            df["year"] = year
+            dataframes.append(df)
         except Exception as e:
-            return html.Div(["There was an error processing this file: ", str(e)]), None, None
+            return html.Div([f"Error loading file {path}: {str(e)}"])
 
-        # Display file info
-        file_info = html.Div([
-            html.H5(f"File: {filename}"),
-            html.P(f"Last Modified: {last_modified}")
+    combined_df = pd.concat(dataframes, ignore_index=True)
+    combined_df = combined_df.drop_duplicates()
+    combined_df["year"] = pd.to_numeric(combined_df["year"], errors="coerce")
+
+    if tab_name == "statistics":
+        stats = combined_df.describe(include="all").reset_index()
+        return html.Div([
+            html.H4("Statistics Summary"),
+            dash_table.DataTable(
+                data=stats.to_dict("records"),
+                columns=[{"name": col, "id": col} for col in stats.columns],
+                style_table={"overflowX": "auto"},
+                style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold"},
+                style_cell={"textAlign": "left"},
+            )
         ])
 
-        # Create filter controls
-        filter_controls = html.Div([
-            html.Div([
-                html.Label("Search:"),
-                dcc.Input(
-                    id="search-input",
-                    type="text",
-                    placeholder="Search for keywords...",
-                    debounce=True,
-                    style={"width": "100%"}
-                )
-            ], style={"marginBottom": "10px"}),
-            html.Div([
-                html.Label("Filter by Column:"),
-                dcc.Dropdown(
-                    id="column-filter",
-                    options=[{"label": col, "value": col} for col in global_df.columns],
-                    placeholder="Select a column to filter...",
-                    style={"width": "100%"}
-                )
-            ])
-        ])
-
-        # Display table
-        table = dash_table.DataTable(
-            id="data-table",
-            data=global_df.head(10).to_dict("records"),
-            columns=[{"name": col, "id": col} for col in global_df.columns],
-            page_size=10,
-            style_table={"overflowX": "auto"},
-            style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold"},
-            style_cell={"textAlign": "left"},
-        )
-        return file_info, filter_controls, table
-
-    return None, None, None
-
-# Callback for Filtering and Searching
-@app.callback(
-    Output("data-table", "data"),
-    [Input("search-input", "value"), Input("column-filter", "value")]
-)
-def update_filtered_table(search_value, column_filter):
-    if global_df.empty:
-        return []
-
-    filtered_df = global_df.copy()
-
-    # Apply search filter
-    if search_value:
-        filtered_df = filtered_df[
-            filtered_df.apply(lambda row: search_value.lower() in row.to_string().lower(), axis=1)
-        ]
-
-    # Apply column filter (optional: could add dropdown for specific values)
-    if column_filter:
-        filtered_df = filtered_df[[column_filter]]
-
-    return filtered_df.to_dict("records")
-
-# Callback for Descriptive Statistics
-@app.callback(
-    Output("stats-container", "children"),
-    Input("data-table", "data")
-)
-def update_stats_table(filtered_data):
-    if not filtered_data:
-        return html.Div(["No data to calculate statistics."])
+    elif tab_name == "intent_trend":
+        if "intent" not in combined_df.columns:
+            return html.Div(["The selected data does not contain an 'intent' column."])
     
-    filtered_df = pd.DataFrame(filtered_data)
+        # Determine number of files being read
+        num_files = len(file_paths)
+    
+        if num_files == 1:
+            # Single CSV: Show intent breakdown
+            intent_breakdown = combined_df["intent"].value_counts().reset_index()
+            intent_breakdown.columns = ["Intent", "Count"]
+    
+            fig = px.bar(
+                intent_breakdown,
+                x="Intent",
+                y="Count",
+                title="Intent Breakdown for Single Paper",
+                labels={"Intent": "Question Intent", "Count": "Number of Questions"},
+                text="Count",
+            )
+            fig.update_traces(textposition="outside")
+    
+            return html.Div([
+                html.H4("Intent Breakdown"),
+                dcc.Graph(figure=fig)
+            ])
+    
+        else:
+            # Multiple CSVs: Show intent trend
+            unique_years = sorted(combined_df["year"].dropna().unique())
+            unique_intents = sorted(combined_df["intent"].dropna().unique())
+            full_index = pd.MultiIndex.from_product([unique_years, unique_intents], names=["year", "intent"])
+    
+            grouped = combined_df.groupby(["year", "intent"]).size()
+            intent_trend = (
+                grouped.reindex(full_index, fill_value=0)
+                .reset_index(name="count")
+            )
+            intent_trend["proportion"] = intent_trend.groupby("year")["count"].transform(lambda x: x / x.sum() if x.sum() > 0 else 0)
+    
+            toggle = dcc.RadioItems(
+                id="yaxis-toggle-local",
+                options=[
+                    {"label": "Proportion", "value": "proportion"},
+                    {"label": "Count", "value": "count"}
+                ],
+                value="proportion",  # Default choice
+                inline=True
+            )
+    
+            yaxis_choice = "proportion"  # Default to proportion if toggle state isn't managed globally
+            fig = px.area(
+                intent_trend,
+                x="year",
+                y=yaxis_choice,
+                color="intent",
+                title=f"{yaxis_choice.capitalize()} of Intent Over Time",
+                labels={"year": "Year", yaxis_choice: f"{yaxis_choice.capitalize()} of Questions", "intent": "Intent"},
+                line_group="intent",
+                custom_data=["count"],
+            )
+            fig.update_traces(
+                hovertemplate=(
+                    "<b>Year:</b> %{x}<br>"
+                    "<b>Proportion:</b> %{y:.2%}<br>"
+                    "<b>Count:</b> %{customdata}<br>"
+                )
+            )
+    
+            return html.Div([
+                toggle,
+                html.H4("Intent Trend Analysis"),
+                dcc.Graph(figure=fig)
+            ])
 
-    # Compute statistics for numeric columns
-    numeric_stats = filtered_df.describe().reset_index()
 
-    # Display statistics
-    stats_table = dash_table.DataTable(
-        data=numeric_stats.to_dict("records"),
-        columns=[{"name": col, "id": col} for col in numeric_stats.columns],
-        page_size=10,
-        style_table={"overflowX": "auto"},
-        style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold"},
-        style_cell={"textAlign": "left"},
-    )
+
+def load_csv(selected_year, selected_level, selected_subject):
+    if not (selected_level and selected_subject):
+        return html.Div(["Please select at least Level and Subject to load file paths."])
+
+    # Find all matching files
+    file_paths = []
+    if selected_year and selected_year != "all":
+        # Specific year
+        year_dir = directory_info.get(selected_year, {})
+        if selected_level in year_dir and selected_subject in year_dir[selected_level]:
+            file_paths.append(os.path.join(DATA_DIR, selected_year, selected_level, f"{selected_subject}.csv"))
+    else:
+        # Search across all years
+        for year, levels in directory_info.items():
+            if selected_level in levels and selected_subject in levels[selected_level]:
+                file_paths.append(os.path.join(DATA_DIR, year, selected_level, f"{selected_subject}.csv"))
+
+    if not file_paths:
+        return html.Div(["No matching files found."])
+
+    # Display file paths as a list
     return html.Div([
-        html.H4("Descriptive Statistics:"),
-        stats_table
+        html.H4("Loaded File Paths:"),
+        html.Ul([html.Li(path) for path in file_paths])
     ])
+
 
 # Run the app
 if __name__ == "__main__":

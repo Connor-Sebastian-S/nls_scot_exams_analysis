@@ -263,10 +263,11 @@ def Analyse_and_save_questions(metadata, output_file):
                 #"named_entities": topics["named_entities"], 
                 #"thematic_keywords": topics["thematic_keywords"]
             })
-            
+                        
     # Write to CSV
-    with open(output_file + re.sub(r"[^\w\s]", "", metadata["subject"]) + 
-    ".csv", 'w', newline='', encoding='utf-8') as csvfile:
+    csv_name = os.path.join(output_file + re.sub(r"[^\w\s]", "", metadata["subject"]) + ".csv")
+    print (csv_name)
+    with open(csv_name, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=[
             "year", "level", "subject", 
             "question", "text", 
@@ -279,6 +280,43 @@ def Analyse_and_save_questions(metadata, output_file):
         writer.writeheader()
         writer.writerows(rows)
 
+def map_grade_to_modern_equivalent(level: str) -> str:
+    """
+    Maps a historical exam level to its modern equivalent under the Curriculum for Excellence (CfE),
+    with support for wildcard matches (e.g., "Higher II", "Higher III").
+
+    Parameters:
+        level (str): The level of the exam (e.g., "Higher", "Higher II", "O-Grade").
+
+    Returns:
+        str: The modern equivalent under CfE (e.g., "National 4", "Higher").
+    """
+    # Mapping of historical grades to modern equivalents
+    mapping = {
+        "Lower Grade": "National 4",
+        "Intermediate Grade": "National 5",
+        "Higher Grade": "Higher",
+        "Ordinary Grade": "National 5",
+        "Foundation Standard Grade": "National 3",
+        "General Standard Grade": "National 4",
+        "Credit Standard Grade": "National 5",
+        "CSYS": "Advanced Higher",
+        "National 1": "National 1",
+        "National 2": "National 2",
+        "National 3": "National 3",
+        "National 4": "National 4",
+        "National 5": "National 5",
+        "Higher": "Higher",
+        "Advanced Higher": "Advanced Higher",
+    }
+
+    # Handle wildcard matches for "Higher II", "Higher III", etc.
+    if re.match(r"^Higher\s+[IVXLCDM]+$", level):  # Matches "Higher II", "Higher 2", "Higher III", etc.
+        return "Higher"
+
+    # Return the modern equivalent or "Unknown Level" if not found
+    return mapping.get(level, "Unknown Level")
+    
 def process_all_files(folder_path, output_dir):
     """
     Process all files in the folder and save results to separate CSV files.
@@ -296,13 +334,11 @@ def process_all_files(folder_path, output_dir):
         csv_file_name = (
             metadata["year"] + 
             "/" + 
-            re.sub(r"[^\w\s]", "", metadata["level"]) + 
+            re.sub(r"[^\w\s]", "", map_grade_to_modern_equivalent(metadata["level"])) + 
             "/")
-        print (csv_file_name)
         
         output_file = os.path.join(output_dir, csv_file_name)
-        print (output_file)
-        os.makedirs(output_file)
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
         Analyse_and_save_questions(metadata, output_file)
 
 # directory containing exam text files

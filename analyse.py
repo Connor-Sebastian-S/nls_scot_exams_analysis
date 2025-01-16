@@ -2,11 +2,31 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
+import os
 
-# load all CSV files in a directory
-def load_csv_files(directory):
-    csv_files = list(Path(directory).glob("*.csv"))
-    dataframes = {file.stem: pd.read_csv(file) for file in csv_files}
+def load_files_to_dataframes(filepaths):
+    """
+    Loads each file in the filepaths list into a pandas DataFrame.
+
+    Parameters:
+    filepaths (list): List of file paths to load.
+
+    Returns:
+    dict: A dictionary where keys are file paths and values are DataFrames.
+    """
+    dataframes = {}
+    for filepath in filepaths:
+        try:
+            # Load CSV or Excel based on file extension
+            if filepath.endswith('.csv'):
+                dataframes[filepath] = pd.read_csv(filepath)
+            elif filepath.endswith('.xlsx'):
+                dataframes[filepath] = pd.read_excel(filepath)
+            else:
+                print(f"Unsupported file format: {filepath}")
+        except Exception as e:
+            print(f"Error loading file {filepath}: {e}")
+
     return dataframes
 
 # analyse individual files
@@ -147,23 +167,61 @@ def analyse_intent_trend(combined_df):
     # display the pivoted data for review
     print("--- Proportional Data for Intent Trend ---")
     print(pivot_data)
-    
+
+def get_matching_filepaths(root_folder, target_level, target_subject):
+    """
+    Traverses the directory structure starting at root_folder and collects
+    file paths of files matching the given level and subject.
+
+    Parameters:
+    root_folder (str): The root folder (e.g., "output").
+    target_level (str): The level to match (e.g., "level1").
+    target_subject (str): The subject file to match (e.g., "english.txt").
+
+    Returns:
+    list: A list of matching file paths.
+    """
+    matching_filepaths = []
+
+    # Traverse the directory structure
+    for year_folder in os.listdir(root_folder):
+        year_path = os.path.join(root_folder, year_folder)
+        if os.path.isdir(year_path):  # Ensure it is a directory
+            level_path = os.path.join(year_path, target_level)
+            if os.path.isdir(level_path):  # Ensure the level directory exists
+                for item in os.listdir(level_path):
+                    item_path = os.path.join(level_path, item)
+                    if os.path.isfile(item_path) and item.lower() == target_subject.lower():  # Case-insensitive match
+                        matching_filepaths.append(item_path)
+
+    return matching_filepaths
+
+
+
 # Main Execution Update
 if __name__ == "__main__":
-    directory = "./output"  # Replace with your directory path
-    dataframes = load_csv_files(directory)
+    root = "output"  # Root folder
+    level = "higher"  # Level folder to search
+    subject = "english.csv"  # Subject folder to match
+    
+    matching_paths = get_matching_filepaths(root, level, subject)
+    dataframes = load_files_to_dataframes(matching_paths)
+
+
+    
+    #dataframes = load_csv_files(directory)
 
     # analyse each file
     stats = analyse_individual_files(dataframes)
 
     # Compare files
-    combined_df, readability_means, token_means = compare_files(dataframes)
+    #combined_df, readability_means, token_means = compare_files(dataframes)
 
     # visualise the results
-    visualise_comparisons(readability_means, token_means)
+    #visualise_comparisons(readability_means, token_means)
 
     # Perform trend analysis for multiple metrics
-    metrics_to_analyse = ["gunning_fog", "coleman_liau", "flesch_kincaid"]
-    analyse_readability_trends_with_error_bars(combined_df, metrics_to_analyse)
+    #metrics_to_analyse = ["gunning_fog", "coleman_liau", "flesch_kincaid"]
+    #analyse_readability_trends_with_error_bars(combined_df, metrics_to_analyse)
 
-    analyse_intent_trend(combined_df)
+    #analyse_intent_trend(combined_df)
