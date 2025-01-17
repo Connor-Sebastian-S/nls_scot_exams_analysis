@@ -68,6 +68,7 @@ app.layout = html.Div([
     dcc.Tabs(id="tabs", value="statistics", children=[
         dcc.Tab(label="Statistics", value="statistics"),
         dcc.Tab(label="Intent Trend", value="intent_trend"),
+        dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend"),
     ]),
 
     # Content for tabs
@@ -116,31 +117,98 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     combined_df = combined_df.drop_duplicates()
     combined_df["year"] = pd.to_numeric(combined_df["year"], errors="coerce")
 
+    # Handle "Statistics" tab
     if tab_name == "statistics":
-        stats = combined_df.describe(include="all").reset_index()
-        return html.Div([
-            html.H4("Statistics Summary"),
-            dash_table.DataTable(
-                data=stats.to_dict("records"),
-                columns=[{"name": col, "id": col} for col in stats.columns],
-                style_table={"overflowX": "auto"},
-                style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold"},
-                style_cell={"textAlign": "left"},
-            )
-        ])
+        num_files = len(file_paths)
+        metrics = []
+    
+        if num_files == 1:
+            # Single paper: Calculate metrics
+            avg_word_count = combined_df["total_tokens"].mean()
+            num_questions = len(combined_df)
+            
+            # Summary statistics for readability and sentiment
+            stats = {}
+            cols_to_describe = [
+                "coleman_liau", "flesch_kincaid", "gunning_fog",
+                "compound_sentiment_score", "total_tokens"
+            ]
+            stats = df[cols_to_describe].describe()
+            
+            metrics.append(f"Average Word Count per Question: {avg_word_count:.2f}")
+            metrics.append(f"Total Number of Questions: {num_questions}")    
+            #count mean std min 25% 50% 75% max
+            metrics.append(f"Average (mean) Coleman-Liau score: {stats["coleman_liau"]["mean"]:.2f}")
+            metrics.append(f"Minimum Coleman-Liau score: {stats["coleman_liau"]["min"]:.2f}")
+            metrics.append(f"Maximum Coleman-Liau score: {stats["coleman_liau"]["max"]:.2f}")
+            metrics.append(f"Standard deviation (std) Coleman-Liau score: {stats["coleman_liau"]["std"]:.2f}")
+            metrics.append(f"Average (mean) Flesch-Kincaid score: {stats["flesch_kincaid"]["mean"]:.2f}")
+            metrics.append(f"Minimum Flesch-Kincaid score: {stats["flesch_kincaid"]["min"]:.2f}")
+            metrics.append(f"Maximum Flesch-Kincaid score: {stats["flesch_kincaid"]["max"]:.2f}")
+            metrics.append(f"Standard deviation (std) Flesch-Kincaid score: {stats["flesch_kincaid"]["std"]:.2f}")
+            metrics.append(f"Average (mean) Gunning Fog score: {stats["gunning_fog"]["mean"]:.2f}")
+            metrics.append(f"Minimum Gunning Fog score: {stats["gunning_fog"]["min"]:.2f}")
+            metrics.append(f"Maximum Gunning Fog score: {stats["gunning_fog"]["max"]:.2f}")
+            metrics.append(f"Standard deviation (std) Gunning Fog score: {stats["gunning_fog"]["std"]:.2f}")
+            metrics.append(f"Average (mean) Compound Sentiment score: {stats["compound_sentiment_score"]["mean"]:.2f}")
+            metrics.append(f"Minimum Compound Sentiment score: {stats["compound_sentiment_score"]["min"]:.2f}")
+            metrics.append(f"Maximum Compound Sentiment score: {stats["compound_sentiment_score"]["max"]:.2f}")
+            metrics.append(f"Standard deviation (std) Compound Sentiment score: {stats["compound_sentiment_score"]["std"]:.2f}")
+            metrics.append(f"Average (mean) token count: {stats["total_tokens"]["mean"]:.2f}")
+            metrics.append(f"Minimum token count: {stats["total_tokens"]["min"]:.2f}")
+            metrics.append(f"Maximum token count: {stats["total_tokens"]["max"]:.2f}")
+            metrics.append(f"Standard deviation (std) token count: {stats["total_tokens"]["std"]:.2f}")
+    
+            return html.Div([
+                html.H4("Statistics for the Selected Paper"),
+                html.Ul([html.Li(metric) for metric in metrics])
+            ])
+        else:
+            # Multiple papers: Aggregate metrics
+            avg_word_count = combined_df.groupby("year")["total_tokens"].mean().to_dict()
+            total_questions = combined_df.groupby("year").size().to_dict()
+            avg_coleman_liau = combined_df.groupby("year")["coleman_liau"].mean().to_dict()
+            avg_flesch_kincaid = combined_df.groupby("year")["flesch_kincaid"].mean().to_dict()
+            avg_gunning_fog = combined_df.groupby("year")["gunning_fog"].mean().to_dict()
+            
+            metrics.append("Average Coleman-Liau score by Year:")
+            for year, count in avg_coleman_liau.items():
+                metrics.append(f"  {year}: {count:.2f}")
+                
+            metrics.append("Average Flesch-Kincaid score by Year:")
+            for year, count in avg_flesch_kincaid.items():
+                metrics.append(f"  {year}: {count:.2f}")
+    
+            metrics.append("Average Gunning Fog score by Year:")
+            for year, count in avg_gunning_fog.items():
+                metrics.append(f"  {year}: {count:.2f}")
 
+            metrics.append("Average Word Count per Question by Year:")
+            for year, count in avg_word_count.items():
+                metrics.append(f"  {year}: {count:.2f}")
+            
+            metrics.append("Total Number of Questions by Year:")
+            for year, total in total_questions.items():
+                metrics.append(f"  {year}: {total}")
+    
+            return html.Div([
+                html.H4("Summary Statistics for Selected Papers"),
+                html.Ul([html.Li(metric) for metric in metrics])
+            ])
+
+
+    # Handle "Intent Trend" tab
     elif tab_name == "intent_trend":
         if "intent" not in combined_df.columns:
             return html.Div(["The selected data does not contain an 'intent' column."])
-    
-        # Determine number of files being read
+
         num_files = len(file_paths)
-    
+
         if num_files == 1:
             # Single CSV: Show intent breakdown
             intent_breakdown = combined_df["intent"].value_counts().reset_index()
             intent_breakdown.columns = ["Intent", "Count"]
-    
+
             fig = px.bar(
                 intent_breakdown,
                 x="Intent",
@@ -150,60 +218,126 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 text="Count",
             )
             fig.update_traces(textposition="outside")
-    
+
             return html.Div([
                 html.H4("Intent Breakdown"),
                 dcc.Graph(figure=fig)
             ])
-    
+
         else:
             # Multiple CSVs: Show intent trend
             unique_years = sorted(combined_df["year"].dropna().unique())
             unique_intents = sorted(combined_df["intent"].dropna().unique())
             full_index = pd.MultiIndex.from_product([unique_years, unique_intents], names=["year", "intent"])
-    
+
             grouped = combined_df.groupby(["year", "intent"]).size()
             intent_trend = (
                 grouped.reindex(full_index, fill_value=0)
                 .reset_index(name="count")
             )
             intent_trend["proportion"] = intent_trend.groupby("year")["count"].transform(lambda x: x / x.sum() if x.sum() > 0 else 0)
-    
+
             toggle = dcc.RadioItems(
                 id="yaxis-toggle-local",
                 options=[
                     {"label": "Proportion", "value": "proportion"},
                     {"label": "Count", "value": "count"}
                 ],
-                value="proportion",  # Default choice
+                value="proportion",
                 inline=True
             )
-    
-            yaxis_choice = "proportion"  # Default to proportion if toggle state isn't managed globally
-            fig = px.area(
-                intent_trend,
-                x="year",
-                y=yaxis_choice,
-                color="intent",
-                title=f"{yaxis_choice.capitalize()} of Intent Over Time",
-                labels={"year": "Year", yaxis_choice: f"{yaxis_choice.capitalize()} of Questions", "intent": "Intent"},
-                line_group="intent",
-                custom_data=["count"],
-            )
-            fig.update_traces(
-                hovertemplate=(
-                    "<b>Year:</b> %{x}<br>"
-                    "<b>Proportion:</b> %{y:.2%}<br>"
-                    "<b>Count:</b> %{customdata}<br>"
-                )
-            )
-    
+
             return html.Div([
                 toggle,
                 html.H4("Intent Trend Analysis"),
-                dcc.Graph(figure=fig)
+                dcc.Graph(id="intent-trend-graph"),
+                dcc.Store(id="intent-trend-data", data=intent_trend.to_dict("records"))
             ])
+        
+    elif tab_name == "sentiment_trend":
+       if "compound_sentiment_score" not in combined_df.columns:
+           return html.Div(["The selected data does not contain a 'compound_sentiment_score' column."])
+   
+       num_files = len(file_paths)
+   
+       if num_files == 1:
+           # Single CSV: Show trend over the course of questions
+           combined_df = combined_df.sort_index()  # Ensure questions are in order
+           avg_sentiment = combined_df["compound_sentiment_score"].mean()
+   
+           fig = px.line(
+               combined_df,
+               x=combined_df.index,
+               y="compound_sentiment_score",
+               title="Compound Sentiment Score Trend for Single Paper",
+               labels={"index": "Question Index", "compound_sentiment_score": "Compound Sentiment Score"},
+           )
+           fig.update_traces(mode="lines+markers")
+   
+           # Add horizontal average line
+           fig.add_hline(
+               y=avg_sentiment,
+               line_dash="dash",
+               line_color="red",
+               annotation_text=f"Average: {avg_sentiment:.2f}",
+               annotation_position="top left",
+           )
+   
+           return html.Div([
+               html.H4("Sentiment Trend for Single Paper"),
+               dcc.Graph(figure=fig)
+           ])
+   
+       else:
+           # Multiple CSVs: Show trend over time by averaging scores
+           sentiment_trend = combined_df.groupby("year")["compound_sentiment_score"].mean().reset_index()
+   
+           fig = px.line(
+               sentiment_trend,
+               x="year",
+               y="compound_sentiment_score",
+               title="Average Compound Sentiment Score Trend Over Time",
+               labels={"year": "Year", "compound_sentiment_score": "Average Compound Sentiment Score"},
+           )
+           fig.update_traces(mode="lines+markers")
+   
+           return html.Div([
+               html.H4("Sentiment Trend Over Time"),
+               dcc.Graph(figure=fig)
+           ])
 
+
+
+
+# Callback for dynamic toggle
+@app.callback(
+    Output("intent-trend-graph", "figure"),
+    [
+        Input("yaxis-toggle-local", "value"),
+        Input("intent-trend-data", "data"),
+    ]
+)
+def update_intent_trend_chart(yaxis_choice, intent_trend_data):
+    intent_trend = pd.DataFrame(intent_trend_data)
+
+    fig = px.area(
+        intent_trend,
+        x="year",
+        y=yaxis_choice,
+        color="intent",
+        title=f"{yaxis_choice.capitalize()} of Intent Over Time",
+        labels={"year": "Year", yaxis_choice: f"{yaxis_choice.capitalize()} of Questions", "intent": "Intent"},
+        line_group="intent",
+        custom_data=["count"],
+    )
+    fig.update_traces(
+        hovertemplate=(
+            "<b>Year:</b> %{x}<br>"
+            "<b>Proportion:</b> %{y:.2%}<br>"
+            "<b>Count:</b> %{customdata}<br>"
+        )
+    )
+    return fig
 
 
 def load_csv(selected_year, selected_level, selected_subject):
