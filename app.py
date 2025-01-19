@@ -38,9 +38,9 @@ directory_info = parse_directory(DATA_DIR)
 
 # App layout
 app.layout = html.Div([
-    html.H1("Scottish Examination Analysis Dashboard", style={"textAlign": "center"}),
+    html.H1("Scottish Exams - Linguistical Analysis Dashboard", style={"textAlign": "center"}),
     
-    html.P("""Please first read the "Introduction below so as to understand how to use the dashboard - thanks :)
+    html.P("""Please first read the Introduction tab below so as to understand how to use the dashboard - thanks :)
            """, style={"textAlign": "center"}),
 
     # Filters
