@@ -1,0 +1,13 @@
+/analyse.py
+/eval.py
+/process.py
+/test.py
+/train.py
+/Procfile
+/sentences.csv
+/sentences_lower.csv
+.spyproject/
+__pycache__/
+data/
+logs/
+results/
