@@ -1,3 +1,2 @@
-web: gunicorn app:server
-
-
+web: gunicorn nls_scot_exams_analysis
+:server
