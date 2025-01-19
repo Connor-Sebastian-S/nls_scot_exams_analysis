@@ -10,8 +10,8 @@ from nltk.collocations import BigramCollocationFinder
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, pipeline
 
 # load tokeniser and model
-tokeniser = DistilBertTokenizer.from_pretrained("./results/checkpoint-final")
-model = DistilBertForSequenceClassification.from_pretrained("./results/checkpoint-final")
+tokeniser = DistilBertTokenizer.from_pretrained("./bak/results/checkpoint-final")
+model = DistilBertForSequenceClassification.from_pretrained("./bak/results/checkpoint-final")
 classifier = pipeline("text-classification", model=model, tokenizer=tokeniser)    
 label_mapping = {
     0: "discuss",
@@ -294,6 +294,7 @@ def map_grade_to_modern_equivalent(level: str) -> str:
     # Mapping of historical grades to modern equivalents
     mapping = {
         "Lower Grade": "National 4",
+        "Second Grade": "Higher", #?
         "Intermediate Grade": "National 5",
         "Higher Grade": "Higher",
         "Ordinary Grade": "National 5",
@@ -342,7 +343,7 @@ def process_all_files(folder_path, output_dir):
         Analyse_and_save_questions(metadata, output_file)
 
 # directory containing exam text files
-folder_path = './data/text/test/'  
+folder_path = './data/'  
 # directory to save CSV files
 output_dir = './output/'     
 os.makedirs(output_dir, exist_ok=True)
