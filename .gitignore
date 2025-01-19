@@ -3,7 +3,6 @@
 /process.py
 /test.py
 /train.py
-/Procfile
 /sentences.csv
 /sentences_lower.csv
 .spyproject/
