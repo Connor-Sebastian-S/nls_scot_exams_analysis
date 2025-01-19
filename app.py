@@ -369,4 +369,5 @@ def load_csv(selected_year, selected_level, selected_subject):
 
 # Run the app
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    #app.run_server(debug=True)
+    app.run(host='0.0.0.0', port=8050)
