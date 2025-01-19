@@ -92,6 +92,36 @@ app.layout = html.Div([
 def render_tab_content(tab_name, selected_year, selected_level, selected_subject):
        
     if tab_name == "introduction":
+        # Data for exam grades progression
+        exam_grades_data = [
+            {"Era": "Pre-1947", "Grade": "Lower Grade", "Modern Equivalent": "National 4"},
+            {"Era": "Pre-1947", "Grade": "Intermediate Grade", "Modern Equivalent": "National 5"},
+            {"Era": "Pre-1947", "Grade": "Higher Grade", "Modern Equivalent": "Higher"},
+            {"Era": "1947-1962", "Grade": "Lower Grade", "Modern Equivalent": "National 4"},
+            {"Era": "1947-1962", "Grade": "Intermediate Grade", "Modern Equivalent": "National 5"},
+            {"Era": "1947-1962", "Grade": "Higher Grade", "Modern Equivalent": "Higher"},
+            {"Era": "1962-1986", "Grade": "O-Grade", "Modern Equivalent": "National 5"},
+            {"Era": "1962-1986", "Grade": "Higher Grade", "Modern Equivalent": "Higher"},
+            {"Era": "1962-1986", "Grade": "CSYS", "Modern Equivalent": "Advanced Higher"},
+            {"Era": "1986-2013", "Grade": "Foundation Standard Grade", "Modern Equivalent": "National 3"},
+            {"Era": "1986-2013", "Grade": "General Standard Grade", "Modern Equivalent": "National 4"},
+            {"Era": "1986-2013", "Grade": "Credit Standard Grade", "Modern Equivalent": "National 5"},
+            {"Era": "1986-2013", "Grade": "Higher Grade", "Modern Equivalent": "Higher"},
+            {"Era": "1986-2013", "Grade": "Advanced Higher", "Modern Equivalent": "Advanced Higher"},
+            {"Era": "2013-Present", "Grade": "National 1", "Modern Equivalent": "National 1"},
+            {"Era": "2013-Present", "Grade": "National 2", "Modern Equivalent": "National 2"},
+            {"Era": "2013-Present", "Grade": "National 3", "Modern Equivalent": "National 3"},
+            {"Era": "2013-Present", "Grade": "National 4", "Modern Equivalent": "National 4"},
+            {"Era": "2013-Present", "Grade": "National 5", "Modern Equivalent": "National 5"},
+            {"Era": "2013-Present", "Grade": "Higher", "Modern Equivalent": "Higher"},
+            {"Era": "2013-Present", "Grade": "Advanced Higher", "Modern Equivalent": "Advanced Higher"},
+        ]
+
+
+
+
+
+
         return html.Div([
                     html.H4("Welcome to the Scottish Examination Analysis Dashboard"),
                     html.P(
@@ -122,6 +152,36 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                         it will analyse data from all of the available years. You MUST select both a subject and 
                         a level, however."""
                     ),
+                    
+                    html.H3("Scottish Exam Grades Through the Years"),
+                        html.P(""""To make the filtering above easier for the user (that's you!) I first had tio udnerstand
+                                    how levels in secondary schools had changed over the years so that I could effectively
+                                    make a system to map any of the old-style levels to their modern equivalents under the current
+                                    Curriculum for Excellence model.
+                                    This table below shows the progression of Scottish exam grades and their modern equivalents."""),
+                        dash_table.DataTable(
+                            id='exam-grades-table',
+                            columns=[
+                                {"name": "Era", "id": "Era"},
+                                {"name": "Grade", "id": "Grade"},
+                                {"name": "Modern Equivalent", "id": "Modern Equivalent"},
+                            ],
+                            data=exam_grades_data,
+                            style_table={'overflowX': 'auto'},
+                            style_cell={
+                                'textAlign': 'left',
+                                'padding': '10px',
+                                'fontFamily': 'Arial, sans-serif',
+                                'fontSize': '14px',
+                            },
+                            style_header={
+                                'backgroundColor': 'rgb(230, 230, 230)',
+                                'fontWeight': 'bold'
+                            },
+                            style_data={
+                                'border': '1px solid grey',
+                            },
+                        )
                 ])
     #if tab_name != "introduction":
     if not (selected_level and selected_subject):
