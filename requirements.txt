@@ -3,7 +3,7 @@ dash_bootstrap_components==1.6.0
 datasets==3.0.1
 matplotlib==3.8.4
 nltk==3.9.1
-numpy==2.2.1
+numpy
 pandas==2.2.3
 plotly==5.22.0
 scikit_learn==1.4.2
