@@ -39,6 +39,9 @@ directory_info = parse_directory(DATA_DIR)
 # App layout
 app.layout = html.Div([
     html.H1("Scottish Examination Analysis Dashboard", style={"textAlign": "center"}),
+    
+    html.P("""Please first read the "Introduction below so as to understand how to use the dashboard - thanks :)
+           """, style={"textAlign": "center"}),
 
     # Filters
     html.Div([
@@ -66,7 +69,8 @@ app.layout = html.Div([
     ], style={"marginBottom": "20px"}),
 
     # Tabs for different views
-    dcc.Tabs(id="tabs", value="statistics", children=[
+    dcc.Tabs(id="tabs", value="introduction", children=[
+        dcc.Tab(label="Introduction", value="introduction"),
         dcc.Tab(label="Statistics", value="statistics"),
         dcc.Tab(label="Intent Trend", value="intent_trend"),
         dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend"),
@@ -86,6 +90,40 @@ app.layout = html.Div([
     ]
 )
 def render_tab_content(tab_name, selected_year, selected_level, selected_subject):
+       
+    if tab_name == "introduction":
+        return html.Div([
+                    html.H4("Welcome to the Scottish Examination Analysis Dashboard"),
+                    html.P(
+                        """This dashboard allows for one to interact with analysis results on Scottish exam papers.
+                               Currently a work in progress, at the time of writing there are a selection of paprs from both
+                               History and English available at three levels: Higher, National 4, and National 5. 'Old style'
+                               levels have been converted to their modern CfE equivalent to simplify analysis for the end user."""
+                    ),
+                    html.Ul([
+                        html.Li("Statistics: View detailed statistics about the selected dataset."),
+                        html.P(
+                            """This tab shows a breakdown of the chosen paper, or papers, using various metrics."""
+                        ),
+                        html.Li("Intent Trend: Explore trends in question intents over time."),
+                        html.P(
+                            """Here, intent is what the question is asking of the reader. Is it asking them to
+                            analyse something, or compare between two or more options, etc."""
+                        ),
+                        html.Li("Sentiment Trend: Analyse the sentiment scores of questions over time."),
+                        html.P(
+                            """Sentiment is a measurement of whether a given text is positive, neutral, or negative."""
+                        )
+                    ]),
+                    html.P(
+                        """To get started, select the desired year, level, and subject using the dropdowns
+                        above. Depending on your selection, the dashboard will update to reflect the
+                        relevant data. If you leave the  year selection blank, or select the 'All Years' option,
+                        it will analyse data from all of the available years. You MUST select both a subject and 
+                        a level, however."""
+                    ),
+                ])
+    #if tab_name != "introduction":
     if not (selected_level and selected_subject):
         return html.Div(["Please select at least Level and Subject to continue."])
 
@@ -99,7 +137,8 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         for year, levels in directory_info.items():
             if selected_level in levels and selected_subject in levels[selected_level]:
                 file_paths.append(os.path.join(DATA_DIR, year, selected_level, f"{selected_subject}.csv"))
-
+    
+    #if tab_name != "introduction":
     if not file_paths:
         return html.Div(["No matching files found."])
 
@@ -117,7 +156,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     combined_df = pd.concat(dataframes, ignore_index=True)
     combined_df = combined_df.drop_duplicates()
     combined_df["year"] = pd.to_numeric(combined_df["year"], errors="coerce")
-
+    
     # Handle "Statistics" tab
     if tab_name == "statistics":
         num_files = len(file_paths)
@@ -222,6 +261,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
             return html.Div([
                 html.H4("Intent Breakdown"),
+                html.P(
+                    """This plot shows the count for each type of question in the given exam paper. 
+                    The intent of a question has been decided by training a Bidirectional and Auto-Regressive Transformer
+                    model on a hand-crafted dataset of questions and their intent. Although early days, the results
+                    show promise (however should not be taken as absolute until more testing has been done)."""
+                ),
                 dcc.Graph(figure=fig)
             ])
 
@@ -251,6 +296,15 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             return html.Div([
                 toggle,
                 html.H4("Intent Trend Analysis"),
+                html.P(
+                    """This plot shows the count for each type of question in the given exam paper. 
+                    There are two options here; proportional, or count. Proportional ensures proportions are calculated 
+                    for each year, making trends comparable despite varying question counts between papers, whereas Count 
+                    shows the actual count of the question intent types in each paper. 
+                    The intent of a question has been calculated by training a Bidirectional and Auto-Regressive Transformer
+                    model on a hand-crafted dataset of questions and their intent. Although early days, the results
+                    show promise (however should not be taken as absolute until more testing has been done)."""
+                ),
                 dcc.Graph(id="intent-trend-graph"),
                 dcc.Store(id="intent-trend-data", data=intent_trend.to_dict("records"))
             ])
@@ -286,6 +340,15 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
    
            return html.Div([
                html.H4("Sentiment Trend for Single Paper"),
+               html.P(
+                   """This plot shows the sentiment score for each question in the given exam paper.
+                   Sentiment, in this sense, is a number between -1 and +1, with -1 being negative, +1 being 
+                   positive, and 0 being neutral. Although it should be noted that sentiment does take into
+                   account the length of a piece of text when calculating the sentiment score, thus, shorter (i.e. more
+                   abrupt texts, can adjust the score into the negative. As modern texts do tend to be shorter for
+                   accessibility reasons their sentiment score will be lower than their older equivalents. 
+                   This doesn't necessarily mean they are negative, just that they are more direct."""
+               ),
                dcc.Graph(figure=fig)
            ])
    
@@ -304,6 +367,15 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
    
            return html.Div([
                html.H4("Sentiment Trend Over Time"),
+               html.P(
+                   """This plot shows the overall average sentiment score for each question in the given exam papers over time.
+                   Sentiment, in this sense, is a number between -1 and +1, with -1 being negative, +1 being 
+                   positive, and 0 being neutral. Although it should be noted that sentiment does take into
+                   account the length of a piece of text when calculating the sentiment score, thus, shorter (i.e. more
+                   abrupt texts, can adjust the score into the negative. As modern texts do tend to be shorter for
+                   accessibility reasons their sentiment score will be lower than their older equivalents. 
+                   This doesn't necessarily mean they are negative, just that they are more direct."""
+               ),
                dcc.Graph(figure=fig)
            ])
 
