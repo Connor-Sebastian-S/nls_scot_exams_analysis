@@ -74,6 +74,8 @@ app.layout = html.Div([
         dcc.Tab(label="Statistics", value="statistics"),
         dcc.Tab(label="Intent Trend", value="intent_trend"),
         dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend"),
+        dcc.Tab(label="Question Length Trend", value="sentence_length_trend"),
+
     ]),
 
     # Content for tabs
@@ -143,6 +145,10 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                         html.Li("Sentiment Trend: Analyse the sentiment scores of questions over time."),
                         html.P(
                             """Sentiment is a measurement of whether a given text is positive, neutral, or negative."""
+                        ),
+                        html.Li("Question Length Trend: Analyse the length of questions, in words, over time."),
+                        html.P(
+                            """The length of a question can be used as a measurement of its complexity."""
                         )
                     ]),
                     html.P(
@@ -154,7 +160,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     ),
                     
                     html.H3("Scottish Exam Grades Through the Years"),
-                        html.P(""""To make the filtering above easier for the user (that's you!) I first had tio udnerstand
+                        html.P(""""To make the filtering above easier for the user (that's you!) I first had to understand
                                     how levels in secondary schools had changed over the years so that I could effectively
                                     make a system to map any of the old-style levels to their modern equivalents under the current
                                     Curriculum for Excellence model.
@@ -438,6 +444,54 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                ),
                dcc.Graph(figure=fig)
            ])
+                   
+    elif tab_name == "sentence_length_trend":
+        if "text" not in combined_df.columns:
+            return html.Div(["The selected data does not contain a 'text' column."])
+
+        num_files = len(file_paths)
+
+        if num_files == 1:
+            # Single Paper: Sentence length per question
+            combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(x.split()))
+            fig = px.line(
+                combined_df,
+                x=combined_df.index,
+                y="sentence_length",
+                title="Question Length Per Question for Single Paper",
+                labels={"index": "Question Index", "sentence_length": "Question Length (words)"},
+            )
+            fig.update_traces(mode="lines+markers")
+
+            return html.Div([
+                html.H4("Question Length Trend for Single Paper"),
+                html.P(
+                    """This shows the length of each question (in words) throughout the paper."""
+                ),
+                dcc.Graph(figure=fig)
+            ])
+
+        else:
+            # Multiple Papers: Average sentence length per year
+            combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(x.split()))
+            sentence_length_trend = combined_df.groupby("year")["sentence_length"].mean().reset_index()
+
+            fig = px.line(
+                sentence_length_trend,
+                x="year",
+                y="sentence_length",
+                title="Average Question Length Per Year",
+                labels={"year": "Year", "sentence_length": "Average Question Length (words)"},
+            )
+            fig.update_traces(mode="lines+markers")
+
+            return html.Div([
+                html.H4("Average Question Length Per Year"),
+                html.P(
+                    """This shows the average length of each question (in words) throughout each paper over the years."""
+                ),
+                dcc.Graph(figure=fig)
+            ])
 
 
 
