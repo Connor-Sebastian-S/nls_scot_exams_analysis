@@ -37,11 +37,20 @@ def parse_directory(data_dir):
 directory_info = parse_directory(DATA_DIR)
 
 # App layout
+
+
+
+
 app.layout = html.Div([
+    
+    dcc.Store(id="selected-year", data=None),
+    
     html.H1("Scottish Exams - Linguistical Analysis Dashboard", style={"textAlign": "center"}),
     
     html.P("""Please first read the Introduction tab below so as to understand how to use the dashboard - thanks :)
            """, style={"textAlign": "center"}),
+           
+    
 
     # Filters
     html.Div([
@@ -81,6 +90,7 @@ app.layout = html.Div([
     # Content for tabs
     html.Div(id="tabs-content")
 ])
+
 
 @app.callback(
     Output("tabs-content", "children"),
@@ -372,6 +382,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     show promise (however should not be taken as absolute until more testing has been done)."""
                 ),
                 dcc.Graph(id="intent-trend-graph"),
+                
                 dcc.Store(id="intent-trend-data", data=intent_trend.to_dict("records"))
             ])
         
