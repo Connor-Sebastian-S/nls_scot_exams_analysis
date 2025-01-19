@@ -2,14 +2,10 @@ dash
 dash_bootstrap_components
 datasets
 matplotlib
-nltk
 numpy
 pandas
 plotly
-scikit_learn
 seaborn
 textstat
-torch
-transformers
 gunicorn
 
