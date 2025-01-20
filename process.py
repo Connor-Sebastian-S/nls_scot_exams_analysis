@@ -157,6 +157,7 @@ def process_exam_text(file_path):
         level = lines[0].strip()
         year = lines[1].strip()
         subject = lines[2].strip()
+        paper = lines[3].strip()
 
         text_from_questions = " ".join(line.strip() for line in lines[3:])
         question_pattern = r'\d+\.\s*(?:\([a-z]\)\s*)?'
@@ -172,6 +173,7 @@ def process_exam_text(file_path):
             "level": level,
             "year": year,
             "subject": subject,
+            "paper": paper,
             "questions": structured_questions
         }
     except Exception as e:
@@ -212,6 +214,7 @@ def Analyse_and_save_questions(metadata, output_file):
             "year": metadata["year"],
             "level": metadata["level"],
             "subject": metadata["subject"],
+            "paper": metadata["paper"],
             "question": main_question_number.rstrip('.'),
             "text": main_question_text,
             "coleman_liau": main_score,
@@ -249,6 +252,7 @@ def Analyse_and_save_questions(metadata, output_file):
                 "year": metadata["year"],
                 "level": metadata["level"],
                 "subject": metadata["subject"],
+                "paper": metadata["paper"],
                 "question": f"{main_question_number.rstrip('.')}{marker}",
                 "text": questionText,
                 "coleman_liau": sub_score,
@@ -270,7 +274,7 @@ def Analyse_and_save_questions(metadata, output_file):
     print (csv_name)
     with open(csv_name, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=[
-            "year", "level", "subject", 
+            "year", "level", "subject", "paper",
             "question", "text", 
             "coleman_liau", "flesch_kincaid", "gunning_fog",
             "total_tokens", "positive_tokens", "negative_tokens", "neutral_tokens", 
@@ -337,7 +341,8 @@ def process_all_files(folder_path, output_dir):
             metadata["year"] + 
             "/" + 
             re.sub(r"[^\w\s]", "", map_grade_to_modern_equivalent(metadata["level"])) + 
-            "/")
+            "/" +
+            metadata["paper"] + "/")
         
         output_file = os.path.join(output_dir, csv_file_name)
         os.makedirs(os.path.dirname(output_file), exist_ok=True)

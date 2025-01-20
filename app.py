@@ -19,7 +19,6 @@ server = app.server
 # Directory containing CSV files
 DATA_DIR = "output"
 
-# Parse directory for available options
 def parse_directory(data_dir):
     directory_info = {}
     for year in os.listdir(data_dir):
@@ -29,10 +28,21 @@ def parse_directory(data_dir):
             for level in os.listdir(year_path):
                 level_path = os.path.join(year_path, level)
                 if os.path.isdir(level_path):
-                    directory_info[year][level] = [
-                        os.path.splitext(file)[0] for file in os.listdir(level_path) if file.endswith(".csv")
-                    ]
+                    directory_info[year][level] = {}
+                    for paper in os.listdir(level_path):  # Handle paper subfolders
+                        paper_path = os.path.join(level_path, paper)
+                        if os.path.isdir(paper_path):
+                            # Extract subject file names (without .csv extensions)
+                            subjects = [
+                                os.path.splitext(file)[0]
+                                for file in os.listdir(paper_path)
+                                if file.endswith(".csv")
+                            ]
+                            directory_info[year][level][paper] = subjects  # Keep "Paper 1", "Paper 2" as keys
     return directory_info
+
+
+
 
 directory_info = parse_directory(DATA_DIR)
 
@@ -71,10 +81,28 @@ app.layout = html.Div([
         html.Label("Select Subject:"),
         dcc.Dropdown(
             id="subject-dropdown",
-            options=[{"label": subj, "value": subj} for subj in set(s for levels in directory_info.values() for subs in levels.values() for s in subs)],
+            options=[
+                {"label": subj, "value": subj}
+                for subj in set(
+                    s
+                    for levels in directory_info.values()
+                    for papers in levels.values()
+                    for subjects in papers.values()
+                    for s in subjects
+                )
+            ],
             placeholder="Select a Subject",
             style={"width": "90%"}
         ),
+
+        html.Label("Select Paper:"),
+        dcc.Dropdown(
+            id="paper-dropdown",
+            options=[{"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 3)] + [{"label": "All Papers", "value": "all"}],
+            placeholder="Select a Paper",
+            style={"width": "90%"}
+        ),
+
     ], style={"marginBottom": "20px"}),
 
     # Tabs for different views
@@ -99,10 +127,16 @@ app.layout = html.Div([
         Input("year-dropdown", "value"),
         Input("level-dropdown", "value"),
         Input("subject-dropdown", "value"),
+        Input("paper-dropdown", "value"),
     ]
 )
-def render_tab_content(tab_name, selected_year, selected_level, selected_subject):
+def render_tab_content(tab_name, selected_year, selected_level, selected_subject, selected_paper):
        
+    #selected_paper = selected_paper.replace("Paper ", "")
+    print (selected_year)
+    print(selected_level)
+    print(selected_subject)
+    print(selected_paper)
     if tab_name == "introduction":
         # Data for exam grades progression
         exam_grades_data = [
@@ -128,11 +162,6 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             {"Era": "2013-Present", "Grade": "Higher", "Modern Equivalent": "Higher"},
             {"Era": "2013-Present", "Grade": "Advanced Higher", "Modern Equivalent": "Advanced Higher"},
         ]
-
-
-
-
-
 
         return html.Div([
                     html.H4("Welcome to the Scottish Examination Analysis Dashboard"),
@@ -162,11 +191,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                         )
                     ]),
                     html.P(
-                        """To get started, select the desired year, level, and subject using the dropdowns
+                        """To get started, select the desired year, level, subject, and paper using the dropdowns
                         above. Depending on your selection, the dashboard will update to reflect the
                         relevant data. If you leave the  year selection blank, or select the 'All Years' option,
                         it will analyse data from all of the available years. You MUST select both a subject and 
-                        a level, however."""
+                        a level, however. If you leave paper blank or select "All papers" it will return every paper 
+                        for that particular subject (for example paper 1, paper 2 for Higher History 2024)."""
                     ),
                     
                     html.H3("Scottish Exam Grades Through the Years"),
@@ -199,40 +229,72 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                             },
                         )
                 ])
-    #if tab_name != "introduction":
+
     if not (selected_level and selected_subject):
         return html.Div(["Please select at least Level and Subject to continue."])
 
-    # Load data
+ # Construct file paths
     file_paths = []
     if selected_year and selected_year != "all":
+        # Handle a specific year
         year_dir = directory_info.get(selected_year, {})
-        if selected_level in year_dir and selected_subject in year_dir[selected_level]:
-            file_paths.append(os.path.join(DATA_DIR, selected_year, selected_level, f"{selected_subject}.csv"))
+        if selected_level in year_dir:
+            if selected_paper and selected_paper != "all":
+                # Load specific paper for the year
+                paper_path = os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
+                if os.path.exists(paper_path):
+                    file_paths.append(paper_path)
+            else:
+                # Load all papers for the year
+                for paper in year_dir[selected_level]:
+                    paper_path = os.path.join(DATA_DIR, selected_year, selected_level, paper, f"{selected_subject}.csv")
+                    if os.path.exists(paper_path):
+                        file_paths.append(paper_path)
     else:
+        # Handle "all years"
         for year, levels in directory_info.items():
-            if selected_level in levels and selected_subject in levels[selected_level]:
-                file_paths.append(os.path.join(DATA_DIR, year, selected_level, f"{selected_subject}.csv"))
+            for level, papers in levels.items():
+                if level == selected_level:
+                    if selected_paper and selected_paper != "all":
+                        # Load specific paper across all years
+                        paper_path = os.path.join(DATA_DIR, year, level, selected_paper, f"{selected_subject}.csv")
+                        if os.path.exists(paper_path):
+                            file_paths.append(paper_path)
+                    else:
+                        # Load all papers across all years
+                        for paper, subjects in papers.items():
+                            if selected_subject in subjects:
+                                paper_path = os.path.join(DATA_DIR, year, level, paper, f"{selected_subject}.csv")
+                                if os.path.exists(paper_path):
+                                    file_paths.append(paper_path)
+
+
+    print(file_paths)
+  
     
-    #if tab_name != "introduction":
     if not file_paths:
         return html.Div(["No matching files found."])
 
     # Combine data
+    # Combine CSVs into a single DataFrame
     dataframes = []
     for path in file_paths:
         try:
             df = pd.read_csv(path)
-            year = os.path.basename(os.path.dirname(os.path.dirname(path)))  # Extract year
-            df["year"] = year
+            # Extract paper and year
+            paper_number = os.path.basename(os.path.dirname(path))  # Full "Paper 1", "Paper 2"
+            df["paper"] = paper_number
+            year = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(path))))
+
+            df["year"] = int(year)
             dataframes.append(df)
         except Exception as e:
-            return html.Div([f"Error loading file {path}: {str(e)}"])
-
+            print(f"Error loading file {path}: {e}")  # Debugging
+            return html.Div([f"Error loading file {path}: {e}"])
+    
     combined_df = pd.concat(dataframes, ignore_index=True)
     combined_df = combined_df.drop_duplicates()
-    combined_df["year"] = pd.to_numeric(combined_df["year"], errors="coerce")
-    
+   
     # Handle "Statistics" tab
     if tab_name == "statistics":
         num_files = len(file_paths)
@@ -485,14 +547,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         else:
             # Multiple Papers: Average sentence length per year
             combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(x.split()))
-            sentence_length_trend = combined_df.groupby("year")["sentence_length"].mean().reset_index()
+            sentence_length_trend = combined_df.groupby(["year", "paper"])["sentence_length"].mean().reset_index()
 
             fig = px.line(
                 sentence_length_trend,
                 x="year",
                 y="sentence_length",
                 title="Average Question Length Per Year",
-                labels={"year": "Year", "sentence_length": "Average Question Length (words)"},
+                labels={"year": "Year", "sentence_length": "Average Question Length (words)", "paper": "Paper"},
             )
             fig.update_traces(mode="lines+markers")
 
@@ -538,22 +600,32 @@ def update_intent_trend_chart(yaxis_choice, intent_trend_data):
     return fig
 
 
-def load_csv(selected_year, selected_level, selected_subject):
+def load_csv(selected_year, selected_level, selected_subject, selected_paper):
     if not (selected_level and selected_subject):
         return html.Div(["Please select at least Level and Subject to load file paths."])
 
-    # Find all matching files
+    # Determine file paths
     file_paths = []
     if selected_year and selected_year != "all":
-        # Specific year
         year_dir = directory_info.get(selected_year, {})
-        if selected_level in year_dir and selected_subject in year_dir[selected_level]:
-            file_paths.append(os.path.join(DATA_DIR, selected_year, selected_level, f"{selected_subject}.csv"))
+        if selected_level in year_dir:
+            if selected_paper and selected_paper != "all":
+                file_paths = [
+                    os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
+                ]
+            else:
+                # Load all papers
+                for paper in year_dir[selected_level]:
+                    paper_path = os.path.join(DATA_DIR, selected_year, selected_level, paper, f"{selected_subject}.csv")
+                    file_paths.append(paper_path)
     else:
-        # Search across all years
+        # Load all years, levels, and papers
         for year, levels in directory_info.items():
-            if selected_level in levels and selected_subject in levels[selected_level]:
-                file_paths.append(os.path.join(DATA_DIR, year, selected_level, f"{selected_subject}.csv"))
+            for level, papers in levels.items():
+                if selected_level == level:
+                    for paper, files in papers.items():
+                        paper_path = os.path.join(DATA_DIR, year, level, paper, f"{selected_subject}.csv")
+                        file_paths.append(paper_path)
 
     if not file_paths:
         return html.Div(["No matching files found."])
