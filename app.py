@@ -12,9 +12,18 @@ import dash
 import plotly.express as px
 from collections import Counter
 import re
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+import base64
+from io import BytesIO
+import re
+import pandas as pd
 
 # Initialize Dash app
-app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.SOLAR])
+app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL])
 app.title = "Scottish Examination Analysis Dashboard"
 server = app.server
 
@@ -44,31 +53,22 @@ def parse_directory(data_dir):
     return directory_info
 
 
-
-
 directory_info = parse_directory(DATA_DIR)
 
-# App layout
 
-
-
-
-app.layout = html.Div([
-    
+#=============================================================================
+app.layout = dbc.Container([
+     
     dcc.Store(id="selected-year", data=None),
     
     html.H1("Scottish Exams - Linguistical Analysis Dashboard", style={"textAlign": "center"}),
-    
-    html.P("""Please first read the Introduction tab below so as to understand how to use the dashboard - thanks :)
-           """, style={"textAlign": "center"}),
-           
-    
 
     # Filters
     html.Div([
         html.Label("Select Year (Optional):"),
         dcc.Dropdown(
             id="year-dropdown",
+            className="customDropdown",
             options=[{"label": year, "value": year} for year in directory_info.keys()] + [{"label": "All Years", "value": "all"}],
             placeholder="Select a Year",
             style={"width": "90%"}
@@ -76,6 +76,7 @@ app.layout = html.Div([
         html.Label("Select Level:"),
         dcc.Dropdown(
             id="level-dropdown",
+            className="customDropdown",
             options=[{"label": level, "value": level} for level in set(l for levels in directory_info.values() for l in levels)],
             placeholder="Select a Level",
             style={"width": "90%"}
@@ -83,6 +84,7 @@ app.layout = html.Div([
         html.Label("Select Subject:"),
         dcc.Dropdown(
             id="subject-dropdown",
+            className="customDropdown",
             options=[
                 {"label": subj, "value": subj}
                 for subj in set(
@@ -97,9 +99,10 @@ app.layout = html.Div([
             style={"width": "90%"}
         ),
 
-        html.Label("Select Paper:"),
+        html.Label("Select Paper: (Optional)"),
         dcc.Dropdown(
             id="paper-dropdown",
+            className="customDropdown",
             options=[{"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 3)] + [{"label": "All Papers", "value": "all"}],
             placeholder="Select a Paper",
             style={"width": "90%"}
@@ -115,11 +118,17 @@ app.layout = html.Div([
         dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend"),
         dcc.Tab(label="Question Length Trend", value="sentence_length_trend"),
         dcc.Tab(label="Question Topics", value="topics"),
+        dcc.Tab(label="Complexity Trends", value="complexity"),
     ]),
 
     # Content for tabs
     html.Div(id="tabs-content")
-])
+], 
+    fluid=True, 
+    #style={'display': 'flex'},
+    className='dashboard-container'
+    )
+#=============================================================================
 
 
 @app.callback(
@@ -134,11 +143,6 @@ app.layout = html.Div([
 )
 def render_tab_content(tab_name, selected_year, selected_level, selected_subject, selected_paper):
        
-    #selected_paper = selected_paper.replace("Paper ", "")
-    print (selected_year)
-    print(selected_level)
-    print(selected_subject)
-    print(selected_paper)
     if tab_name == "introduction":
         # Data for exam grades progression
         exam_grades_data = [
@@ -190,6 +194,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                         html.Li("Question Length Trend: Analyse the length of questions, in words, over time."),
                         html.P(
                             """The length of a question can be used as a measurement of its complexity."""
+                        ),
+                        html.Li("Question Topics: Named entities in the text and the number of times they appear."),
+                        html.P(
+                            """Placeholder formatting, will be explored later"""
+                        ),
+                        html.Li("Complexity Trends: Various metrics for establishign the compelxity of the text."),
+                        html.P(
+                            """How complex is the text, and how does this change over time?"""
                         )
                     ]),
                     html.P(
@@ -273,7 +285,6 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
     print(file_paths)
   
-    
     if not file_paths:
         return html.Div(["No matching files found."])
 
@@ -587,6 +598,8 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         
         formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
 
+        image_base64 = generate_wordcloud(word_counts)
+        
         return html.Div([
             html.H4("Named Entities in the filtered results"),
             html.P(
@@ -594,10 +607,115 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 results. Named entities here refers to people and places. The number next to 
                 an entity is the number of times it appears in the filtered results."""
             ),
-            html.Ul([html.Li(metric) for metric in formatted_entries])
+            html.Div([
+                html.Div([
+                    html.H4("List of Named Entities"),
+                    html.Ul([html.Li(entry) for entry in formatted_entries]),
+                ], style={'flex': '1', 'padding': '10px'}),
+                html.Div([
+                    html.H4("Word Cloud of Named Entities"),
+                    html.Img(src='data:image/png;base64,{}'.format(image_base64)),
+                ], style={'flex': '1', 'padding': '10px'}),
+            ], style={'display': 'flex', 'flex-direction': 'row'}),
         ])
+    
+    elif tab_name == "complexity":
+        if "coleman_liau" not in combined_df.columns:
+            return html.Div(["The selected data does not contain a 'coleman_liau' column."])
+        if "flesch_kincaid" not in combined_df.columns:
+            return html.Div(["The selected data does not contain a 'flesch_kincaid' column."])
+        if "gunning_fog" not in combined_df.columns:
+            return html.Div(["The selected data does not contain a 'gunning_fog' column."])
+        
+        num_files = len(file_paths)
+        
+        if num_files == 1:
+            # Single CSV: Show trend over the course of questions
+            combined_df = combined_df.sort_index()  # Ensure questions are in order
+        
+            avg_coleman_liau = combined_df["coleman_liau"].mean()
+            avg_flesch_kincaid = combined_df["flesch_kincaid"].mean()
+            avg_gunning_fog = combined_df["gunning_fog"].mean()
+        
+            fig = px.line(
+                combined_df,
+                x=combined_df.index,
+                y=["coleman_liau", "flesch_kincaid", "gunning_fog"],
+                title="Readability Index Trend for Single Paper",
+                labels={"index": "Question Index", "value": "Readability Index"},
+                template="plotly_white",
+            )
+            fig.update_traces(mode="lines+markers")
+        
+            # Add horizontal average lines
+            fig.add_hline(
+                y=avg_coleman_liau,
+                line_dash="dash",
+                line_color="red",
+                annotation_text=f"Coleman-Liau Avg: {avg_coleman_liau:.2f}",
+                annotation_position="top left",
+            )
+            fig.add_hline(
+                y=avg_flesch_kincaid,
+                line_dash="dash",
+                line_color="blue",
+                annotation_text=f"Flesch-Kincaid Avg: {avg_flesch_kincaid:.2f}",
+                annotation_position="top right",
+            )
+            fig.add_hline(
+                y=avg_gunning_fog,
+                line_dash="dash",
+                line_color="green",
+                annotation_text=f"Gunning Fog Avg: {avg_gunning_fog:.2f}",
+                annotation_position="bottom left",
+            )
+        
+            return html.Div([
+                html.H4("Readability Trend for Single Paper"),
+                html.P(
+                    """This plot shows the readability indices for each question in the given exam paper. 
+                    The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
+                    The higher the index, the more difficult the text is to read."""
+                ),
+                dcc.Graph(figure=fig)
+            ])
+        
+        else:
+            # Multiple CSVs: Show trend over time by averaging scores
+            readability_trend = combined_df.groupby("year")[["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean().reset_index()
+        
+            fig = px.line(
+                readability_trend,
+                x="year",
+                y=["coleman_liau", "flesch_kincaid", "gunning_fog"],
+                title="Average Readability Index Trend Over Time",
+                labels={"year": "Year", "value": "Average Readability Index"},
+                template="plotly_white",
+            )
+            fig.update_traces(mode="lines+markers")
+        
+            return html.Div([
+                html.H4("Readability Trend Over Time"),
+                html.P(
+                    """This plot shows the overall average readability indices for each question in the given exam papers over time. 
+                    The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
+                    The higher the index, the more difficult the text is to read."""
+                ),
+                dcc.Graph(figure=fig)
+            ])
 
 
+# Function to generate word cloud image
+def generate_wordcloud(word_counts):
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(word_counts)
+    fig = plt.figure()
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    buf = BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    image_base64 = base64.b64encode(buf.read()).decode('utf-8')
+    return image_base64
 
 
 # Callback for dynamic toggle
