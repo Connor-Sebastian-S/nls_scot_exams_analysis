@@ -10,6 +10,8 @@ import pandas as pd
 from dash import dcc, html, Input, Output, State, dash_table
 import dash
 import plotly.express as px
+from collections import Counter
+import re
 
 # Initialize Dash app
 app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.SOLAR])
@@ -112,7 +114,7 @@ app.layout = html.Div([
         dcc.Tab(label="Intent Trend", value="intent_trend"),
         dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend"),
         dcc.Tab(label="Question Length Trend", value="sentence_length_trend"),
-
+        dcc.Tab(label="Question Topics", value="topics"),
     ]),
 
     # Content for tabs
@@ -565,6 +567,35 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 ),
                 dcc.Graph(figure=fig)
             ])
+        
+    elif tab_name == "topics":
+        all_entities = " ".join(combined_df["named_entities"].dropna())
+
+        # Split the string into words and counts
+        entries = re.findall(r'(\w+) \{(\d+)\}', all_entities)
+        
+        # Create a dictionary to aggregate counts for each word
+        word_counts = {}
+        for word, count in entries:
+            if word in word_counts:
+                word_counts[word] += int(count)
+            else:
+                word_counts[word] = int(count)
+
+        # Convert the dictionary to a 2D array
+        result = [[word, count] for word, count in word_counts.items()]
+        
+        formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
+
+        return html.Div([
+            html.H4("Named Entities in the filtered results"),
+            html.P(
+                """This shows an aggregated list of named entities in the filtered
+                results. Named entities here refers to people and places. The number next to 
+                an entity is the number of times it appears in the filtered results."""
+            ),
+            html.Ul([html.Li(metric) for metric in formatted_entries])
+        ])
 
 
 
