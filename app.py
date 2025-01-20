@@ -21,8 +21,8 @@ import base64
 from io import BytesIO
 import re
 import pandas as pd
-import spacy 
-from spacy import displacy
+#import spacy 
+#from spacy import displacy
 
 # Initialize Dash app
 app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL])
@@ -32,7 +32,7 @@ server = app.server
 # Directory containing CSV files
 DATA_DIR = "output"
 
-nlp = spacy.load("en_core_web_sm")
+#nlp = spacy.load("en_core_web_sm")
 
 def parse_directory(data_dir):
     directory_info = {}
@@ -123,7 +123,7 @@ app.layout = dbc.Container([
         dcc.Tab(label="Question Length Trend", value="sentence_length_trend"),
         dcc.Tab(label="Question Topics", value="topics"),
         dcc.Tab(label="Complexity Trends", value="complexity"),
-        dcc.Tab(label="Question Structure", value="structure"),
+        #dcc.Tab(label="Question Structure", value="structure"),
     ]),
 
     # Content for tabs
@@ -708,33 +708,35 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 ),
                 dcc.Graph(figure=fig)
             ])
-    elif tab_name == "structure":
-        
-        num_files = len(file_paths)
-        
-        def tag_entities(text): 
-            doc = nlp(text) 
-            tagged_text = ""
-            for token in doc:
-                tagged_text += f"<span class='token'>{token.text} <span class='pos'>({token.pos_})</span></span> "
-            return tagged_text
-
-        if num_files == 1:
-            combined_df = combined_df.sort_index()  # Ensure questions are in order
-            questions = combined_df["text"]
-            tagged_q = questions
-            
-            for i, q in enumerate (questions):
-            
-                tagged_q[i] = tag_entities(q)
-            
-            return html.Div([
-                html.H4("Tagged Representation of Questions"),
-                html.Div([
-                    html.Div(dcc.Markdown(f"### Question {i+1}\n{tagged}", dangerously_allow_html=True), style={'margin-bottom': '20px'})
-                    for i, tagged in enumerate(tagged_q)
-                ])
-            ])
+# =============================================================================
+#     elif tab_name == "structure":
+#         
+#         num_files = len(file_paths)
+#         
+#         def tag_entities(text): 
+#             doc = nlp(text) 
+#             tagged_text = ""
+#             for token in doc:
+#                 tagged_text += f"<span class='token'>{token.text} <span class='pos'>({token.pos_})</span></span> "
+#             return tagged_text
+# 
+#         if num_files == 1:
+#             combined_df = combined_df.sort_index()  # Ensure questions are in order
+#             questions = combined_df["text"]
+#             tagged_q = questions
+#             
+#             for i, q in enumerate (questions):
+#             
+#                 tagged_q[i] = tag_entities(q)
+#             
+#             return html.Div([
+#                 html.H4("Tagged Representation of Questions"),
+#                 html.Div([
+#                     html.Div(dcc.Markdown(f"### Question {i+1}\n{tagged}", dangerously_allow_html=True), style={'margin-bottom': '20px'})
+#                     for i, tagged in enumerate(tagged_q)
+#                 ])
+#             ])
+# =============================================================================
 
 
 
