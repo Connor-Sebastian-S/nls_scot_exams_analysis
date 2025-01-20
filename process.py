@@ -9,6 +9,8 @@ from nltk.stem import WordNetLemmatizer
 from nltk.collocations import BigramCollocationFinder
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification, pipeline
 import shutil
+import spacy
+from collections import Counter
 
 # load tokeniser and model
 tokeniser = DistilBertTokenizer.from_pretrained("./bak/results/checkpoint-final")
@@ -23,6 +25,27 @@ label_mapping = {
     5: "reason",
     6: "other"
 }
+
+# Load the spaCy model
+nlp = spacy.load("en_core_web_sm")
+
+def extract_topics(text):
+    """
+    Extract named entities and their counts from the given text.
+    """
+    # Process the text with spaCy
+    doc = nlp(text)
+
+    # Extract named entities of interest
+    entities = [ent.text for ent in doc.ents if ent.label_ in {"PERSON", "ORG", "GPE", "EVENT"}]
+
+    # Count frequencies of each entity
+    entity_counts = Counter(entities)
+
+    # Format as "word {count}"
+    topics = " ".join([f"{word} {{{count}}}" for word, count in entity_counts.items()])
+
+    return topics
 
 def get_intent(question):
 
@@ -209,6 +232,8 @@ def Analyse_and_save_questions(metadata, output_file):
         lemmatised_tokens = lemmatise_tokens(tokens)
         sentiment_df = return_sentiment_df(lemmatised_tokens)
         intent_ = get_intent(main_question_text)
+        
+        main_topics = extract_topics(main_question_text)
 
         rows.append({
             "year": metadata["year"],
@@ -226,9 +251,8 @@ def Analyse_and_save_questions(metadata, output_file):
             "neutral_tokens": int(sentiment_df["neutral_tokens"].iloc[0]),
             "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0]),  
             "intent": intent_["label"],
-            "intent_certainty": intent_["score"]      
-            #"named_entities": topics["named_entities"], 
-            #"thematic_keywords": topics["thematic_keywords"]
+            "intent_certainty": intent_["score"],      
+            "named_entities": main_topics
         })
 
         # analyse subquestions
@@ -247,6 +271,8 @@ def Analyse_and_save_questions(metadata, output_file):
             sentiment_df = return_sentiment_df(lemmatised_tokens)
             questionText = subtext.strip()
             intent_ = get_intent(subtext)
+            
+            _topics = extract_topics(main_question_text)
 
             rows.append({
                 "year": metadata["year"],
@@ -264,9 +290,8 @@ def Analyse_and_save_questions(metadata, output_file):
                 "neutral_tokens": int(sentiment_df["neutral_tokens"].iloc[0]),
                 "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0]), 
                 "intent": intent_["label"],
-                "intent_certainty": intent_["score"]
-                #"named_entities": topics["named_entities"], 
-                #"thematic_keywords": topics["thematic_keywords"]
+                "intent_certainty": intent_["score"],      
+                "named_entities": _topics
             })
                         
     # Write to CSV
@@ -280,7 +305,7 @@ def Analyse_and_save_questions(metadata, output_file):
             "total_tokens", "positive_tokens", "negative_tokens", "neutral_tokens", 
             "compound_sentiment_score", 
             "intent", "intent_certainty",
-            "named_entities", "thematic_keywords"
+            "named_entities"
         ])
         writer.writeheader()
         writer.writerows(rows)
