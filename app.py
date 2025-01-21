@@ -668,6 +668,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     html.H4("Word Cloud of Named Entities"),
                     #html.Img(src='data:image/png;base64,{}'.format(image_base64)),
                     DashWordcloud(
+                        id="cloud",
                         list=result,
                         width=600, height=400,
                         gridSize=10,
