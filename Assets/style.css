@@ -14,7 +14,7 @@ label {
 .customDropdown {
     font-size: 16px;
     font-family: "Poppins";
-    padding-left: 1px;
+    padding-left: 10px;
 }
 
 .customDropdown .Select-control {
@@ -71,16 +71,19 @@ label {
         flex-direction: column;
         margin-bottom: 0px;
     }
-    .tab-item {
-        margin-bottom: 10px;
-    }
-    .custom-tab {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        cursor: pointer;
-        text-align: center;
+.custom-tab {
+        display: flex;
+        align-items: center; /* Center vertically */
+        justify-content: center; /* Center horizontally */
+        height: 50px; /* Ensure consistent height */
+        padding: 0; /* Remove padding */
+        text-align: center; /* Align text centrally */
+        font-size: 16px; /* Adjust font size */
     }
     .custom-tab:hover {
-        background-color: #f9f9f9;
+        background-color: #f9f9f9; /* Optional hover effect */
     }
+    .dash-tab {
+        height: 50px; /* Ensure tabs have a consistent height */
+    }
+    

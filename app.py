@@ -21,8 +21,7 @@ import base64
 from io import BytesIO
 import re
 import pandas as pd
-#import spacy 
-#from spacy import displacy
+
 
 # Initialize Dash app
 app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL])
@@ -32,7 +31,6 @@ server = app.server
 # Directory containing CSV files
 DATA_DIR = "output"
 
-#nlp = spacy.load("en_core_web_sm")
 
 def parse_directory(data_dir):
     directory_info = {}
@@ -92,7 +90,7 @@ app.layout = dbc.Container(
                                     {"label": year, "value": year} for year in directory_info.keys()
                                 ] + [{"label": "All Years", "value": "all"}],
                                 placeholder="Select a Year",
-                                style={"width": "90%"}
+                                style={"width": "100%"}
                             ),
                             html.Label("Select Level:"),
                             dcc.Dropdown(
@@ -103,7 +101,7 @@ app.layout = dbc.Container(
                                     for level in set(l for levels in directory_info.values() for l in levels)
                                 ],
                                 placeholder="Select a Level",
-                                style={"width": "90%"}
+                                style={"width": "100%"}
                             ),
                             html.Label("Select Subject:"),
                             dcc.Dropdown(
@@ -120,7 +118,7 @@ app.layout = dbc.Container(
                                     )
                                 ],
                                 placeholder="Select a Subject",
-                                style={"width": "90%"}
+                                style={"width": "100%"}
                             ),
                             html.Label("Select Paper: (Optional)"),
                             dcc.Dropdown(
@@ -130,7 +128,7 @@ app.layout = dbc.Container(
                                     {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 3)
                                 ] + [{"label": "All Papers", "value": "all"}],
                                 placeholder="Select a Paper",
-                                style={"width": "90%", "marginBottom": "15px"}
+                                style={"width": "100%", "marginBottom": "15px"}
                             ),
                         ],
                         className="vertical-tabs"
@@ -146,13 +144,13 @@ app.layout = dbc.Container(
                                 id="tabs",
                                 value="introduction",
                                 children=[
-                                    dcc.Tab(label="Introduction", value="introduction", className="custom-tab"),
-                                    dcc.Tab(label="Statistics", value="statistics", className="custom-tab"),
-                                    dcc.Tab(label="Intent Trend", value="intent_trend", className="custom-tab"),
-                                    dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend", className="custom-tab"),
-                                    dcc.Tab(label="Question Length Trend", value="sentence_length_trend", className="custom-tab"),
-                                    dcc.Tab(label="Question Topics", value="topics", className="custom-tab"),
-                                    dcc.Tab(label="Complexity Trends", value="complexity", className="custom-tab"),
+                                    dcc.Tab(label="Introduction", value="introduction", className=".custom-tab"),
+                                    dcc.Tab(label="Statistics", value="statistics", className=".custom-tab"),
+                                    dcc.Tab(label="Intent Trend", value="intent_trend", className=".custom-tab"),
+                                    dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend", className=".custom-tab"),
+                                    dcc.Tab(label="Question Length Trend", value="sentence_length_trend", className=".custom-tab"),
+                                    dcc.Tab(label="Question Topics", value="topics", className=".custom-tab"),
+                                    dcc.Tab(label="Complexity Trends", value="complexity", className=".custom-tab"),
                                 ],
                                 style={
                                     "marginBottom": "0px",  # Remove gap between tabs and content
