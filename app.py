@@ -443,7 +443,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
         num_files = len(file_paths)
 
-        if num_files == 1:
+        if num_files == 1 or combined_df['year'].nunique() == 1:
             # Single CSV: Show intent breakdown
             intent_breakdown = combined_df["intent"].value_counts().reset_index()
             intent_breakdown.columns = ["Intent", "Count"]
@@ -515,7 +515,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
    
        num_files = len(file_paths)
    
-       if num_files == 1:
+       if num_files == 1 or combined_df['year'].nunique() == 1:
            # Single CSV: Show trend over the course of questions
            combined_df = combined_df.sort_index()  # Ensure questions are in order
            avg_sentiment = combined_df["compound_sentiment_score"].mean()
@@ -585,7 +585,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
         num_files = len(file_paths)
 
-        if num_files == 1:
+        if num_files == 1 or combined_df['year'].nunique() == 1:
             # Single Paper: Sentence length per question
             combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(x.split()))
             fig = px.line(
@@ -696,7 +696,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         
         num_files = len(file_paths)
         
-        if num_files == 1:
+        if num_files == 1 or combined_df['year'].nunique() == 1:
             # Single CSV: Show trend over the course of questions
             combined_df = combined_df.sort_index()  # Ensure questions are in order
         
@@ -908,7 +908,8 @@ def load_csv(selected_year, selected_level, selected_subject, selected_paper):
                 if selected_level == level:
                     for paper, files in papers.items():
                         paper_path = os.path.join(DATA_DIR, year, level, paper, f"{selected_subject}.csv")
-                        file_paths.append(paper_path)
+                        if (os.path.isfile(paper_path)):
+                            file_paths.append(paper_path)
                         
     dataframes = []
     for path in file_paths:
