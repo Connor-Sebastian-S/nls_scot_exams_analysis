@@ -57,12 +57,13 @@ def parse_directory(data_dir):
 
 directory_info = parse_directory(DATA_DIR)
 
-
 #=============================================================================
 app.layout = dbc.Container(
     [
         # Store
         dcc.Store(id="selected-year", data=None),
+        dcc.Store(id='combined-data', data=None),
+
         
         # Header
         dbc.Row(
@@ -180,7 +181,10 @@ app.layout = dbc.Container(
 
 
 @app.callback(
-    Output("tabs-content", "children"),
+     [
+        Output("tabs-content", "children"),
+        Output("combined-data", "data"),  # Store combined data
+    ],
     [
         Input("tabs", "value"),
         Input("year-dropdown", "value"),
@@ -221,7 +225,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     html.H4("Welcome to the Scottish Examination Analysis Dashboard"),
                     html.P(
                         """This dashboard allows for one to interact with analysis results on Scottish exam papers.
-                               Currently a work in progress, at the time of writing there are a selection of paprs from both
+                               Currently a work in progress, at the time of writing there are a selection of papers from both
                                History and English available at three levels: Higher, National 4, and National 5. 'Old style'
                                levels have been converted to their modern CfE equivalent to simplify analysis for the end user."""
                     ),
@@ -290,10 +294,10 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                 'border': '1px solid grey',
                             },
                         )
-                ])
+                ]), None
 
     if not (selected_level and selected_subject):
-        return html.Div(["Please select at least Level and Subject to continue."])
+        return html.Div(["Please select at least Level and Subject to continue."]), None
 
  # Construct file paths
     file_paths = []
@@ -331,10 +335,10 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                     file_paths.append(paper_path)
 
 
-    print(file_paths)
+    #print(file_paths)
   
     if not file_paths:
-        return html.Div(["No matching files found."])
+        return html.Div(["No matching files found."]), None
 
     # Combine data
     # Combine CSVs into a single DataFrame
@@ -351,10 +355,11 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             dataframes.append(df)
         except Exception as e:
             print(f"Error loading file {path}: {e}")  # Debugging
-            return html.Div([f"Error loading file {path}: {e}"])
+            return html.Div([f"Error loading file {path}: {e}"]), None
     
     combined_df = pd.concat(dataframes, ignore_index=True)
     combined_df = combined_df.drop_duplicates()
+
    
     # Handle "Statistics" tab
     if tab_name == "statistics":
@@ -401,7 +406,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             return html.Div([
                 html.H4("Statistics for the Selected Paper"),
                 html.Ul([html.Li(metric) for metric in metrics])
-            ])
+            ]), combined_df.to_dict("records")
         else:
             # Multiple papers: Aggregate metrics
             avg_word_count = combined_df.groupby("year")["total_tokens"].mean().to_dict()
@@ -433,13 +438,13 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             return html.Div([
                 html.H4("Summary Statistics for Selected Papers"),
                 html.Ul([html.Li(metric) for metric in metrics])
-            ])
+            ]), combined_df.to_dict("records")
 
 
     # Handle "Intent Trend" tab
     elif tab_name == "intent_trend":
         if "intent" not in combined_df.columns:
-            return html.Div(["The selected data does not contain an 'intent' column."])
+            return html.Div(["The selected data does not contain an 'intent' column."]), combined_df.to_dict("records")
 
         num_files = len(file_paths)
 
@@ -467,7 +472,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     show promise (however should not be taken as absolute until more testing has been done)."""
                 ),
                 dcc.Graph(figure=fig)
-            ])
+            ]), combined_df.to_dict("records")
 
         else:
             # Multiple CSVs: Show intent trend
@@ -507,11 +512,11 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 dcc.Graph(id="intent-trend-graph"),
                 
                 dcc.Store(id="intent-trend-data", data=intent_trend.to_dict("records"))
-            ])
+            ]), combined_df.to_dict("records")
         
     elif tab_name == "sentiment_trend":
        if "compound_sentiment_score" not in combined_df.columns:
-           return html.Div(["The selected data does not contain a 'compound_sentiment_score' column."])
+           return html.Div(["The selected data does not contain a 'compound_sentiment_score' column."]), combined_df.to_dict("records")
    
        num_files = len(file_paths)
    
@@ -550,7 +555,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                    This doesn't necessarily mean they are negative, just that they are more direct."""
                ),
                dcc.Graph(figure=fig)
-           ])
+           ]), combined_df.to_dict("records")
    
        else:
            # Multiple CSVs: Show trend over time by averaging scores
@@ -577,11 +582,11 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                    This doesn't necessarily mean they are negative, just that they are more direct."""
                ),
                dcc.Graph(figure=fig)
-           ])
+           ]), combined_df.to_dict("records")
                    
     elif tab_name == "sentence_length_trend":
         if "text" not in combined_df.columns:
-            return html.Div(["The selected data does not contain a 'text' column."])
+            return html.Div(["The selected data does not contain a 'text' column."]), combined_df.to_dict("records")
 
         num_files = len(file_paths)
 
@@ -603,7 +608,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     """This shows the length of each question (in words) throughout the paper."""
                 ),
                 dcc.Graph(figure=fig)
-            ])
+            ]), combined_df.to_dict("records")
 
         else:
             # Multiple Papers: Average sentence length per year
@@ -625,7 +630,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     """This shows the average length of each question (in words) throughout each paper over the years."""
                 ),
                 dcc.Graph(figure=fig)
-            ])
+            ]), combined_df.to_dict("records")
         
     elif tab_name == "topics":
         all_entities = " ".join(combined_df["named_entities"].dropna())
@@ -645,7 +650,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         result = [[word, count] for word, count in word_counts.items()]
         
         #formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
-        
+           
         return html.Div([
             html.H4("Named Entities in the filtered results"),
             html.P(
@@ -679,16 +684,17 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             ], style={'display': 'flex', 'flex-direction': 'row'}),
             html.Div([
                 html.H4("", id="report"),
+                dcc.Graph(id="word-usage-plot"),
                 ])    
-        ])
+        ]), combined_df.to_dict("records")
     
     elif tab_name == "complexity":
         if "coleman_liau" not in combined_df.columns:
-            return html.Div(["The selected data does not contain a 'coleman_liau' column."])
+            return html.Div(["The selected data does not contain a 'coleman_liau' column."]), combined_df.to_dict("records")
         if "flesch_kincaid" not in combined_df.columns:
-            return html.Div(["The selected data does not contain a 'flesch_kincaid' column."])
+            return html.Div(["The selected data does not contain a 'flesch_kincaid' column."]), combined_df.to_dict("records")
         if "gunning_fog" not in combined_df.columns:
-            return html.Div(["The selected data does not contain a 'gunning_fog' column."])
+            return html.Div(["The selected data does not contain a 'gunning_fog' column."]), combined_df.to_dict("records")
         
         num_files = len(file_paths)
         
@@ -741,7 +747,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     The higher the index, the more difficult the text is to read."""
                 ),
                 dcc.Graph(figure=fig)
-            ])
+            ]), combined_df.to_dict("records")
         
         else:
             # Multiple CSVs: Show trend over time by averaging scores
@@ -765,8 +771,8 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     The higher the index, the more difficult the text is to read."""
                 ),
                 dcc.Graph(figure=fig)
-            ])
-        
+            ]), combined_df.to_dict("records")
+
         
 @app.callback(
     Output(component_id='report', component_property='children'),
@@ -776,11 +782,58 @@ def update_output_div(item):
     if item == None:
         return ''
     
-    
-    #all_words = data.groupby("year")["named_entities"]
-    #print(all_words)
-    
     return f'Frequency of "{item[0]}" over time'.format(item)
+
+
+@app.callback(
+    Output("word-usage-plot", "figure"),
+    [
+        Input("cloud", "click"),
+        State("combined-data", "data"),  # Retrieve stored data (list of dictionaries)
+    ]
+)
+def plot_word_usage(word, combined_data):
+    if not word or not combined_data:
+        return {}
+
+    #print (word)
+    # Convert the stored data back into a DataFrame
+    combined_df = pd.DataFrame(combined_data)
+    #print("Converted DataFrame:")
+    #print(combined_df.head())
+    
+    def count_word_in_year(named_entities, word):
+        if not isinstance(named_entities, str):
+            return 0
+        # Use regex to find the word followed by its count in curly braces
+        matches = re.findall(fr'\b{word}\b\s*\{{(\d+)\}}', named_entities)
+        # Convert counts to integers and sum them
+        return sum(int(count) for count in matches)
+    
+    # Group by 'year' and aggregate 'named_entities', ignoring empty rows
+    result = (
+        combined_df.groupby("year", as_index=False)
+        .agg({"named_entities": lambda rows: sum(count_word_in_year(row, word[0]) for row in rows)})
+        .rename(columns={"named_entities": "count"})
+    )
+    
+    #print(result)
+    
+    # Create a line plot using the aggregated DataFrame
+    fig = px.line(
+        result,  # Use the DataFrame with 'year' and 'count'
+        x="year",
+        y="count",
+        title=f"Occurrences of '{word[0]}' Over Time",
+        labels={"year": "Year", "count": "Occurrences"},
+    )
+    
+    # Add markers for better visualization
+    fig.update_traces(mode="lines+markers")
+    
+    
+    return fig
+
 
 
 # Function to generate word cloud image
@@ -798,16 +851,7 @@ def generate_wordcloud(word_counts):
         rotateRatio=0.5,
         shrinkToFit=False,
         shape='circle',
-        hover=True)#.generate_from_frequencies(word_counts)
-# =============================================================================
-#     fig = plt.figure()
-#     plt.imshow(wordcloud, interpolation='bilinear')
-#     plt.axis('off')
-#     buf = BytesIO()
-#     fig.savefig(buf, format='png')
-#     buf.seek(0)
-#     image_base64 = base64.b64encode(buf.read()).decode('utf-8')
-# =============================================================================
+        hover=True)
     return wordcloud
 
 
