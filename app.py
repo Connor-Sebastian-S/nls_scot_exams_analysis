@@ -339,6 +339,8 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
   
     if not file_paths:
         return html.Div(["No matching files found."]), None
+    
+
 
     # Combine data
     # Combine CSVs into a single DataFrame
@@ -359,7 +361,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     
     combined_df = pd.concat(dataframes, ignore_index=True)
     combined_df = combined_df.drop_duplicates()
-
+    
    
     # Handle "Statistics" tab
     if tab_name == "statistics":
@@ -633,6 +635,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             ]), combined_df.to_dict("records")
         
     elif tab_name == "topics":
+        
+        
+        
         all_entities = " ".join(combined_df["named_entities"].dropna())
 
         # Split the string into words and counts
@@ -773,7 +778,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 dcc.Graph(figure=fig)
             ]), combined_df.to_dict("records")
 
-        
+          
 @app.callback(
     Output(component_id='report', component_property='children'),
     Input(component_id='cloud', component_property='click')
@@ -784,15 +789,17 @@ def update_output_div(item):
     
     return f'Frequency of "{item[0]}" over time'.format(item)
 
-
+    
 @app.callback(
     Output("word-usage-plot", "figure"),
     [
         Input("cloud", "click"),
         State("combined-data", "data"),  # Retrieve stored data (list of dictionaries)
+        Input("level-dropdown", "value"),
+        Input("subject-dropdown", "value"),
     ]
 )
-def plot_word_usage(word, combined_data):
+def plot_word_usage(word, combined_data, selected_level, selected_subject):
     if not word or not combined_data:
         return {}
 
