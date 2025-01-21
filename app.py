@@ -299,7 +299,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     if not (selected_level and selected_subject):
         return html.Div(["Please select at least Level and Subject to continue."]), None
 
- # Construct file paths
+    # Construct file paths
     file_paths = []
     if selected_year and selected_year != "all":
         # Handle a specific year
@@ -334,16 +334,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                 if os.path.exists(paper_path):
                                     file_paths.append(paper_path)
 
-
-    #print(file_paths)
-  
     if not file_paths:
         return html.Div(["No matching files found."]), None
-    
 
-
-    # Combine data
-    # Combine CSVs into a single DataFrame
     dataframes = []
     for path in file_paths:
         try:
@@ -803,24 +796,23 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
     if not word or not combined_data:
         return {}
 
-    #print (word)
     # Convert the stored data back into a DataFrame
-    combined_df = pd.DataFrame(combined_data)
-    #print("Converted DataFrame:")
-    #print(combined_df.head())
+    #combined_df = pd.DataFrame(combined_data)
+
+    combined_df = load_csv(selected_year = None, selected_paper = None, selected_level = selected_level, selected_subject = selected_subject)
     
     def count_word_in_year(named_entities, word):
         if not isinstance(named_entities, str):
             return 0
         # Use regex to find the word followed by its count in curly braces
-        matches = re.findall(fr'\b{word}\b\s*\{{(\d+)\}}', named_entities)
+        matches = re.findall(fr'\b{word}\b\s*\{{(\d+)\}}', named_entities.lower())
         # Convert counts to integers and sum them
         return sum(int(count) for count in matches)
     
     # Group by 'year' and aggregate 'named_entities', ignoring empty rows
     result = (
         combined_df.groupby("year", as_index=False)
-        .agg({"named_entities": lambda rows: sum(count_word_in_year(row, word[0]) for row in rows)})
+        .agg({"named_entities": lambda rows: sum(count_word_in_year(row, word[0].lower()) for row in rows)})
         .rename(columns={"named_entities": "count"})
     )
     
@@ -837,10 +829,8 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
     
     # Add markers for better visualization
     fig.update_traces(mode="lines+markers")
-    
-    
-    return fig
 
+    return fig
 
 
 # Function to generate word cloud image
@@ -919,15 +909,36 @@ def load_csv(selected_year, selected_level, selected_subject, selected_paper):
                     for paper, files in papers.items():
                         paper_path = os.path.join(DATA_DIR, year, level, paper, f"{selected_subject}.csv")
                         file_paths.append(paper_path)
+                        
+    dataframes = []
+    for path in file_paths:
+        try:
+            df = pd.read_csv(path)
+            # Extract paper and year
+            paper_number = os.path.basename(os.path.dirname(path))  # Full "Paper 1", "Paper 2"
+            df["paper"] = paper_number
+            year = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(path))))
 
-    if not file_paths:
-        return html.Div(["No matching files found."])
+            df["year"] = int(year)
+            dataframes.append(df)
+        except Exception as e:
+            print(f"Error loading file {path}: {e}")  # Debugging
+            return html.Div([f"Error loading file {path}: {e}"]), None
+    
+    combined_df = pd.concat(dataframes, ignore_index=True)
+    combined_df = combined_df.drop_duplicates()
+    return combined_df
 
-    # Display file paths as a list
-    return html.Div([
-        html.H4("Loaded File Paths:"),
-        html.Ul([html.Li(path) for path in file_paths])
-    ])
+# =============================================================================
+#     if not file_paths:
+#         return html.Div(["No matching files found."])
+# 
+#     # Display file paths as a list
+#     return html.Div([
+#         html.H4("Loaded File Paths:"),
+#         html.Ul([html.Li(path) for path in file_paths])
+#     ])
+# =============================================================================
 
 
 # Run the app
