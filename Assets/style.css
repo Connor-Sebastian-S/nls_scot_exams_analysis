@@ -69,6 +69,7 @@ label {
 .vertical-tabs {
         display: flex;
         flex-direction: column;
+        margin-bottom: 0px;
     }
     .tab-item {
         margin-bottom: 10px;

@@ -130,48 +130,54 @@ app.layout = dbc.Container(
                                     {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 3)
                                 ] + [{"label": "All Papers", "value": "all"}],
                                 placeholder="Select a Paper",
-                                style={"width": "90%"}
+                                style={"width": "90%", "marginBottom": "15px"}
                             ),
                         ],
                         className="vertical-tabs"
                     ),
-                    #width=4,  # Adjust the width as needed
+                    # width=4,  # Adjust the width as needed
                 ),
                 
                 # Right-hand side: Tabs
                 dbc.Col(
-                    dcc.Tabs(
-                        id="tabs",
-                        value="introduction",
-                        children=[
-                            dcc.Tab(label="Introduction", value="introduction", className=".custom-tab"),
-                            dcc.Tab(label="Statistics", value="statistics", className=".custom-tab"),
-                            dcc.Tab(label="Intent Trend", value="intent_trend", className=".custom-tab"),
-                            dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend", className=".custom-tab"),
-                            dcc.Tab(label="Question Length Trend", value="sentence_length_trend", className=".custom-tab"),
-                            dcc.Tab(label="Question Topics", value="topics", className=".custom-tab"),
-                            dcc.Tab(label="Complexity Trends", value="complexity", className=".custom-tab"),
+                    html.Div(
+                        [
+                            dcc.Tabs(
+                                id="tabs",
+                                value="introduction",
+                                children=[
+                                    dcc.Tab(label="Introduction", value="introduction", className="custom-tab"),
+                                    dcc.Tab(label="Statistics", value="statistics", className="custom-tab"),
+                                    dcc.Tab(label="Intent Trend", value="intent_trend", className="custom-tab"),
+                                    dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend", className="custom-tab"),
+                                    dcc.Tab(label="Question Length Trend", value="sentence_length_trend", className="custom-tab"),
+                                    dcc.Tab(label="Question Topics", value="topics", className="custom-tab"),
+                                    dcc.Tab(label="Complexity Trends", value="complexity", className="custom-tab"),
+                                ],
+                                style={
+                                    "marginBottom": "0px",  # Remove gap between tabs and content
+                                    "borderBottom": "none",  # Remove the bottom border of tabs
+                                },
+                            ),
+                            html.Div(
+                                id="tabs-content",
+                                style={
+                                    "border": "1px solid #ccc",  # Add border for a cleaner look
+                                    "padding": "10px",  # Add padding inside the content area
+                                    "marginTop": "0px",  # Ensure no gap between tabs and content
+                                },
+                            ),
                         ],
                     ),
-                    className="vertical-tabs"
                 ),
             ],
             style={"marginBottom": "20px"},
-        ),
-        
-        html.Hr(style={"borderWidth": "2px", "borderColor": "#ccc", "width": "100%"}),
-        
-        # Tab content at the bottom
-        dbc.Row(
-            dbc.Col(
-                html.Div(id="tabs-content"),
-                width=12
-            ),
         ),
     ],
     fluid=True,
     className="dashboard-container"
 )
+
 #=============================================================================
 
 
