@@ -32,7 +32,6 @@ server = app.server
 # Directory containing CSV files
 DATA_DIR = "output"
 
-
 def parse_directory(data_dir):
     directory_info = {}
     for year in os.listdir(data_dir):
@@ -644,29 +643,21 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
         # Convert the dictionary to a 2D array
         result = [[word, count] for word, count in word_counts.items()]
-        print(result)
         
-        #print(word_counts)
-        
-        formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
-
-        #image_base64 = generate_wordcloud(result)
+        #formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
         
         return html.Div([
             html.H4("Named Entities in the filtered results"),
             html.P(
-                """This shows an aggregated list of named entities in the filtered
-                results. Named entities here refers to people and places. The number next to 
-                an entity is the number of times it appears in the filtered results."""
+                """This shows the frequency of named entities (people and places) for the filtered
+                results. The larger a word appears in the wordcloud below, the more frequent it is.
+                Hovering over a word will show the number of times it appears in the selected
+                filters. Clicking a word will show a plot below the wordcloud that shows the frequency of
+                that word over time."""
             ),
             html.Div([
                 html.Div([
-                    html.H4("List of Named Entities"),
-                    html.Ul([html.Li(entry) for entry in formatted_entries]),
-                ], style={'flex': '1', 'padding': '10px'}),
-                html.Div([
                     html.H4("Word Cloud of Named Entities"),
-                    #html.Img(src='data:image/png;base64,{}'.format(image_base64)),
                     DashWordcloud(
                         id="cloud",
                         list=result,
@@ -684,11 +675,11 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                         weightFactor=8,
                         drawOutOfBound=False,
                         hover=True),
-                    html.H4("Test: ", id="report")
                 ]),
-                
             ], style={'display': 'flex', 'flex-direction': 'row'}),
-            
+            html.Div([
+                html.H4("", id="report"),
+                ])    
         ])
     
     elif tab_name == "complexity":
@@ -775,42 +766,22 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 ),
                 dcc.Graph(figure=fig)
             ])
-# =============================================================================
-#     elif tab_name == "structure":
-#         
-#         num_files = len(file_paths)
-#         
-#         def tag_entities(text): 
-#             doc = nlp(text) 
-#             tagged_text = ""
-#             for token in doc:
-#                 tagged_text += f"<span class='token'>{token.text} <span class='pos'>({token.pos_})</span></span> "
-#             return tagged_text
-# 
-#         if num_files == 1:
-#             combined_df = combined_df.sort_index()  # Ensure questions are in order
-#             questions = combined_df["text"]
-#             tagged_q = questions
-#             
-#             for i, q in enumerate (questions):
-#             
-#                 tagged_q[i] = tag_entities(q)
-#             
-#             return html.Div([
-#                 html.H4("Tagged Representation of Questions"),
-#                 html.Div([
-#                     html.Div(dcc.Markdown(f"### Question {i+1}\n{tagged}", dangerously_allow_html=True), style={'margin-bottom': '20px'})
-#                     for i, tagged in enumerate(tagged_q)
-#                 ])
-#             ])
-# =============================================================================
-
+        
+        
 @app.callback(
     Output(component_id='report', component_property='children'),
     Input(component_id='cloud', component_property='click')
 )
 def update_output_div(item):
-    return 'Output: {}'.format(item)
+    if item == None:
+        return ''
+    
+    
+    #all_words = data.groupby("year")["named_entities"]
+    #print(all_words)
+    
+    return f'Frequency of "{item[0]}" over time'.format(item)
+
 
 # Function to generate word cloud image
 def generate_wordcloud(word_counts):
