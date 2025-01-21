@@ -22,8 +22,10 @@ import base64
 from io import BytesIO
 import re
 import pandas as pd
-import boto3
+
 from io import StringIO
+
+
 
 
 # Initialize Dash app
@@ -33,10 +35,6 @@ server = app.server
 
 # Directory containing CSV files
 DATA_DIR = "output"
-
-s3_client = boto3.client('s3')
-bucket_name = "csanlsdatabucket"
-
 
 def parse_directory(data_dir):
     directory_info = {}
@@ -305,6 +303,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     if not (selected_level and selected_subject):
         return html.Div(["Please select at least Level and Subject to continue."]), None
 
+#=============================================================================
     # Construct file paths
     file_paths = []
     if selected_year and selected_year != "all":
@@ -340,16 +339,16 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                 if os.path.exists(paper_path):
                                     file_paths.append(paper_path)
 
+#=============================================================================
+
     if not file_paths:
         return html.Div(["No matching files found."]), None
 
     dataframes = []
     for path in file_paths:
-        try:
-            obj = s3_client.get_object(Bucket=bucket_name, Key=path)
-            data = obj['Body'].read().decode('utf-8')
-            df = pd.read_csv(StringIO(data))
-            #df = pd.read_csv(path)
+        try: 
+            df = pd.read_csv(path)
+            #df = read_csv_from_s3(S3_BUCKET, path)
             # Extract paper and year
             paper_number = os.path.basename(os.path.dirname(path))  # Full "Paper 1", "Paper 2"
             df["paper"] = paper_number
