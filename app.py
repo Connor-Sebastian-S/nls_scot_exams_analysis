@@ -61,78 +61,117 @@ directory_info = parse_directory(DATA_DIR)
 
 
 #=============================================================================
-app.layout = dbc.Container([
-     
-    dcc.Store(id="selected-year", data=None),
-    
-    html.H1("Scottish Exams - Linguistical Analysis Dashboard", style={"textAlign": "center"}),
-
-    # Filters
-    html.Div([
-        html.Label("Select Year (Optional):"),
-        dcc.Dropdown(
-            id="year-dropdown",
-            className="customDropdown",
-            options=[{"label": year, "value": year} for year in directory_info.keys()] + [{"label": "All Years", "value": "all"}],
-            placeholder="Select a Year",
-            style={"width": "90%"}
+app.layout = dbc.Container(
+    [
+        # Store
+        dcc.Store(id="selected-year", data=None),
+        
+        # Header
+        dbc.Row(
+            dbc.Col(
+                html.H1(
+                    "Scottish Exams - Linguistical Analysis Dashboard",
+                    style={"textAlign": "center"}
+                ),
+                width=12
+            ),
         ),
-        html.Label("Select Level:"),
-        dcc.Dropdown(
-            id="level-dropdown",
-            className="customDropdown",
-            options=[{"label": level, "value": level} for level in set(l for levels in directory_info.values() for l in levels)],
-            placeholder="Select a Level",
-            style={"width": "90%"}
-        ),
-        html.Label("Select Subject:"),
-        dcc.Dropdown(
-            id="subject-dropdown",
-            className="customDropdown",
-            options=[
-                {"label": subj, "value": subj}
-                for subj in set(
-                    s
-                    for levels in directory_info.values()
-                    for papers in levels.values()
-                    for subjects in papers.values()
-                    for s in subjects
-                )
+        
+        # Main body with dropdowns and tabs
+        dbc.Row(
+            [
+                # Left-hand side: Dropdown filters
+                dbc.Col(
+                    html.Div(
+                        [
+                            html.Label("Select Year (Optional):"),
+                            dcc.Dropdown(
+                                id="year-dropdown",
+                                className="customDropdown",
+                                options=[
+                                    {"label": year, "value": year} for year in directory_info.keys()
+                                ] + [{"label": "All Years", "value": "all"}],
+                                placeholder="Select a Year",
+                                style={"width": "90%"}
+                            ),
+                            html.Label("Select Level:"),
+                            dcc.Dropdown(
+                                id="level-dropdown",
+                                className="customDropdown",
+                                options=[
+                                    {"label": level, "value": level}
+                                    for level in set(l for levels in directory_info.values() for l in levels)
+                                ],
+                                placeholder="Select a Level",
+                                style={"width": "90%"}
+                            ),
+                            html.Label("Select Subject:"),
+                            dcc.Dropdown(
+                                id="subject-dropdown",
+                                className="customDropdown",
+                                options=[
+                                    {"label": subj, "value": subj}
+                                    for subj in set(
+                                        s
+                                        for levels in directory_info.values()
+                                        for papers in levels.values()
+                                        for subjects in papers.values()
+                                        for s in subjects
+                                    )
+                                ],
+                                placeholder="Select a Subject",
+                                style={"width": "90%"}
+                            ),
+                            html.Label("Select Paper: (Optional)"),
+                            dcc.Dropdown(
+                                id="paper-dropdown",
+                                className="customDropdown",
+                                options=[
+                                    {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 3)
+                                ] + [{"label": "All Papers", "value": "all"}],
+                                placeholder="Select a Paper",
+                                style={"width": "90%"}
+                            ),
+                        ],
+                        className="vertical-tabs"
+                    ),
+                    #width=4,  # Adjust the width as needed
+                ),
+                
+                # Right-hand side: Tabs
+                dbc.Col(
+                    dcc.Tabs(
+                        id="tabs",
+                        value="introduction",
+                        children=[
+                            dcc.Tab(label="Introduction", value="introduction", className=".custom-tab"),
+                            dcc.Tab(label="Statistics", value="statistics", className=".custom-tab"),
+                            dcc.Tab(label="Intent Trend", value="intent_trend", className=".custom-tab"),
+                            dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend", className=".custom-tab"),
+                            dcc.Tab(label="Question Length Trend", value="sentence_length_trend", className=".custom-tab"),
+                            dcc.Tab(label="Question Topics", value="topics", className=".custom-tab"),
+                            dcc.Tab(label="Complexity Trends", value="complexity", className=".custom-tab"),
+                        ],
+                    ),
+                    className="vertical-tabs"
+                ),
             ],
-            placeholder="Select a Subject",
-            style={"width": "90%"}
+            style={"marginBottom": "20px"},
         ),
-
-        html.Label("Select Paper: (Optional)"),
-        dcc.Dropdown(
-            id="paper-dropdown",
-            className="customDropdown",
-            options=[{"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 3)] + [{"label": "All Papers", "value": "all"}],
-            placeholder="Select a Paper",
-            style={"width": "90%"}
+        
+        html.Hr(style={"borderWidth": "2px", "borderColor": "#ccc", "width": "100%"}),
+        
+        # Tab content at the bottom
+        dbc.Row(
+            dbc.Col(
+                html.Div(id="tabs-content"),
+                width=12
+            ),
         ),
-
-    ], style={"marginBottom": "20px"}),
-
-    # Tabs for different views
-    dcc.Tabs(id="tabs", value="introduction", children=[
-        dcc.Tab(label="Introduction", value="introduction"),
-        dcc.Tab(label="Statistics", value="statistics"),
-        dcc.Tab(label="Intent Trend", value="intent_trend"),
-        dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend"),
-        dcc.Tab(label="Question Length Trend", value="sentence_length_trend"),
-        dcc.Tab(label="Question Topics", value="topics"),
-        dcc.Tab(label="Complexity Trends", value="complexity"),
-        #dcc.Tab(label="Question Structure", value="structure"),
-    ]),
-
-    # Content for tabs
-    html.Div(id="tabs-content")
-], 
-    fluid=True, 
-    #style={'display': 'flex'},
-    className='dashboard-container'
-    )
+    ],
+    fluid=True,
+    className="dashboard-container"
+)
 #=============================================================================
 
 

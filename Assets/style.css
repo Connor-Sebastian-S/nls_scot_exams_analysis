@@ -5,6 +5,12 @@ h1 {
     margin: 15px;
 }
 
+label {
+    font-family: "Poppins"; 
+    color: #676768;
+    margin: 5px;
+}
+
 .customDropdown {
     font-size: 16px;
     font-family: "Poppins";
@@ -60,32 +66,20 @@ h1 {
     color: #010103;
 }
 
-.token {
-            position: relative;
-            display: inline-block;
-            padding: 5px;
-            margin: 5px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-        }
-        .pos {
-            position: absolute;
-            top: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 3px 6px;
-            background-color: #ffa;
-            border-radius: 3px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            font-size: 12px;
-        }
-        .token::after {
-            content: "";
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 10px;
-            border-style: solid;
-            border-color: transparent transparent #ffa transparent;
-        }
+.vertical-tabs {
+        display: flex;
+        flex-direction: column;
+    }
+    .tab-item {
+        margin-bottom: 10px;
+    }
+    .custom-tab {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+    }
+    .custom-tab:hover {
+        background-color: #f9f9f9;
+    }
