@@ -15,7 +15,8 @@ import re
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from wordcloud import WordCloud
+#from wordcloud import WordCloud
+from dash_holoniq_wordcloud import DashWordcloud
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
@@ -643,10 +644,13 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
         # Convert the dictionary to a 2D array
         result = [[word, count] for word, count in word_counts.items()]
+        print(result)
+        
+        #print(word_counts)
         
         formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
 
-        image_base64 = generate_wordcloud(word_counts)
+        #image_base64 = generate_wordcloud(result)
         
         return html.Div([
             html.H4("Named Entities in the filtered results"),
@@ -662,9 +666,28 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 ], style={'flex': '1', 'padding': '10px'}),
                 html.Div([
                     html.H4("Word Cloud of Named Entities"),
-                    html.Img(src='data:image/png;base64,{}'.format(image_base64)),
-                ], style={'flex': '1', 'padding': '10px'}),
+                    #html.Img(src='data:image/png;base64,{}'.format(image_base64)),
+                    DashWordcloud(
+                        list=result,
+                        width=600, height=400,
+                        gridSize=10,
+                        # weightFactor=2,
+                        # origin=[90, 0],
+                        # fontFamily='Sans, serif',
+                        color='random-light',
+                        backgroundColor='#ffffff',
+                        shuffle=True,
+                        rotateRatio=0.5,
+                        shrinkToFit=False,
+                        shape='circle',
+                        weightFactor=8,
+                        drawOutOfBound=False,
+                        hover=True),
+                    html.H4("Test: ", id="report")
+                ]),
+                
             ], style={'display': 'flex', 'flex-direction': 'row'}),
+            
         ])
     
     elif tab_name == "complexity":
@@ -781,19 +804,39 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 #             ])
 # =============================================================================
 
-
+@app.callback(
+    Output(component_id='report', component_property='children'),
+    Input(component_id='cloud', component_property='click')
+)
+def update_output_div(item):
+    return 'Output: {}'.format(item)
 
 # Function to generate word cloud image
 def generate_wordcloud(word_counts):
-    wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(word_counts)
-    fig = plt.figure()
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis('off')
-    buf = BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
-    image_base64 = base64.b64encode(buf.read()).decode('utf-8')
-    return image_base64
+    wordcloud = DashWordcloud(
+        list=word_counts,
+        width=600, height=400,
+        gridSize=16,
+        # weightFactor=2,
+        # origin=[90, 0],
+        # fontFamily='Sans, serif',
+        color='#f0f0c0',
+        backgroundColor='#001f00',
+        shuffle=False,
+        rotateRatio=0.5,
+        shrinkToFit=False,
+        shape='circle',
+        hover=True)#.generate_from_frequencies(word_counts)
+# =============================================================================
+#     fig = plt.figure()
+#     plt.imshow(wordcloud, interpolation='bilinear')
+#     plt.axis('off')
+#     buf = BytesIO()
+#     fig.savefig(buf, format='png')
+#     buf.seek(0)
+#     image_base64 = base64.b64encode(buf.read()).decode('utf-8')
+# =============================================================================
+    return wordcloud
 
 
 # Callback for dynamic toggle
