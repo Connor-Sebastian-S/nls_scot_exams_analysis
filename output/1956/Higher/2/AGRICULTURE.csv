@@ -1,0 +1,13 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1956,Higher Grade,AGRICULTURE,2,1. ,Describe the process known as carbon assimilation in plants. ,11.1,9.2,8.04,6,0,0,6,0.0,reason,0.9612756967544556,
+1956,Higher Grade,AGRICULTURE,2,1. b,Explain how the rate of this process varies with weather and with climatic conditions.,11.94,8.8,11.31,7,0,0,7,0.0,reason,0.9906623959541321,
+1956,Higher Grade,AGRICULTURE,2,2. ,"Discuss the extent to which nitrogen as nitrate, nitrogen as ammonia, lime, potash, phosphate may be lost by the leaching action of water in the soil. ",10.39,12.3,13.48,15,0,1,14,-0.3182,reason,0.9881171584129333,
+1956,Higher Grade,AGRICULTURE,2,2. b,What action may be taken to prevent or rectify those losses which are likely to be serious ?,7.65,7.6,11.51,8,1,2,5,-0.12319999999999999,compare,0.9922109842300415,
+1956,Higher Grade,AGRICULTURE,2,3,"State, with reasons where possible, the conditions of soil and climate under which five of the following crops are grown most successfully early potatoes, potatoes grown for seed, sugar beet, wheat, barley, cabbage. 4 each",8.98,14.6,16.29,22,1,0,21,0.4939,describe,0.7479246258735657,
+1956,Higher Grade,AGRICULTURE,2,4,"Name two harmful weeds of arable land and two of grassland. Describe the appearance of each, name the natural order or family to which it belongs, and state how it may be kept in check.",7.66,6.6,9.29,19,1,0,18,0.3612,discuss,0.34608879685401917,
+1956,Higher Grade,AGRICULTURE,2,5. ,Explain the process of respiration in animals. 5 ,11.93,10.0,13.2,5,0,0,5,0.0,reason,0.5400073528289795,
+1956,Higher Grade,AGRICULTURE,2,5. b,Describe with suitable sketches the respiratory system in the hen.,13.72,7.2,8.0,6,0,0,6,0.0,reason,0.9068199992179871,
+1956,Higher Grade,AGRICULTURE,2,5. c,Enumerate the main differences between the respiratory system of the hen and that of the ox,9.97,8.4,13.9,7,0,0,7,0.0,reason,0.7452307939529419,
+1956,Higher Grade,AGRICULTURE,2,6,"Give a detailed account, including a description of control measures, of EITHER potato blight OR bovine tuberculosis.",11.91,9.9,13.86,12,0,0,12,0.0,reason,0.9196842312812805,EITHER {1}
+1956,Higher Grade,AGRICULTURE,2,7. ,Explain what is meant by The Theory o£ Evolution. ,9.35,4.4,8.04,4,0,0,4,0.0,reason,0.9907630085945129,The Theory o£ Evolution {1}
+1956,Higher Grade,AGRICULTURE,2,7. b,Discuss the effects of milk recording and artificial insemination on the improvement of breeds of dairy cattle.,14.5,12.3,16.21,10,1,0,9,0.4588,reason,0.9940885305404663,The Theory o£ Evolution {1}

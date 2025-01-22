@@ -130,7 +130,7 @@ app.layout = dbc.Container(
                                 id="paper-dropdown",
                                 className="customDropdown",
                                 options=[
-                                    {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 3)
+                                    {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 5)
                                 ] + [{"label": "All Papers", "value": "all"}],
                                 placeholder="Select a Paper",
                                 style={"width": "100%", "marginBottom": "15px"}
