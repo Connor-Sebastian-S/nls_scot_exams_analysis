@@ -26,8 +26,6 @@ import pandas as pd
 from io import StringIO
 
 
-
-
 # Initialize Dash app
 app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL])
 app.title = "Scottish Examination Analysis Dashboard"
@@ -130,7 +128,7 @@ app.layout = dbc.Container(
                                 id="paper-dropdown",
                                 className="customDropdown",
                                 options=[
-                                    {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 5)
+                                    {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 6)
                                 ] + [{"label": "All Papers", "value": "all"}],
                                 placeholder="Select a Paper",
                                 style={"width": "100%", "marginBottom": "15px"}
@@ -200,6 +198,24 @@ app.layout = dbc.Container(
 def render_tab_content(tab_name, selected_year, selected_level, selected_subject, selected_paper):
        
     if tab_name == "introduction":
+        
+        subj_list = []
+        for subj in set(
+            s
+            for levels in directory_info.values()
+            for papers in levels.values()
+            for subjects in papers.values()
+            for s in subjects
+        ):
+            subj_list.append(subj)
+            div_elements = [html.Li(_s) for _s in subj_list]
+        
+        levl_list = []
+        for level in set(l for levels in directory_info.values() for l in levels):
+            levl_list.append(level)
+        div_elements_levels = [html.Li(_l) for _l in levl_list]
+
+
         # Data for exam grades progression
         exam_grades_data = [
             {"Era": "Pre-1947", "Grade": "Lower Grade", "Modern Equivalent": "National 4"},
@@ -233,6 +249,11 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                History and English available at three levels: Higher, National 4, and National 5. 'Old style'
                                levels have been converted to their modern CfE equivalent to simplify analysis for the end user."""
                     ),
+                    html.P("At the moment we can analyse the following subjects:"),
+                    html.Ul(div_elements),
+                    html.P("At the moment we can analyse the following levels:"),
+                    html.Ul(div_elements_levels),
+                    html.P("And inspect the following metrics:"),
                     html.Ul([
                         html.Li("Statistics: View detailed statistics about the selected dataset."),
                         html.P(
@@ -362,7 +383,6 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     
     combined_df = pd.concat(dataframes, ignore_index=True)
     combined_df = combined_df.drop_duplicates()
-    
    
     # Handle "Statistics" tab
     if tab_name == "statistics":
@@ -923,11 +943,13 @@ def load_csv(selected_year, selected_level, selected_subject, selected_paper):
     for path in file_paths:
         try:
             df = pd.read_csv(path)
+            print (path)
             # Extract paper and year
             paper_number = os.path.basename(os.path.dirname(path))  # Full "Paper 1", "Paper 2"
             df["paper"] = paper_number
+            #print (paper_number)
             year = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(path))))
-
+            #print (year)
             df["year"] = int(year)
             dataframes.append(df)
         except Exception as e:
@@ -935,7 +957,7 @@ def load_csv(selected_year, selected_level, selected_subject, selected_paper):
             return html.Div([f"Error loading file {path}: {e}"]), None
     
     combined_df = pd.concat(dataframes, ignore_index=True)
-    combined_df = combined_df.drop_duplicates()
+    combined_df = combined_df.drop_duplicates()       
     return combined_df
 
 # =============================================================================
