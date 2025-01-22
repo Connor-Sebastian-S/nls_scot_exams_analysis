@@ -45,7 +45,7 @@ def process_all_text_files(input_dir, output_dir, move_dir):
             input_file_path = os.path.join(input_dir, file_name)
             print(f"Processing file: {input_file_path}")
             split_file_by_empty_lines(input_file_path, output_dir)
-            os.rename(input_directory + file_name, move_dir + file_name)
+            #os.rename(input_directory + file_name, move_dir + file_name)
 
 # Example usage
 input_directory = "./data/"  # Replace with your input directory path

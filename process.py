@@ -369,12 +369,12 @@ def process_all_files(folder_path, output_dir):
             "/" +
             metadata["paper"] + "/")
         
-        output_file = os.path.join(output_dir, csv_file_name)
-        if not (os.path.isfile(output_file)):
-            os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        output_file = os.path.join(output_dir, csv_file_name)   
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+            #os.remove(output_file)
+        if not os.path.exists(output_file):
             Analyse_and_save_questions(metadata, output_file)
             shutil.move(file_path, os.path.join(folder_path, "processed"))
-        #shutil.move(file_path, os.path.join(folder_path, "already_here"))
 
 
 # directory containing exam text files
