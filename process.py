@@ -372,9 +372,9 @@ def process_all_files(folder_path, output_dir):
         output_file = os.path.join(output_dir, csv_file_name)   
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
             #os.remove(output_file)
-        if not os.path.exists(output_file):
-            Analyse_and_save_questions(metadata, output_file)
-            shutil.move(file_path, os.path.join(folder_path, "processed"))
+        #if not os.path.exists(output_file):
+        Analyse_and_save_questions(metadata, output_file)
+        shutil.move(file_path, os.path.join(folder_path, "processed"))
 
 
 # directory containing exam text files
