@@ -909,11 +909,15 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             avg_coleman_liau = combined_df["coleman_liau"].mean()
             avg_flesch_kincaid = combined_df["flesch_kincaid"].mean()
             avg_gunning_fog = combined_df["gunning_fog"].mean()
+            
+            # Calculate the average of the three readability indices for each row
+            combined_df['average'] = combined_df[["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean(axis=1)
+
         
             fig = px.line(
                 combined_df,
                 x=combined_df.index,
-                y=["coleman_liau", "flesch_kincaid", "gunning_fog"],
+                y=["coleman_liau", "flesch_kincaid", "gunning_fog", "average"],  # Include the average in the plot
                 title="Readability Index Trend for Single Paper",
                 labels={"index": "Question Index", "value": "Readability Index"},
                 template="plotly_white",
@@ -944,10 +948,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             # Multiple CSVs: Show trend over time by averaging scores
             readability_trend = combined_df.groupby("year")[["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean().reset_index()
         
+            # Calculate the average of the three readability indices for each year
+            readability_trend['average'] = readability_trend[["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean(axis=1)
+            
+            # Create the plot with the three existing indices and the new average line
             fig = px.line(
                 readability_trend,
                 x="year",
-                y=["coleman_liau", "flesch_kincaid", "gunning_fog"],
+                y=["coleman_liau", "flesch_kincaid", "gunning_fog", "average"],  # Include the average in the plot
                 title="Average Readability Index Trend Over Time",
                 labels={"year": "Year", "value": "Average Readability Index"},
                 template="plotly_white",
