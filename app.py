@@ -306,8 +306,48 @@ app.layout = dbc.Container(
         ),
     ],
     fluid=True,
-    className="dashboard-container"
+    className="dashboard-container"   
 )
+
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <script type="text/javascript">
+            MathJax = {
+                tex: {
+                    inlineMath: [['$', '$'], ['\\(', '\\)']],
+                    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+                },
+                svg: {
+                    fontCache: 'global'
+                }
+            };
+        </script>
+        <script type="text/javascript" async
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
+        </script>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    MathJax.typeset();
+                });
+            </script>
+        </footer>
+    </body>
+</html>
+'''
+
 
 #=============================================================================
 
