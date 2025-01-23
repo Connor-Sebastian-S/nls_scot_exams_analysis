@@ -25,9 +25,20 @@ import pandas as pd
 
 from io import StringIO
 
+MATHJAX_CDN = '''
+https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/
+MathJax.js?config=TeX-MML-AM_CHTML'''
+
+
+external_scripts = [
+                    {'type': 'text/javascript',
+                     'id': 'MathJax-script',
+                     'src': MATHJAX_CDN,
+                     },
+                    ]
 
 # Initialize Dash app
-app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL])
+app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL], external_scripts=external_scripts)
 app.title = "Scottish Examination Analysis Dashboard"
 server = app.server
 
@@ -42,6 +53,107 @@ notable_events = [
     {"year": 1986, "event": "Standard Grades introduced"},
     {"year": 2013, "event": "Curriculum for Excellence introduced"},
 ]
+           
+# Readability explanation block (common for both single and multiple paper analysis)
+readability_explanation = html.Div([
+    html.H4("Understanding Readability Metrics in the Scottish Education System"),
+    html.P("This section provides an explanation of the three readability indices used in the analysis: "
+           "Coleman-Liau Index, Flesch-Kincaid Grade Level, and Gunning Fog Index. Each metric offers insight into text complexity, "
+           "and you can analyze them either as raw values or as proportional contributions."),
+
+    html.H5("1. Coleman-Liau Index (CLI)"),
+    dcc.Markdown(r"""
+        - The Coleman-Liau Index estimates readability based on **letter count per 100 words** and **sentence length**, rather than syllables.  
+        - The formula is:  
+        
+          $$ CLI = (0.0588 \times L) - (0.296 \times S) - 15.8 $$  
+
+          Where:  
+          - \( L \) is the **average number of letters per 100 words**  
+          - \( S \) is the **average number of sentences per 100 words**
+
+        - **Interpretation:** A higher score indicates higher complexity, approximating the Scottish school level required to understand the text.
+        - **Example:** A CLI score of **9** suggests the text is suitable for **S3 students (Fourth Level - BGE).**
+    """),
+
+    html.H5("2. Flesch-Kincaid Grade Level (FKGL)"),
+    dcc.Markdown(r"""
+        - The Flesch-Kincaid Grade Level evaluates readability based on **words per sentence** and **syllables per word**.  
+        - The formula is:  
+        
+          $$ FKGL = (0.39 \times \text{words per sentence}) + (11.8 \times \text{syllables per word}) - 15.59 $$  
+
+        - **Interpretation:** Lower scores suggest simpler text, while higher scores align with more advanced stages in the Scottish education system.
+        - **Example:** A score of **12** indicates that the text is suitable for **S6 students (Advanced Higher).**
+    """),
+
+    html.H5("3. Gunning Fog Index (GFI)"),
+    dcc.Markdown(r"""
+        - The Gunning Fog Index assesses readability by counting **sentence length** and the number of **complex words** (words with 3+ syllables).  
+        - The formula is:  
+
+          $$ GFI = 0.4 \times \left( \left(\frac{\text{words}}{\text{sentences}}\right) + 100 \times \left(\frac{\text{complex words}}{\text{words}}\right) \right) $$  
+
+        - **Interpretation:** A higher score indicates greater complexity, representing the number of years of formal education needed in Scotland.
+        - **Example:** A score of **10** indicates the text is appropriate for **S4 students (National 4/5).**
+    """),
+
+    html.H5("Readability Score Interpretation in the Scottish Education System"),
+    html.Table([
+        html.Thead(html.Tr([
+            html.Th("Score Range"), html.Th("Coleman-Liau Index (CLI)"), html.Th("Flesch-Kincaid Grade Level (FKGL)"), html.Th("Gunning Fog Index (GFI)"), html.Th("Scottish Education Level")
+        ])),
+        html.Tbody([
+            html.Tr([html.Td("1 - 5"), html.Td("P5 - P7"), html.Td("P5 - P7"), html.Td("P5 - P7"), html.Td("Second Level")]),
+            html.Tr([html.Td("6 - 8"), html.Td("S1 - S3"), html.Td("S1 - S3"), html.Td("S1 - S3"), html.Td("Third Level - Fourth Level (BGE)")]),
+            html.Tr([html.Td("9 - 10"), html.Td("S4"), html.Td("S4"), html.Td("S4"), html.Td("National 4/5")]),
+            html.Tr([html.Td("11 - 12"), html.Td("S5"), html.Td("S5"), html.Td("S5"), html.Td("Higher")]),
+            html.Tr([html.Td("13+"), html.Td("S6 and beyond"), html.Td("S6 and beyond"), html.Td("S6 and beyond"), html.Td("Advanced Higher / University")])
+        ])
+    ], style={'width': '100%', 'border': '1px solid black', 'textAlign': 'center', 'marginTop': '20px'}),
+
+    html.P("By using the readability scores above, you can estimate the education level required to understand the text."),
+])
+
+
+# Additional toggle explanation (conditionally included only for multiple papers)
+toggle_explanation = html.Div([
+    html.Table([
+        html.Thead(html.Tr([
+            html.Th("Metric"), html.Th("What it Measures"), html.Th("Raw Score Interpretation (Scottish System)"), html.Th("Proportional Interpretation")
+        ])),
+        html.Tbody([
+            html.Tr([
+                html.Td("Coleman-Liau Index"),
+                html.Td("Letter count & sentence length"),
+                html.Td("Equivalent to Scottish school level (e.g., S3 for Fourth Level - BGE)"),
+                html.Td("Contribution based on letter density")
+            ]),
+            html.Tr([
+                html.Td("Flesch-Kincaid Grade Level"),
+                html.Td("Words per sentence & syllables per word"),
+                html.Td("Equivalent to Scottish school level (e.g., S6 for Advanced Higher)"),
+                html.Td("Impact of syllabic complexity")
+            ]),
+            html.Tr([
+                html.Td("Gunning Fog Index"),
+                html.Td("Sentence length & complex words"),
+                html.Td("Years of education needed (e.g., S4 for National 4/5)"),
+                html.Td("Proportion of long/complex words")
+            ])
+        ])
+    ], style={'width': '100%', 'border': '1px solid black', 'textAlign': 'left', 'marginTop': '20px'}),
+    
+    html.H5("Interpreting the Toggle Options"),
+    dcc.Markdown(r"""
+        - **Raw Score Mode:** Displays the absolute readability levels directly in terms of the Scottish education system (e.g., S4 for National 4/5).
+        - **Proportional Mode:** Shows how each metric contributes to the overall complexity, useful for comparing trends over time.
+
+        By switching between these options, you can gain insights into which factors contribute most to a text’s difficulty over time.
+    """),
+])
+
+
 
 def parse_directory(data_dir):
     directory_info = {}
@@ -822,6 +934,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 annotation_text=f"Gunning Fog Avg: {avg_gunning_fog:.2f}",
                 annotation_position="bottom left",
             )
+            
         
             return html.Div([
                 html.H4("Readability Trend for Single Paper"),
@@ -830,7 +943,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
                     The higher the index, the more difficult the text is to read."""
                 ),
-                dcc.Graph(figure=fig)
+                dcc.Graph(figure=fig),
+                readability_explanation
+                
             ]), combined_df.to_dict("records")
         
         else:
@@ -859,15 +974,30 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     ay=-30,
                     bgcolor="yellow"
                 )
+                
+            toggle_complexity = dcc.RadioItems(
+                id="yaxis-toggle-complexity",
+                options=[
+                    {"label": "Proportion", "value": "proportion"},
+                    {"label": "Raw Score", "value": "value"}
+                ],
+                value="proportion",
+                inline=True
+            )
         
             return html.Div([
+                
                 html.H4("Readability Trend Over Time"),
                 html.P(
-                    """This plot shows the overall average readability indices for each question in the given exam papers over time. 
-                    The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
-                    The higher the index, the more difficult the text is to read."""
+                    """This plot shows the readability indices (Coleman-Liau, Flesch-Kincaid, Gunning Fog) over time. 
+                    You can view them as absolute values or proportions."""
                 ),
-                dcc.Graph(figure=fig),
+                toggle_complexity,
+                dcc.Graph(id="complexity-trend-graph"),
+                dcc.Store(id="complexity-trend-data", data=readability_trend.to_dict("records")),
+                
+                readability_explanation,   
+                toggle_explanation
                 
             ]), combined_df.to_dict("records")
 
@@ -942,6 +1072,32 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
     # Add markers for better visualization
     fig.update_traces(mode="lines+markers")
 
+    return fig
+
+
+@app.callback(
+    Output("complexity-trend-graph", "figure"),
+    [
+        Input("yaxis-toggle-complexity", "value"),
+        Input("complexity-trend-data", "data"),
+    ]
+)
+def update_complexity_trend_chart(yaxis_choice, complexity_trend_data):
+    complexity_trend = pd.DataFrame(complexity_trend_data)
+
+    if yaxis_choice == "proportion":
+        complexity_trend[["coleman_liau", "flesch_kincaid", "gunning_fog"]] = (
+            complexity_trend[["coleman_liau", "flesch_kincaid", "gunning_fog"]]
+            .div(complexity_trend[["coleman_liau", "flesch_kincaid", "gunning_fog"]].sum(axis=1), axis=0)
+        )
+
+    fig = px.line(
+        complexity_trend,
+        x="year",
+        y=["coleman_liau", "flesch_kincaid", "gunning_fog"],
+        title=f"{yaxis_choice.capitalize()} of Readability Metrics Over Time",
+        labels={"year": "Year", "value": "Readability Metric"},
+    )
     return fig
 
 
