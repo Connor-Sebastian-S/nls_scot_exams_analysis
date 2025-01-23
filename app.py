@@ -309,6 +309,7 @@ app.layout = dbc.Container(
                                     dcc.Tab(label="Question Length Trend", value="sentence_length_trend", className=".custom-tab"),
                                     dcc.Tab(label="Question Topics", value="topics", className=".custom-tab"),
                                     dcc.Tab(label="Complexity Trends", value="complexity", className=".custom-tab"),
+                                    dcc.Tab(label="Questions", value="questions", className=".custom-tab"),
                                 ],
                                 style={
                                     "marginBottom": "0px",  # Remove gap between tabs and content
@@ -504,6 +505,13 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 #=============================================================================
     # Construct file paths
     file_paths = []
+    
+    if selected_year and selected_level and selected_paper and selected_subject and selected_paper != "all" and selected_year != "all":
+        # Handle specific year, level, paper, and subject
+        paper_path = os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
+        if os.path.exists(paper_path):
+            file_paths.append(paper_path)
+        
     if selected_year and selected_year != "all":
         # Handle a specific year
         year_dir = directory_info.get(selected_year, {})
@@ -657,7 +665,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 intent_breakdown,
                 x="Intent",
                 y="Count",
-                title="Intent Breakdown for Single Paper",
+                title="Intent Breakdown for Single Year",
                 labels={"Intent": "Question Intent", "Count": "Number of Questions"},
                 text="Count",
             )
@@ -730,7 +738,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                combined_df,
                x=combined_df.index,
                y="compound_sentiment_score",
-               title="Compound Sentiment Score Trend for Single Paper",
+               title="Compound Sentiment Score Trend for Single Year",
                labels={"index": "Question Index", "compound_sentiment_score": "Compound Sentiment Score"},
            )
            fig.update_traces(mode="lines+markers")
@@ -745,7 +753,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
            )
    
            return html.Div([
-               html.H4("Sentiment Trend for Single Paper"),
+               html.H4("Sentiment Trend for Single Year"),
                html.P(
                    """This plot shows the sentiment score for each question in the given exam paper.
                    Sentiment, in this sense, is a number between -1 and +1, with -1 being negative, +1 being 
@@ -798,13 +806,13 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 combined_df,
                 x=combined_df.index,
                 y="sentence_length",
-                title="Question Length Per Question for Single Paper",
+                title="Question Length Per Question for Single Year",
                 labels={"index": "Question Index", "sentence_length": "Question Length (words)"},
             )
             fig.update_traces(mode="lines+markers")
 
             return html.Div([
-                html.H4("Question Length Trend for Single Paper"),
+                html.H4("Question Length Trend for Single Year"),
                 html.P(
                     """This shows the length of each question (in words) throughout the paper."""
                 ),
@@ -918,7 +926,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 combined_df,
                 x=combined_df.index,
                 y=["coleman_liau", "flesch_kincaid", "gunning_fog", "average"],  # Include the average in the plot
-                title="Readability Index Trend for Single Paper",
+                title="Readability Index Trend for Single Year",
                 labels={"index": "Question Index", "value": "Readability Index"},
                 template="plotly_white",
             )
@@ -931,7 +939,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             
         
             return html.Div([
-                html.H4("Readability Trend for Single Paper"),
+                html.H4("Readability Trend for Single Year"),
                 html.P(
                     """This plot shows the readability indices for each question in the given exam paper. 
                     The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
@@ -983,8 +991,57 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 html.Script("renderKatex();"),
                 
             ]), combined_df.to_dict("records")
-       
+        
+    elif tab_name == "questions":
+        # Ensure all dropdowns are specified and none is "All"
+        if not (selected_year and selected_level and selected_subject and selected_paper):
+            return html.Div(["Please specify Year, Level, Subject, and Paper to view questions."]), None
+        if selected_year == "all" or selected_level == "all" or selected_subject == "all" or selected_paper == "all":
+            return html.Div(["Please refine your selection. The 'Questions' tab requires a specific paper."]), None
     
+        # Construct the file path for the specified paper
+        paper_path = os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
+        if not os.path.exists(paper_path):
+            return html.Div(["The specified paper could not be found. Please check your selections."]), None
+    
+        # Load the paper data into a DataFrame
+        try:
+            df = pd.read_csv(paper_path)
+    
+            # Display a table of questions and metadata
+            columns_to_display = [
+                {"name": "Question Text", "id": "text"},
+            ]
+            data_to_display = df[["text"]].to_dict("records")
+    
+            # Create an HTML table for the questions data
+            table_header = [
+                html.Thead(html.Tr([
+                    html.Th("Question Text")
+                ]))
+            ]
+            
+            # Table rows
+            table_rows = [
+                html.Tr([
+                    html.Td(str(_+1) + ': ' + row["text"])
+                ])
+                for _, row in df.iterrows()
+            ]
+            
+            table_body = html.Tbody(table_rows)
+
+            # Return the table as part of the "Questions" tab content
+            return html.Div([
+                html.H4("Questions for the Selected Paper"),
+                html.P("Below is each question in the selected paper:"),
+                html.Table(table_header + [table_body], style={"width": "100%", "border": "1px solid black"})
+            ]), None
+    
+        except Exception as e:
+            return html.Div([f"Error loading file: {e}"]), None
+
+                
 
 @app.callback(
     Output(component_id='report', component_property='children'),
