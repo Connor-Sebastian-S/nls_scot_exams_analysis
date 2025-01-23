@@ -25,9 +25,8 @@ import pandas as pd
 
 from io import StringIO
 
-MATHJAX_CDN = '''
-https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/
-MathJax.js?config=TeX-MML-AM_CHTML'''
+MATHJAX_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'
+
 
 
 external_scripts = [
