@@ -954,12 +954,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             )
             fig.update_traces(mode="lines+markers")
             # Add enhancements
-            fig.update_traces(mode="lines+markers", hovertemplate="<b>Year:</b> %{x}<br><b>Value:</b> %{y:.2f}<extra></extra>")
-            fig.update_layout(
-                font=dict(size=14),
-                legend=dict(title="Metrics", orientation="h", x=0.5, xanchor="center"),
-                xaxis=dict(tickangle=45),
-            )
+            #fig.update_traces(mode="lines+markers", hovertemplate="<b>Year:</b> %{x}<br><b>Value:</b> %{y:.2f}<extra></extra>")
+            # fig.update_layout(
+            #     font=dict(size=14),
+            #     legend=dict(title="Metrics", orientation="h", x=0.5, xanchor="center"),
+            #     xaxis=dict(tickangle=45),
+            # )
             fig.add_hline(y=10, line_dash="dash", line_color="black", annotation_text="S4 Threshold", annotation_position="top left")
             fig.add_hline(y=12, line_dash="dash", line_color="black", annotation_text="S5 Threshold", annotation_position="top left")
 
