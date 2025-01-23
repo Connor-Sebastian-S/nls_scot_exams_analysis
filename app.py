@@ -310,19 +310,25 @@ app.index_string = '''
         {%favicon%}
         {%css%}
         <script type="text/javascript">
-            MathJax = {
-                tex: {
-                    inlineMath: [['$', '$'], ['\\(', '\\)']],
-                    displayMath: [['$$', '$$'], ['\\[', '\\]']]
-                },
-                svg: {
-                    fontCache: 'global'
-                }
-            };
-        </script>
-        <script type="text/javascript" async
-            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js">
-        </script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        },
+        svg: {
+            fontCache: 'global',
+        },
+    };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.MathJax) {
+            MathJax.typeset();
+        }
+    });
+</script>
+
     </head>
     <body>
         {%app_entry%}
