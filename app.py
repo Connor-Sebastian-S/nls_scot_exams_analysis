@@ -137,13 +137,14 @@ readability_explanation = html.Div([
 
     html.P("By using the readability scores above, you can estimate the education level required to understand the text."),
     
-    html.Hr()
+    
 ])
 
 
 
 # Additional toggle explanation (conditionally included only for multiple papers)
 toggle_explanation = html.Div([
+    html.Hr(),
     html.Table([
         html.Thead(html.Tr([
             html.Th("Metric"), html.Th("What it Measures"), html.Th("Raw Score Interpretation (Scottish System)"), html.Th("Proportional Interpretation")
@@ -769,20 +770,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                labels={"year": "Year", "compound_sentiment_score": "Average Compound Sentiment Score"},
            )
            fig.update_traces(mode="lines+markers")
-           # Add annotations for notable events
-           for l, event in enumerate(notable_events):
-               fig.add_annotation(
-                   x=event["year"],
-                   y=sentiment_trend.loc[sentiment_trend["year"] == event["year"], ["compound_sentiment_score"]].mean().mean(),
-                   text=str(l+1),
-                   showarrow=True,
-                   arrowhead=2,
-                   ax=-50,
-                   ay=-30,
-                   bgcolor="yellow"
-               )
 
-   
            return html.Div([
                html.H4("Sentiment Trend Over Time"),
                html.P(
@@ -836,19 +824,6 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 labels={"year": "Year", "sentence_length": "Average Question Length (words)", "paper": "Paper"},
             )
             fig.update_traces(mode="lines+markers")
-            
-            # Add annotations for notable events
-            for l, event in enumerate(notable_events):
-                fig.add_annotation(
-                    x=event["year"],
-                    y=sentence_length_trend.loc[sentence_length_trend["year"] == event["year"], ["sentence_length"]].mean().mean(),
-                    text=str(l+1),
-                    showarrow=True,
-                    arrowhead=2,
-                    ax=-50,
-                    ay=-30,
-                    bgcolor="yellow"
-                )
 
             return html.Div([
                 html.H4("Average Question Length Per Year"),
@@ -944,29 +919,11 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 template="plotly_white",
             )
             fig.update_traces(mode="lines+markers")
-        
-            # Add horizontal average lines
-            fig.add_hline(
-                y=avg_coleman_liau,
-                line_dash="dash",
-                line_color="red",
-                annotation_text=f"Coleman-Liau Avg: {avg_coleman_liau:.2f}",
-                annotation_position="top left",
-            )
-            fig.add_hline(
-                y=avg_flesch_kincaid,
-                line_dash="dash",
-                line_color="blue",
-                annotation_text=f"Flesch-Kincaid Avg: {avg_flesch_kincaid:.2f}",
-                annotation_position="top right",
-            )
-            fig.add_hline(
-                y=avg_gunning_fog,
-                line_dash="dash",
-                line_color="green",
-                annotation_text=f"Gunning Fog Avg: {avg_gunning_fog:.2f}",
-                annotation_position="bottom left",
-            )
+    
+            
+            fig.add_hline(y=10, line_dash="dash", line_color="black", annotation_text="S4 Threshold", annotation_position="top left")
+            fig.add_hline(y=12, line_dash="dash", line_color="black", annotation_text="S5 Threshold", annotation_position="top left")
+
             
         
             return html.Div([
@@ -996,44 +953,25 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 template="plotly_white",
             )
             fig.update_traces(mode="lines+markers")
-            
-            # Add annotations for notable events
-            for l, event in enumerate(notable_events):
-                fig.add_annotation(
-                    x=event["year"],
-                    y=readability_trend.loc[readability_trend["year"] == event["year"], ["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean().mean(),
-                    text=str(l+1),
-                    showarrow=True,
-                    arrowhead=2,
-                    ax=-50,
-                    ay=-30,
-                    bgcolor="yellow"
-                )
-                
-            toggle_complexity = dcc.RadioItems(
-                id="yaxis-toggle-complexity",
-                options=[
-                    {"label": "Proportion", "value": "proportion"},
-                    {"label": "Raw Score", "value": "value"}
-                ],
-                value="proportion",
-                inline=True
+            # Add enhancements
+            fig.update_traces(mode="lines+markers", hovertemplate="<b>Year:</b> %{x}<br><b>Value:</b> %{y:.2f}<extra></extra>")
+            fig.update_layout(
+                font=dict(size=14),
+                legend=dict(title="Metrics", orientation="h", x=0.5, xanchor="center"),
+                xaxis=dict(tickangle=45),
             )
-        
+            fig.add_hline(y=10, line_dash="dash", line_color="black", annotation_text="S4 Threshold", annotation_position="top left")
+            fig.add_hline(y=12, line_dash="dash", line_color="black", annotation_text="S5 Threshold", annotation_position="top left")
+
             return html.Div([
                 
                 html.H4("Readability Trend Over Time"),
                 html.P(
-                    """This plot shows the readability indices (Coleman-Liau, Flesch-Kincaid, Gunning Fog) over time. 
-                    You can view them as absolute values or proportions."""
+                    """This plot shows the readability indices (Coleman-Liau, Flesch-Kincaid, Gunning Fog) over time. """
                 ),
-                toggle_complexity,
-                dcc.Graph(id="complexity-trend-graph"),
-                dcc.Store(id="complexity-trend-data", data=readability_trend.to_dict("records")),
-                
-                
+                dcc.Graph(figure=fig),
+
                 readability_explanation,   
-                toggle_explanation,
                 html.Script("renderKatex();"),
                 
             ]), combined_df.to_dict("records")
@@ -1094,48 +1032,10 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
         title=f"Occurrences of '{word[0]}' Over Time",
         labels={"year": "Year", "count": "Occurrences"},
     )
-    # Add annotations for notable events
-    for l, event in enumerate(notable_events):
-        fig.add_annotation(
-            x=event["year"],
-            y=result.loc[result["year"] == event["year"], ["count"]].mean().mean(),
-            text=str(l+1),
-            showarrow=True,
-            arrowhead=2,
-            ax=-50,
-            ay=-30,
-            bgcolor="yellow"
-        )
     
     # Add markers for better visualization
     fig.update_traces(mode="lines+markers")
 
-    return fig
-
-
-@app.callback(
-    Output("complexity-trend-graph", "figure"),
-    [
-        Input("yaxis-toggle-complexity", "value"),
-        Input("complexity-trend-data", "data"),
-    ]
-)
-def update_complexity_trend_chart(yaxis_choice, complexity_trend_data):
-    complexity_trend = pd.DataFrame(complexity_trend_data)
-
-    if yaxis_choice == "proportion":
-        complexity_trend[["coleman_liau", "flesch_kincaid", "gunning_fog"]] = (
-            complexity_trend[["coleman_liau", "flesch_kincaid", "gunning_fog"]]
-            .div(complexity_trend[["coleman_liau", "flesch_kincaid", "gunning_fog"]].sum(axis=1), axis=0)
-        )
-
-    fig = px.line(
-        complexity_trend,
-        x="year",
-        y=["coleman_liau", "flesch_kincaid", "gunning_fog"],
-        title=f"{yaxis_choice.capitalize()} of Readability Metrics Over Time",
-        labels={"year": "Year", "value": "Readability Metric"},
-    )
     return fig
 
 
