@@ -951,8 +951,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     The higher the index, the more difficult the text is to read."""
                 ),
                 dcc.Graph(figure=fig),
+                
+                readability_explanation,
                 html.Script("MathJax.Hub.Queue(['Typeset', MathJax.Hub]);"),
-                readability_explanation
                 
             ]), combined_df.to_dict("records")
         
@@ -1004,9 +1005,10 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 dcc.Graph(id="complexity-trend-graph"),
                 dcc.Store(id="complexity-trend-data", data=readability_trend.to_dict("records")),
                 
-                html.Script("MathJax.Hub.Queue(['Typeset', MathJax.Hub]);"),
+                
                 readability_explanation,   
-                toggle_explanation
+                toggle_explanation,
+                html.Script("MathJax.Hub.Queue(['Typeset', MathJax.Hub]);"),
                 
             ]), combined_df.to_dict("records")
 
