@@ -30,11 +30,10 @@ MATHJAX_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?c
 
 
 external_scripts = [
-                    {'type': 'text/javascript',
-                     'id': 'MathJax-script',
-                     'src': MATHJAX_CDN,
-                     },
-                    ]
+    {'type': 'text/javascript',
+     'id': 'MathJax-script',
+     'src': MATHJAX_CDN}
+]
 
 # Initialize Dash app
 app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL], external_scripts=external_scripts)
