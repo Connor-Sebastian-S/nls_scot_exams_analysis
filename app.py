@@ -25,18 +25,41 @@ import pandas as pd
 
 from io import StringIO
 
-MATHJAX_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'
-
-
-
-external_scripts = [
-    {'type': 'text/javascript',
-     'id': 'MathJax-script',
-     'src': MATHJAX_CDN}
-]
 
 # Initialize Dash app
-app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL], external_scripts=external_scripts)
+app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL])
+
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.2/katex.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.2/katex.min.js"></script>
+        <script>
+            function renderKatex() {
+                document.querySelectorAll('.math').forEach(function (el) {
+                    katex.render(el.textContent, el, {throwOnError: false});
+                });
+            }
+            document.addEventListener('DOMContentLoaded', renderKatex);
+            document.addEventListener('DOMSubtreeModified', renderKatex);
+        </script>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
+
 app.title = "Scottish Examination Analysis Dashboard"
 server = app.server
 
@@ -52,7 +75,6 @@ notable_events = [
     {"year": 2013, "event": "Curriculum for Excellence introduced"},
 ]
            
-# Readability explanation block (common for both single and multiple paper analysis)
 readability_explanation = html.Div([
     html.H4("Understanding Readability Metrics in the Scottish Education System"),
     html.P("This section provides an explanation of the three readability indices used in the analysis: "
@@ -60,41 +82,29 @@ readability_explanation = html.Div([
            "and you can analyze them either as raw values or as proportional contributions."),
 
     html.H5("1. Coleman-Liau Index (CLI)"),
-    dcc.Markdown(r"""
-        - The Coleman-Liau Index estimates readability based on **letter count per 100 words** and **sentence length**, rather than syllables.  
-        - The formula is:  
-        
-          $$ CLI = (0.0588 \times L) - (0.296 \times S) - 15.8 $$  
-
-          Where:  
-          - \( L \) is the **average number of letters per 100 words**  
-          - \( S \) is the **average number of sentences per 100 words**
-
-        - **Interpretation:** A higher score indicates higher complexity, approximating the Scottish school level required to understand the text.
-        - **Example:** A CLI score of **9** suggests the text is suitable for **S3 students (Fourth Level - BGE).**
-    """),
+    html.Div([
+        html.Span("The Coleman-Liau Index estimates readability based on letter count per 100 words and sentence length. The formula is:"),
+        html.Div("CLI = 0.0588 × L - 0.296 × S - 15.8", className="math"),
+        html.Ul([
+            html.Li("L: Average number of letters per 100 words"),
+            html.Li("S: Average number of sentences per 100 words"),
+        ]),
+        html.P("A higher score indicates greater complexity, aligning with the Scottish school level required to understand the text.")
+    ]),
 
     html.H5("2. Flesch-Kincaid Grade Level (FKGL)"),
-    dcc.Markdown(r"""
-        - The Flesch-Kincaid Grade Level evaluates readability based on **words per sentence** and **syllables per word**.  
-        - The formula is:  
-        
-          $$ FKGL = (0.39 \times \text{words per sentence}) + (11.8 \times \text{syllables per word}) - 15.59 $$  
-
-        - **Interpretation:** Lower scores suggest simpler text, while higher scores align with more advanced stages in the Scottish education system.
-        - **Example:** A score of **12** indicates that the text is suitable for **S6 students (Advanced Higher).**
-    """),
+    html.Div([
+        html.Span("The Flesch-Kincaid Grade Level evaluates readability based on words per sentence and syllables per word. The formula is:"),
+        html.Div("FKGL = 0.39 × (words/sentence) + 11.8 × (syllables/word) - 15.59", className="math"),
+        html.P("A higher score suggests a more advanced education level is required to comprehend the text.")
+    ]),
 
     html.H5("3. Gunning Fog Index (GFI)"),
-    dcc.Markdown(r"""
-        - The Gunning Fog Index assesses readability by counting **sentence length** and the number of **complex words** (words with 3+ syllables).  
-        - The formula is:  
-
-          $$ GFI = 0.4 \times \left( \left(\frac{\text{words}}{\text{sentences}}\right) + 100 \times \left(\frac{\text{complex words}}{\text{words}}\right) \right) $$  
-
-        - **Interpretation:** A higher score indicates greater complexity, representing the number of years of formal education needed in Scotland.
-        - **Example:** A score of **10** indicates the text is appropriate for **S4 students (National 4/5).**
-    """),
+    html.Div([
+        html.Span("The Gunning Fog Index measures readability using sentence length and complex words. The formula is:"),
+        html.Div("GFI = 0.4 × [(words/sentences) + 100 × (complex words/words)]", className="math"),
+        html.P("A higher score indicates greater text complexity.")
+    ]),
 
     html.H5("Readability Score Interpretation in the Scottish Education System"),
     html.Table([
@@ -110,8 +120,9 @@ readability_explanation = html.Div([
         ])
     ], style={'width': '100%', 'border': '1px solid black', 'textAlign': 'center', 'marginTop': '20px'}),
 
-    html.P("By using the readability scores above, you can estimate the education level required to understand the text."),
+    html.P("By using the readability scores above, you can estimate the education level required to understand the text.")
 ])
+
 
 
 # Additional toggle explanation (conditionally included only for multiple papers)
@@ -301,50 +312,8 @@ app.layout = dbc.Container(
     className="dashboard-container"   
 )
 
-app.index_string = '''
-<!DOCTYPE html>
-<html>
-    <head>
-        {%metas%}
-        <title>{%title%}</title>
-        {%favicon%}
-        {%css%}
-        <script type="text/javascript">
-    window.MathJax = {
-        tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        },
-        svg: {
-            fontCache: 'global',
-        },
-    };
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" defer></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        if (window.MathJax) {
-            MathJax.typeset();
-        }
-    });
-</script>
 
-    </head>
-    <body>
-        {%app_entry%}
-        <footer>
-            {%config%}
-            {%scripts%}
-            {%renderer%}
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    MathJax.typeset();
-                });
-            </script>
-        </footer>
-    </body>
-</html>
-'''
+
 
 
 #=============================================================================
@@ -989,7 +958,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 dcc.Graph(figure=fig),
                 
                 readability_explanation,
-                html.Script("MathJax.Hub.Queue(['Typeset', MathJax.Hub]);"),
+                html.Script("renderKatex();"),
                 
             ]), combined_df.to_dict("records")
         
@@ -1044,17 +1013,11 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 
                 readability_explanation,   
                 toggle_explanation,
-                html.Script("MathJax.Hub.Queue(['Typeset', MathJax.Hub]);"),
+                html.Script("renderKatex();"),
                 
             ]), combined_df.to_dict("records")
-
+       
     
-@app.callback(
-    Output('dummy-output', 'children'),
-    Input('mathjax-refresh', 'n_intervals')
-)
-def update_mathjax(n):
-    return html.Script("MathJax.typeset();")
 
 @app.callback(
     Output(component_id='report', component_property='children'),
