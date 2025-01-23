@@ -1010,7 +1010,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 
             ]), combined_df.to_dict("records")
 
-          
+    
+@app.callback(
+    Output('dummy-output', 'children'),
+    Input('mathjax-refresh', 'n_intervals')
+)
+def update_mathjax(n):
+    return html.Script("MathJax.typeset();")
+
 @app.callback(
     Output(component_id='report', component_property='children'),
     Input(component_id='cloud', component_property='click')
