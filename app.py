@@ -186,6 +186,13 @@ app.layout = dbc.Container(
         # Store
         dcc.Store(id="selected-year", data=None),
         dcc.Store(id='combined-data', data=None),
+        
+        dcc.Interval(
+            id='mathjax-refresh',
+            interval=3000,  # Run every 3 seconds
+            n_intervals=0
+        ),
+
 
         
         # Header
@@ -944,6 +951,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     The higher the index, the more difficult the text is to read."""
                 ),
                 dcc.Graph(figure=fig),
+                html.Script("MathJax.Hub.Queue(['Typeset', MathJax.Hub]);"),
                 readability_explanation
                 
             ]), combined_df.to_dict("records")
@@ -996,6 +1004,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 dcc.Graph(id="complexity-trend-graph"),
                 dcc.Store(id="complexity-trend-data", data=readability_trend.to_dict("records")),
                 
+                html.Script("MathJax.Hub.Queue(['Typeset', MathJax.Hub]);"),
                 readability_explanation,   
                 toggle_explanation
                 
