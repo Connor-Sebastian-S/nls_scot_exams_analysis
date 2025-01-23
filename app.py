@@ -184,15 +184,7 @@ app.layout = dbc.Container(
         # Store
         dcc.Store(id="selected-year", data=None),
         dcc.Store(id='combined-data', data=None),
-        
-        dcc.Interval(
-            id='mathjax-refresh',
-            interval=3000,  # Run every 3 seconds
-            n_intervals=0
-        ),
-
-
-        
+          
         # Header
         dbc.Row(
             dbc.Col(
