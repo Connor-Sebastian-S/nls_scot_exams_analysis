@@ -38,6 +38,19 @@ app.index_string = '''
         {%favicon%}
         {%css%}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.2/katex.min.css">
+        <style>
+            .math {
+                font-size: 1.2rem; /* Adjust font size for visibility */
+                font-weight: bold; /* Make the equation bold */
+                color: #003366; /* Add a distinctive color (dark blue in this case) */
+                background-color: #f2f4f7; /* Light background for contrast */
+                padding: 5px 10px; /* Add padding around the equations */
+                border-radius: 5px; /* Rounded corners for aesthetics */
+                display: inline-block; /* Ensure equations are inline-block */
+                margin: 10px 0; /* Add spacing above and below */
+            }
+        </style>
+
         <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.2/katex.min.js"></script>
         <script>
             function renderKatex() {
@@ -79,7 +92,7 @@ readability_explanation = html.Div([
     html.H4("Understanding Readability Metrics in the Scottish Education System"),
     html.P("This section provides an explanation of the three readability indices used in the analysis: "
            "Coleman-Liau Index, Flesch-Kincaid Grade Level, and Gunning Fog Index. Each metric offers insight into text complexity, "
-           "and you can analyze them either as raw values or as proportional contributions."),
+           "and you can analyse them either as raw values or as proportional contributions."),
 
     html.H5("1. Coleman-Liau Index (CLI)"),
     html.Div([
@@ -105,6 +118,8 @@ readability_explanation = html.Div([
         html.Div("GFI = 0.4 × [(words/sentences) + 100 × (complex words/words)]", className="math"),
         html.P("A higher score indicates greater text complexity.")
     ]),
+    
+    html.Hr(),
 
     html.H5("Readability Score Interpretation in the Scottish Education System"),
     html.Table([
@@ -120,7 +135,9 @@ readability_explanation = html.Div([
         ])
     ], style={'width': '100%', 'border': '1px solid black', 'textAlign': 'center', 'marginTop': '20px'}),
 
-    html.P("By using the readability scores above, you can estimate the education level required to understand the text.")
+    html.P("By using the readability scores above, you can estimate the education level required to understand the text."),
+    
+    html.Hr()
 ])
 
 
@@ -153,6 +170,8 @@ toggle_explanation = html.Div([
         ])
     ], style={'width': '100%', 'border': '1px solid black', 'textAlign': 'left', 'marginTop': '20px'}),
     
+    html.Hr(),
+    
     html.H5("Interpreting the Toggle Options"),
     dcc.Markdown(r"""
         - **Raw Score Mode:** Displays the absolute readability levels directly in terms of the Scottish education system (e.g., S4 for National 4/5).
@@ -160,6 +179,8 @@ toggle_explanation = html.Div([
 
         By switching between these options, you can gain insights into which factors contribute most to a text’s difficulty over time.
     """),
+    
+    
 ])
 
 
