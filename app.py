@@ -34,6 +34,15 @@ server = app.server
 # Directory containing CSV files
 DATA_DIR = "output"
 
+#{"Year": , "event": ""},
+notable_events = [
+    {"year": 1918, "event": "Education (Scotland) Act introduced"},
+    {"year": 1947, "event": "Education (Scotland) Act passed"},
+    {"year": 1962, "event": "Introduction of O-Grades"},
+    {"year": 1986, "event": "Standard Grades introduced"},
+    {"year": 2013, "event": "Curriculum for Excellence introduced"},
+]
+
 def parse_directory(data_dir):
     directory_info = {}
     for year in os.listdir(data_dir):
@@ -133,6 +142,10 @@ app.layout = dbc.Container(
                                 placeholder="Select a Paper",
                                 style={"width": "100%", "marginBottom": "15px"}
                             ),
+                            
+                            html.H4("Notable Events in Education"),
+                            html.P("The numbers correspond to the yellow labels on any plots"),
+                            html.Ul([html.Li(f"{l+1} = {event['year']}: {event['event']}") for l, event in enumerate(notable_events)]),
                         ],
                         className="vertical-tabs"
                     ),
@@ -214,6 +227,22 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         for level in set(l for levels in directory_info.values() for l in levels):
             levl_list.append(level)
         div_elements_levels = [html.Li(_l) for _l in levl_list]
+        
+        # Collect subject and level counts
+        level_counts = {level: 0 for levels in directory_info.values() for level in levels}
+        subject_counts = {}
+    
+        for year, levels in directory_info.items():
+            for level, papers in levels.items():
+                level_counts[level] += sum(len(subjects) for subjects in papers.values())
+                for subjects in papers.values():
+                    for subject in subjects:
+                        subject_counts[subject] = subject_counts.get(subject, 0) + 1
+    
+        # Prepare the introduction content
+        div_elements = [html.Li(f"{subject}: {count}") for subject, count in subject_counts.items()]
+        div_elements_levels = [html.Li(f"{level}: {count}") for level, count in level_counts.items()]
+    
 
 
         # Data for exam grades progression
@@ -249,10 +278,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                History and English available at three levels: Higher, National 4, and National 5. 'Old style'
                                levels have been converted to their modern CfE equivalent to simplify analysis for the end user."""
                     ),
-                    html.P("At the moment we can analyse the following subjects:"),
+                    html.P("At the moment we can analyse the following subjects in the database, with the following count per level:"),
+                    html.H5("Subjects:"),
                     html.Ul(div_elements),
-                    html.P("At the moment we can analyse the following levels:"),
+                    html.H5("Levels:"),
                     html.Ul(div_elements_levels),
+
                     html.P("And inspect the following metrics:"),
                     html.Ul([
                         html.Li("Statistics: View detailed statistics about the selected dataset."),
@@ -534,6 +565,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 ),
                 dcc.Graph(id="intent-trend-graph"),
                 
+                
                 dcc.Store(id="intent-trend-data", data=intent_trend.to_dict("records"))
             ]), combined_df.to_dict("records")
         
@@ -592,6 +624,19 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                labels={"year": "Year", "compound_sentiment_score": "Average Compound Sentiment Score"},
            )
            fig.update_traces(mode="lines+markers")
+           # Add annotations for notable events
+           for l, event in enumerate(notable_events):
+               fig.add_annotation(
+                   x=event["year"],
+                   y=sentiment_trend.loc[sentiment_trend["year"] == event["year"], ["compound_sentiment_score"]].mean().mean(),
+                   text=str(l+1),
+                   showarrow=True,
+                   arrowhead=2,
+                   ax=-50,
+                   ay=-30,
+                   bgcolor="yellow"
+               )
+
    
            return html.Div([
                html.H4("Sentiment Trend Over Time"),
@@ -635,7 +680,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
         else:
             # Multiple Papers: Average sentence length per year
-            combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(x.split()))
+            combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(str(x).split()))
             sentence_length_trend = combined_df.groupby(["year", "paper"])["sentence_length"].mean().reset_index()
 
             fig = px.line(
@@ -646,6 +691,19 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 labels={"year": "Year", "sentence_length": "Average Question Length (words)", "paper": "Paper"},
             )
             fig.update_traces(mode="lines+markers")
+            
+            # Add annotations for notable events
+            for l, event in enumerate(notable_events):
+                fig.add_annotation(
+                    x=event["year"],
+                    y=sentence_length_trend.loc[sentence_length_trend["year"] == event["year"], ["sentence_length"]].mean().mean(),
+                    text=str(l+1),
+                    showarrow=True,
+                    arrowhead=2,
+                    ax=-50,
+                    ay=-30,
+                    bgcolor="yellow"
+                )
 
             return html.Div([
                 html.H4("Average Question Length Per Year"),
@@ -788,6 +846,19 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 template="plotly_white",
             )
             fig.update_traces(mode="lines+markers")
+            
+            # Add annotations for notable events
+            for l, event in enumerate(notable_events):
+                fig.add_annotation(
+                    x=event["year"],
+                    y=readability_trend.loc[readability_trend["year"] == event["year"], ["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean().mean(),
+                    text=str(l+1),
+                    showarrow=True,
+                    arrowhead=2,
+                    ax=-50,
+                    ay=-30,
+                    bgcolor="yellow"
+                )
         
             return html.Div([
                 html.H4("Readability Trend Over Time"),
@@ -796,7 +867,8 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
                     The higher the index, the more difficult the text is to read."""
                 ),
-                dcc.Graph(figure=fig)
+                dcc.Graph(figure=fig),
+                
             ]), combined_df.to_dict("records")
 
           
@@ -854,6 +926,18 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
         title=f"Occurrences of '{word[0]}' Over Time",
         labels={"year": "Year", "count": "Occurrences"},
     )
+    # Add annotations for notable events
+    for l, event in enumerate(notable_events):
+        fig.add_annotation(
+            x=event["year"],
+            y=result.loc[result["year"] == event["year"], ["count"]].mean().mean(),
+            text=str(l+1),
+            showarrow=True,
+            arrowhead=2,
+            ax=-50,
+            ay=-30,
+            bgcolor="yellow"
+        )
     
     # Add markers for better visualization
     fig.update_traces(mode="lines+markers")
@@ -908,6 +992,18 @@ def update_intent_trend_chart(yaxis_choice, intent_trend_data):
             "<b>Count:</b> %{customdata}<br>"
         )
     )
+    # Add annotations for notable events
+    for l, event in enumerate(notable_events):
+        fig.add_annotation(
+            x=event["year"],
+            y=0,
+            text=str(l+1),
+            showarrow=True,
+            arrowhead=2,
+            ax=-50,
+            ay=-30,
+            bgcolor="yellow"
+        )
     return fig
 
 
@@ -943,7 +1039,7 @@ def load_csv(selected_year, selected_level, selected_subject, selected_paper):
     for path in file_paths:
         try:
             df = pd.read_csv(path)
-            print (path)
+            #print (path)
             # Extract paper and year
             paper_number = os.path.basename(os.path.dirname(path))  # Full "Paper 1", "Paper 2"
             df["paper"] = paper_number

@@ -1,2 +1,0 @@
-year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
-1956,Lower Grade,ART,1,1,"Choose ONE of the following subjects. The Guisers. Sea Harvest. “And in the shade beside the road, Another picnic tea.” “Wherever crowds are thickest These merchants stand all day, With every kind of ‘ novelty ’ Spread out upon a tray.”",7.93,4.8,5.2,25,1,0,24,0.5267,compare,0.3462756276130676,Guisers {1}

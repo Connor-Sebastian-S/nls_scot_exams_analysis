@@ -1,0 +1,7 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1957,Higher,HISTORY,2,1,Explain the causes of the Peloponnesian War and account for the defeat of Athens.,7.71,5.2,5.6,7,0,2,5,-0.5291,reason,0.9771674275398254,the Peloponnesian War {1} Athens {1}
+1957,Higher,HISTORY,2,2,The deliberate policy of Alexander the Great was that the West should conquer the East and that East and West should mingle. Discuss this opinion of his policy.,8.28,5.2,8.46,13,1,0,12,0.6249,describe,0.5941883325576782,Alexander the Great {1}
+1957,Higher,HISTORY,2,3,Trace the steps by which Roman rule was extended over Italy.,9.92,4.0,8.04,6,0,0,6,0.0,argue,0.5595622658729553,Italy {1}
+1957,Higher,HISTORY,2,4,Estimate the importance of the Gracchi in the social history of Rome.,10.81,8.0,11.47,6,1,0,5,0.3612,describe,0.7471305131912231,Gracchi {1} Rome {1}
+1957,Higher,HISTORY,2,5,"""Trajan had directed the energy of the Empire outwards but all Hadrian’s energy was devoted to conserving and organising it internally."" How far is this true?",10.35,8.4,11.35,13,4,0,9,0.34245,describe,0.6137734651565552,Trajan {1}
+1957,Higher,HISTORY,2,6,"Write notes on two of the following: the Attic theatre, the Spartan invasions of Greece, Socrates, the organisation of the Roman army in the last years of the Republic, the First Triumvirate.",11.14,14.6,17.8,18,0,0,18,0.0,reason,0.9874693155288696,Greece {1}
