@@ -99,17 +99,19 @@ label {
 }
 
 .tab-container .tab {
-    display: block; /* Flexbox for centering */
+    display: flex; /* Flexbox for centering */
     align-items: center; /* Vertical centering */
     justify-content: center; /* Horizontal centering */
-    height: 50px; /* Consistent tab height */
-    text-align: center;
+    height: 50px; /* Set tab height */
+    line-height: 50px; /* Match height for vertical text centering */
+    text-align: center; /* Ensure horizontal text alignment */
     background-color: #f0f0f0; /* Default tab background */
     border: 1px solid #ccc; /* Border color */
     border-radius: 5px; /* Rounded corners */
-    padding: 10px;
     font-weight: bold;
     cursor: pointer; /* Pointer cursor for hover */
+    overflow: hidden; /* Ensure text doesn't overflow */
+    white-space: nowrap; /* Prevent text wrapping */
 }
 
 .tab-container .tab:hover {
