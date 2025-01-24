@@ -23,8 +23,11 @@ from io import BytesIO
 import re
 import pandas as pd
 import plotly.graph_objs as go
-
+from sklearn.decomposition import PCA
+import seaborn as sns
 from io import StringIO
+from scipy.stats import linregress
+from sklearn.cluster import KMeans
 
 
 # Initialize Dash app
@@ -335,6 +338,61 @@ question_length_description = html.Div([
     """, style={"lineHeight": "1.6"})
 ])
 
+wcs_visualisation = html.Div([
+    html.H4("Step-by-Step Breakdown of the Visualisation"),
+    html.P("This section outlines the steps involved in preparing and visualising the weighted composite score over time, showing how readability, sentiment, and document size influence complexity."),
+    
+    html.H5("1. Data Preparation"),
+    html.P("Before creating the plot, we must ensure that the data is properly prepared. The goal of the plot is to show the weighted composite score over time, aggregated by year. "
+           "We start with a dataset containing various metrics for different papers, including readability scores (e.g., Coleman-Liau Index, Flesch-Kincaid Grade Level) "
+           "and token counts (e.g., positive, negative, neutral tokens)."),
+    
+    html.H5("2. Normalisation"),
+    html.P("To ensure that the metrics are on a comparable scale, we apply min-max normalisation to each column. "
+           "This step is important because the metrics may differ in magnitude, and normalisation brings everything into the same range, typically [0, 1]."),
+
+    html.H5("3. Weighting the Metrics"),
+    html.P("Each of the metrics is given a weight based on its perceived importance. The weighted composite score is calculated by summing the weighted, "
+           "normalised values for each metric. The weights are as follows:"),
+    html.Ul([
+        html.Li("Coleman-Liau: 0.25"),
+        html.Li("Flesch-Kincaid: 0.25"),
+        html.Li("Gunning-Fog: 0.25"),
+        html.Li("Total Tokens: 0.15"),
+        html.Li("Negative Tokens: 0.025"),
+        html.Li("Positive Tokens: 0.025"),
+        html.Li("Neutral Tokens: 0.025"),
+        html.Li("Compound Sentiment Score: 0.025"),
+    ]),
+    html.P("The reasoning behind these weights is based on the relative importance of each metric in determining the complexity and sentiment of the text. "
+           "The readability metrics (Coleman-Liau, Flesch-Kincaid, Gunning-Fog) are assigned equal weight because they each offer a different perspective on text complexity. "
+           "Sentiment metrics contribute less due to their smaller role in overall complexity."),
+    
+    html.H5("4. Calculating the Composite Score"),
+    html.P("Once the data is normalised and weighted, the composite score is calculated as a weighted sum of the normalised values for each metric."),
+    html.P("This gives us a single score representing the combined impact of all metrics for each paper."),
+    
+    html.H5("5. Aggregating the Data"),
+    html.P("The next step is to aggregate the data by year to show how the composite score changes over time. "
+           "We group the dataset by year and calculate the average composite score for each year."),
+
+
+    html.H5("6. Summary of the Steps"),
+    html.P("To summarise the process for creating the plot:"),
+    html.Ul([
+        html.Li("Data Normalisation: Apply min-max normalisation to scale each metric between 0 and 1."),
+        html.Li("Weight Assignment: Assign relative weights to each metric based on its perceived importance."),
+        html.Li("Composite Score Calculation: Compute a weighted sum of the normalised values to get the composite score."),
+        html.Li("Aggregation by Year: Calculate the average composite score for each year."),
+        html.Li("Plotting: Visualise the trends in composite score over time using a line plot."),
+    ]),
+    html.P("This approach allows you to understand how different factors, such as readability and sentiment, influence the overall complexity of papers over time. "
+           "It also highlights trends and relationships between these factors."),
+    
+    html.Hr(),
+])
+
+
            
 def parse_directory(data_dir):
     directory_info = {}
@@ -453,21 +511,23 @@ app.layout = dbc.Container(
                                 value="introduction",
                                 children=[
                                     dcc.Tab(label="Introduction", value="introduction", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
-            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                     dcc.Tab(label="Statistics", value="statistics", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
-            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                     dcc.Tab(label="Intent", value="intent_trend", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
-            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                     dcc.Tab(label="Sentiment", value="sentiment_trend", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
-            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                     dcc.Tab(label="Question Length", value="sentence_length_trend", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
-            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                     dcc.Tab(label="Question Topics", value="topics", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
-            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                     dcc.Tab(label="Complexity", value="complexity", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
-            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                     dcc.Tab(label="Questions", value="questions", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
-            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                    dcc.Tab(label="Comparative", value="comparative", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+                                            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                 ],
                                 style={
                                     "marginBottom": "0px",  # Remove gap between tabs and content
@@ -1239,8 +1299,182 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     
         except Exception as e:
             return html.Div([f"Error loading file: {e}"]), None
+        
+    elif tab_name == "comparative":
+        print("comparative")
+        return html.Div([
+            html.H4("Comparative Analysis"),
+            html.P(
+                """This plot visualizes the evolution of the composite scores over time to 
+                identify patterns, significant changes, or correlations in complexity metrics."""
+            ),
+            dcc.Graph(id="ca_report", style={"display": "none"}),
+            wcs_visualisation,
+            html.Script("renderKatex();"),
+            dcc.Graph(id="ca_linreg", style={"display": "none"}),
+            #dcc.Graph(id="ca_clusters", style={"display": "none"}),
+        ]), combined_df.to_dict("records")
 
                 
+@app.callback(
+    Output("ca_report", "figure"),
+    Output("ca_report", "style"),  
+    Output("ca_linreg", "figure"),
+    Output("ca_linreg", "style"),
+    #Output("ca_clusters", "figure"),
+    #Output("ca_clusters", "style"),
+    [
+    Input("level-dropdown", "value"),
+    Input("subject-dropdown", "value"),
+    Input("tabs", "value"),
+    ]
+)
+def get_papers_in_subject(selected_level, selected_subject, tab_name):
+    if tab_name == "comparative":
+        print(selected_level)
+        print(selected_subject)
+        combined_df = load_csv(selected_year = None, selected_paper = None, selected_level = selected_level, selected_subject = selected_subject)
+        
+        metrics_columns = [
+            'coleman_liau',
+            'flesch_kincaid',
+            'gunning_fog',
+            'total_tokens',
+            'negative_tokens',
+            'positive_tokens',
+            'neutral_tokens',
+            'compound_sentiment_score'
+        ]
+        
+        # Calculate min and max for each metric
+        min_values = combined_df[metrics_columns].min()
+        max_values = combined_df[metrics_columns].max()
+        
+        # Normalize each column (metric) using min-max scaling
+        normalized_df = (combined_df[metrics_columns] - min_values) / (max_values - min_values)
+        
+        # Define the weights for each metric
+        weights = {
+            'coleman_liau': 0.25,
+            'flesch_kincaid': 0.25,
+            'gunning_fog': 0.25,
+            'total_tokens': 0.15,
+            'negative_tokens': 0.025,
+            'positive_tokens': 0.025,
+            'neutral_tokens': 0.025,
+            'compound_sentiment_score': 0.025
+        }
+        
+        # Convert weights to a numpy array to facilitate multiplication
+        weights_array = np.array([weights[col] for col in metrics_columns])
+        
+        # Apply the weights to each normalized column
+        weighted_normalized_df = normalized_df * weights_array
+        
+        # Calculate the composite score by summing the weighted values for each row
+        combined_df['composite_score'] = weighted_normalized_df.sum(axis=1)
+        
+        # Display the composite scores for verification
+        #print("DataFrame with Composite Scores:\n", combined_df[['year', 'composite_score']].head())
+        
+        # Group by 'year' and calculate the average composite score for each year
+        df_grouped_by_year = combined_df.groupby('year')['composite_score'].mean()
+        
+        # Display the average composite scores per year
+        #print("Average Composite Scores by Year:\n", df_grouped_by_year)
+        
+        # Group by 'year' to calculate the mean of each metric
+        df_grouped_by_year_metrics = combined_df.groupby('year')[metrics_columns].mean()
+        
+        # Calculate the correlation between the metrics over time
+        correlation_matrix = df_grouped_by_year_metrics.corr()
+        
+        # Display the correlation matrix
+        #print("Correlation Matrix:\n", correlation_matrix)
+        
+        # Calculate the weighted composite score for each year using the weights
+        weighted_composite_score = (df_grouped_by_year_metrics * weights_array).sum(axis=1)
+        
+        # Display the weighted composite score by year
+        #print("Weighted Composite Score by Year:\n", weighted_composite_score)
+
+        # Convert the Series to a DataFrame
+        weighted_composite_score_df = weighted_composite_score.reset_index()
+        weighted_composite_score_df.columns = ['year', 'score']  # Rename columns for clarity
+
+        # Plot using Plotly Express
+        fig = px.line(
+            weighted_composite_score_df,
+            x='year',  # x-axis: year
+            y='score',  # y-axis: score
+            title="Weighted Composite Score Over Time",
+            labels={"year": "Year", "score": "Weighted Composite Score"},
+        )
+        # Add markers for better visualization
+        fig.update_traces(mode="lines+markers")
+        
+        #Compare Metrics
+        #Analyze individual metrics alongside the composite scores to understand which metrics drive changes over time.
+        #Use heatmaps for the correlation matrix to visualize relationships.
+        # Heatmap for correlation matrix
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
+        plt.title('Correlation Between Metrics Over Time')
+        plt.show()
+        
+        years = df_grouped_by_year.index.astype(int)
+        values = df_grouped_by_year.values
+        slope, intercept, r_value, p_value, std_err = linregress(years, df_grouped_by_year.values)
+        print(f"Trend Line: y = {slope:.4f}x + {intercept:.4f} (R²={r_value**2:.4f}, p={p_value:.4e})")
+        regression_line = slope * years + intercept
+
+        # Create the plot
+        lin_reg_fig = go.Figure()
+        
+        # Add scatter plot of the original data
+        lin_reg_fig.add_trace(go.Scatter(
+            x=years,
+            y=values.flatten(),
+            mode='markers',
+            name='Original Data',
+            marker=dict(size=8, color='blue')
+        ))
+        
+        # Add regression line
+        lin_reg_fig.add_trace(go.Scatter(
+            x=years,
+            y=regression_line,
+            mode='lines',
+            name='Regression Line',
+            line=dict(color='red', width=2)
+        ))
+        
+        # Add annotations for regression statistics
+        lin_reg_fig.add_annotation(
+            x=years[len(years) // 2],
+            y=max(values.flatten()),
+            text=f"Slope: {slope:.4f}<br>Intercept: {intercept:.4f}<br>R²: {r_value**2:.4f}",
+            showarrow=False,
+            font=dict(size=12, color="black"),
+            align="left"
+        )
+        
+        # Update layout
+        lin_reg_fig.update_layout(
+            title="Linear Regression Visualisation",
+            xaxis_title="Year",
+            yaxis_title="Value",
+            template="plotly_white",
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+
+
+        return fig, {"display": "block"}, lin_reg_fig, {"display": "block"}
+
+    #return None, {"display": "none"}
+        
+        
+
 
 @app.callback(
     Output(component_id='report', component_property='children'),
