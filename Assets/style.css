@@ -1,8 +1,28 @@
 h1 {
     font-family: "Poppins"; 
-    color: #676768; 
+    color: #34495e; 
     font-size: 35px;
     margin: 15px;
+}
+
+h2 {
+    font-family: "Poppins"; 
+    color: #34495e; 
+}
+
+h3 {
+    font-family: "Poppins"; 
+    color: #34495e; 
+}
+
+h4 {
+    font-family: "Poppins"; 
+    color: #34495e; 
+}
+
+h5 {
+    font-family: "Poppins"; 
+    color: #34495e; 
 }
 
 label {
@@ -71,19 +91,5 @@ label {
         flex-direction: column;
         margin-bottom: 0px;
     }
-.custom-tab {
-        display: flex;
-        align-items: center; /* Center vertically */
-        justify-content: center; /* Center horizontally */
-        height: 50px; /* Ensure consistent height */
-        padding: 0; /* Remove padding */
-        text-align: center; /* Align text centrally */
-        font-size: 16px; /* Adjust font size */
-    }
-    .custom-tab:hover {
-        background-color: #f9f9f9; /* Optional hover effect */
-    }
-    .dash-tab {
-        height: 50px; /* Ensure tabs have a consistent height */
-    }
+
     

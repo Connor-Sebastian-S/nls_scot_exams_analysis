@@ -22,6 +22,7 @@ import base64
 from io import BytesIO
 import re
 import pandas as pd
+import plotly.graph_objs as go
 
 from io import StringIO
 
@@ -89,11 +90,11 @@ notable_events = [
 ]
            
 readability_explanation = html.Div([
-    html.H4("Understanding Readability Metrics in Scottish Exams", style={"color": "#34495e"}),
+    html.H4("Understanding Readability Metrics in Scottish Exams", style={}),
     html.P("This section provides an explanation of the three readability indices used in the analysis: "
            "Coleman-Liau Index, Flesch-Kincaid Grade Level, and Gunning Fog Index."),
 
-    html.H5("1. Coleman-Liau Index (CLI)", style={"color": "#34495e"}),
+    html.H5("1. Coleman-Liau Index (CLI)", style={}),
     html.Div([
         html.Span("The Coleman-Liau Index estimates readability based on letter count per 100 words and sentence length. The formula is:"),
         html.Div("CLI = 0.0588 × L - 0.296 × S - 15.8", className="math"),
@@ -104,14 +105,14 @@ readability_explanation = html.Div([
         html.P("A higher score indicates greater complexity, aligning with the Scottish school level required to understand the text.")
     ]),
 
-    html.H5("2. Flesch-Kincaid Grade Level (FKGL)", style={"color": "#34495e"}),
+    html.H5("2. Flesch-Kincaid Grade Level (FKGL)", style={}),
     html.Div([
         html.Span("The Flesch-Kincaid Grade Level evaluates readability based on words per sentence and syllables per word. The formula is:"),
         html.Div("FKGL = 0.39 × (words/sentence) + 11.8 × (syllables/word) - 15.59", className="math"),
         html.P("A higher score suggests a more advanced education level is required to comprehend the text.")
     ]),
 
-    html.H5("3. Gunning Fog Index (GFI)", style={"color": "#34495e"}),
+    html.H5("3. Gunning Fog Index (GFI)", style={}),
     html.Div([
         html.Span("The Gunning Fog Index measures readability using sentence length and complex words. The formula is:"),
         html.Div("GFI = 0.4 × [(words/sentences) + 100 × (complex words/words)]", className="math"),
@@ -120,7 +121,7 @@ readability_explanation = html.Div([
     
     html.Hr(),
 
-    html.H5("Readability Score Interpretation in the Scottish Education System",style={"color": "#34495e"}),
+    html.H5("Readability Score Interpretation in the Scottish Education System"),
     html.Table([
         html.Thead(html.Tr([
             html.Th("Score Range"), html.Th("Coleman-Liau Index (CLI)"), html.Th("Flesch-Kincaid Grade Level (FKGL)"), html.Th("Gunning Fog Index (GFI)"), html.Th("Scottish Education Level")
@@ -138,14 +139,15 @@ readability_explanation = html.Div([
 ])
 
 intent_description = html.Div([
-    html.H4("Intent Classification Model", style={"color": "#34495e"}),
+    html.H4("Intent Classification Model", style={}),
 
     html.P("""
-        This tab showcases qfine-tuned DistilBERT model, designed to classify the intent behind exam questions.
-        The system analyses each question's content and determines its intent category with high accuracy.
+        This tab showcases a fine-tuned DistilBERT model, designed to classify the intent behind exam questions.
+        The system analyses each question's content and determines its intent category with high accuracy. Potential catagories
+        are; "discuss", "describe", "compare", "explain", "argue", "reason", and "other".
     """, style={"lineHeight": "1.6"}),
 
-    html.H5("How It Works", style={"color": "#34495e"}),
+    html.H5("How It Works", style={}),
     html.Ol([
         html.Li([
             html.Strong("Dataset Preparation:"),
@@ -168,18 +170,172 @@ intent_description = html.Div([
         ])
     ]),
 
-    html.H5("What This Model Does", style={"color": "#34495e"}),
+    html.H5("What This Model Does", style={}),
     html.P("""
-        The model assigns an intent category to questions, such as 'explain', 'describe', or 'evaluate'.
+        The model assigns an intent category to questions.
     """),
 
-    html.H5("About DistilBERT", style={"color": "#34495e"}),
+    html.H5("About DistilBERT", style={}),
     html.P("""
         DistilBERT is a lightweight version of the BERT model, designed to retain the language understanding capabilities of its predecessor while being faster and more efficient. 
         It is ideal for applications requiring limited computational resources or fast response times.
     """),
 
 ])
+          
+sentiment_description = html.Div([
+    html.H4("Sentiment Analysis with NLTK", style={}),
+
+    html.P("""
+        Sentiment analysis is the process of evaluating the emotional tone of a piece of text. It helps to identify whether the text 
+        conveys a positive, negative, or neutral sentiment. In this application, we used the NLTK library's SentimentIntensityAnalyzer 
+        to perform this analysis.
+    """, style={"lineHeight": "1.6"}),
+
+    html.H5("What Is Sentiment?", style={"color": "#34495e"}),
+    html.P("""
+        Sentiment refers to the attitude, emotion, or tone conveyed by a piece of text. It can help us understand the writer's 
+        perspective or the general mood of the content. For instance:
+        """, style={"lineHeight": "1.6"}),
+    html.Ul([
+        html.Li("A positive sentiment might suggest happiness, satisfaction, or approval."),
+        html.Li("A negative sentiment might indicate frustration, criticism, or sadness."),
+        html.Li("A neutral sentiment represents text that is factual or without strong emotional undertones."),
+    ]),
+
+    html.H5("How It Works", style={"color": "#34495e"}),
+    html.Ol([
+        html.Li([
+            html.Strong("Tokenisation:"),
+            " The input text is split into smaller components (words, phrases) to analyse its structure and meaning."
+        ]),
+        html.Li([
+            html.Strong("Scoring Sentiment:"),
+            " The Sentiment Intensity Analyser assigns scores to the text based on the emotional impact of words and phrases. ",
+            "It uses a lexicon of words with predefined sentiment values."
+        ]),
+        html.Li([
+            html.Strong("Combining Scores:"),
+            " The analyser computes an overall sentiment score by combining the individual word scores and taking into account contextual factors."
+        ])
+    ]),
+
+    html.H5("Understanding Sentiment Analysis Results", style={"color": "#34495e"}),
+    html.P("""
+        The Sentiment Intensity outputs four key scores that provide insights into the emotional tone of the text:
+    """, style={"lineHeight": "1.6"}),
+    html.Ul([
+        html.Li([html.Strong("Positive (pos): "), "A score representing the proportion of positive sentiment in the text."]),
+        html.Li([html.Strong("Negative (neg): "), "A score indicating the proportion of negative sentiment."]),
+        html.Li([html.Strong("Neutral (neu): "), "A score reflecting the proportion of neutral sentiment."]),
+        html.Li([html.Strong("Compound: "), "A single score between -1 and 1 that summarises the overall sentiment of the text, where -1 is very negative, 1 is very positive, and 0 is neutral."]),
+    ]),
+
+    html.H5("Interpreting the Results", style={"color": "#34495e"}),
+    html.P("""
+        The compound score is the most useful for determining the overall sentiment. For example:
+        """, style={"lineHeight": "1.6"}),
+    html.Ul([
+        html.Li("A compound score close to 1 indicates strong positive sentiment."),
+        html.Li("A compound score near -1 indicates strong negative sentiment."),
+        html.Li("A compound score around 0 suggests a neutral sentiment."),
+    ]),
+])
+
+named_entity_description = html.Div([
+    html.H4("Named Entities and Word Clouds", style={}),
+
+    html.H5("What Is a Named Entity?"),
+    html.P("""
+        A named entity is a specific type of information that can be identified in text, such as the name of a person, 
+        location, organisation, date, or other key elements. For example, in the sentence 'The Battle of Hastings took place in 1066,' 
+        the named entities are 'The Battle of Hastings' (an event) and '1066' (a date).
+    """, style={"lineHeight": "1.6"}),
+
+    html.H5("How Are Named Entities Established?"),
+    html.P("""
+        Named Entity Recognition (NER) is a natural language processing technique used to identify and classify entities within text. 
+        This is typically achieved using pre-trained language models or algorithms that analyse patterns in language and context 
+        to detect entities. For instance:
+    """, style={"lineHeight": "1.6"}),
+    html.Ul([
+        html.Li("Using context to determine if a word is a name or title."),
+        html.Li("Matching terms against predefined categories like locations, dates, or organisations."),
+        html.Li("Utilising probabilistic models trained on large datasets to identify entities in unseen text."),
+    ]),
+
+    html.H5("What Is a Word Cloud?"),
+    html.P("""
+        A word cloud is a visual representation of text data, where the size of each word corresponds to its frequency or relevance 
+        within the dataset. In this application, the word cloud displays the named entities extracted from each question in the exam paper(s).
+    """, style={"lineHeight": "1.6"}),
+
+    html.H5("What Does the Word Cloud Show?"),
+    html.P("""
+        The word cloud highlights the named entities present in the exam paper or papers you upload. Larger words indicate entities 
+        that appear more frequently across the questions. This allows you to quickly identify prominent topics, locations, names, 
+        or themes within the dataset.
+    """, style={"lineHeight": "1.6"}),
+
+    html.H5("Tracking Word Usage Over Time"),
+    html.P("""
+        In addition to the word cloud, you can select a specific word (entity) from it to explore its usage across all exam papers 
+        in the dataset, spanning multiple years. This is shown in a line plot, which provides insight into trends or changes in 
+        the importance or focus on particular topics over time.
+    """, style={"lineHeight": "1.6"}),
+
+    html.P("""
+        This feature provides valuable insights into the evolution of focus areas, topics, and themes in exam papers, helping you 
+        identify patterns and trends effectively.
+    """, style={"lineHeight": "1.6"})
+])
+   
+question_length_description = html.Div([
+    html.H4("Question Length as a Metric"),
+
+    html.H5("What Is Question Length?"),
+    html.P("""
+        Question length refers to the number of words or tokens used in a question. 
+        It is a simple yet powerful way to quantify the complexity or depth of a question.
+    """, style={"lineHeight": "1.6"}),
+
+    html.H5("Why Is Question Length Important?"),
+    html.P("""
+        The length of a question can reveal key insights about its structure and purpose. 
+        Longer questions often indicate more complex ideas, requiring greater cognitive effort to understand and answer. 
+        Shorter questions, on the other hand, may focus on straightforward or factual queries. 
+        Analysing question length is valuable for several reasons:
+    """, style={"lineHeight": "1.6"}),
+    html.Ul([
+        html.Li("It provides an indirect measure of question complexity."),
+        html.Li("It can help assess the readability of exams by identifying overly lengthy or overly brief questions."),
+        html.Li("Tracking average question length over time can highlight changes in the style or focus of exam papers.")
+    ]),
+
+    html.H5("How Is Question Length Calculated?"),
+    html.P("""
+        Question length is typically calculated as the total number of tokens in a question. Tokens are the smallest units of text, 
+        such as words or punctuation, identified during text processing. By aggregating and analysing these lengths across a dataset, 
+        we can gain insights into question patterns and trends.
+    """, style={"lineHeight": "1.6"}),
+
+    html.H5("Using Question Length in This Application"),
+    html.P("""
+        In this dashboard, question length is used to:
+    """, style={"lineHeight": "1.6"}),
+    html.Ul([
+        html.Li("Calculate average word counts for individual papers or across years."),
+        html.Li("Compare question lengths between different exam papers."),
+        html.Li("Visualise trends in question length over time to track changes in exam design."),
+    ]),
+
+    html.P("""
+        By incorporating question length as a metric, this tool provides an additional layer of understanding to educators, 
+        helping them evaluate the balance, clarity, and fairness of their assessments.
+    """, style={"lineHeight": "1.6"})
+])
+
+           
 def parse_directory(data_dir):
     directory_info = {}
     for year in os.listdir(data_dir):
@@ -217,7 +373,7 @@ app.layout = dbc.Container(
             dbc.Col(
                 html.H1(
                     "Scottish Exams - Linguistical Analysis Dashboard",
-                    style={"textAlign": "center", "color": "#34495e"}
+                    style={"textAlign": "center", }
                 ),
                 width=12
             ),
@@ -238,7 +394,7 @@ app.layout = dbc.Container(
                                     {"label": year, "value": year} for year in directory_info.keys()
                                 ] + [{"label": "All Years", "value": "all"}],
                                 placeholder="Select a Year",
-                                style={"width": "100%", "color": "#34495e"}
+                                style={"width": "100%", }
                             ),
                             html.Label("Select Level:"),
                             dcc.Dropdown(
@@ -249,7 +405,7 @@ app.layout = dbc.Container(
                                     for level in set(l for levels in directory_info.values() for l in levels)
                                 ],
                                 placeholder="Select a Level",
-                                style={"width": "100%", "color": "#34495e"}
+                                style={"width": "100%", }
                             ),
                             html.Label("Select Subject:"),
                             dcc.Dropdown(
@@ -266,7 +422,7 @@ app.layout = dbc.Container(
                                     )
                                 ],
                                 placeholder="Select a Subject",
-                                style={"width": "100%", "color": "#34495e"}
+                                style={"width": "100%", }
                             ),
                             html.Label("Select Paper: (Optional)"),
                             dcc.Dropdown(
@@ -276,10 +432,10 @@ app.layout = dbc.Container(
                                     {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 6)
                                 ] + [{"label": "All Papers", "value": "all"}],
                                 placeholder="Select a Paper",
-                                style={"width": "100%", "marginBottom": "15px", "color": "#34495e"}
+                                style={"width": "100%", "marginBottom": "15px", }
                             ),
                             
-                            html.H4("Notable Events in Education", style = { "color": "#34495e"}),
+                            html.H4("Notable Events in Education", style = { }),
                             html.P("The numbers correspond to the yellow labels on any plots"),
                             html.Ul([html.Li(f"{l+1} = {event['year']}: {event['event']}") for l, event in enumerate(notable_events)]),
                         ],
@@ -296,14 +452,22 @@ app.layout = dbc.Container(
                                 id="tabs",
                                 value="introduction",
                                 children=[
-                                    dcc.Tab(label="Introduction", value="introduction", className=".custom-tab"),
-                                    dcc.Tab(label="Statistics", value="statistics", className=".custom-tab"),
-                                    dcc.Tab(label="Intent", value="intent_trend", className=".custom-tab"),
-                                    dcc.Tab(label="Sentiment", value="sentiment_trend", className=".custom-tab"),
-                                    dcc.Tab(label="Question Length", value="sentence_length_trend", className=".custom-tab"),
-                                    dcc.Tab(label="Question Topics", value="topics", className=".custom-tab"),
-                                    dcc.Tab(label="Complexity", value="complexity", className=".custom-tab"),
-                                    dcc.Tab(label="Questions", value="questions", className=".custom-tab"),
+                                    dcc.Tab(label="Introduction", value="introduction", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                    dcc.Tab(label="Statistics", value="statistics", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                    dcc.Tab(label="Intent", value="intent_trend", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                    dcc.Tab(label="Sentiment", value="sentiment_trend", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                    dcc.Tab(label="Question Length", value="sentence_length_trend", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                    dcc.Tab(label="Question Topics", value="topics", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                    dcc.Tab(label="Complexity", value="complexity", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
+                                    dcc.Tab(label="Questions", value="questions", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
+            selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
                                 ],
                                 style={
                                     "marginBottom": "0px",  # Remove gap between tabs and content
@@ -412,7 +576,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         ]
 
         return html.Div([
-                    html.H4("Welcome to the Scottish Examination Analysis Dashboard",style={"color": "#34495e"}),
+                    html.H4("Welcome to the Scottish Examination Analysis Dashboard"),
                     html.P(
                         """This dashboard allows for one to interact with analysis results on Scottish exam papers.
                                Currently a work in progress, at the time of writing there are a selection of papers from both
@@ -420,9 +584,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                levels have been converted to their modern CfE equivalent to simplify analysis for the end user."""
                     ),
                     html.P("At the moment we can analyse the following subjects in the database, with the following count per level:"),
-                    html.H5("Subjects:",style={"color": "#34495e"}),
+                    html.H5("Subjects:"),
                     html.Ul(div_elements),
-                    html.H5("Levels:",style={"color": "#34495e"}),
+                    html.H5("Levels:"),
                     html.Ul(div_elements_levels),
 
                     html.P("And inspect the following metrics:"),
@@ -462,7 +626,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                         for that particular subject (for example paper 1, paper 2 for Higher History 2024)."""
                     ),
                     
-                    html.H3("Scottish Exam Grades Through the Years",style={"color": "#34495e"}),
+                    html.H3("Scottish Exam Grades Through the Years"),
                         html.P(""""To make the filtering above easier for the user (that's you!) I first had to understand
                                     how levels in secondary schools had changed over the years so that I could effectively
                                     make a system to map any of the old-style levels to their modern equivalents under the current
@@ -566,80 +730,133 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     # Handle "Statistics" tab
     if tab_name == "statistics":
         num_files = len(file_paths)
+        print(num_files)
         metrics = []
     
-        if num_files == 1:
-            # Single paper: Calculate metrics
+        if (selected_year and selected_level and selected_subject and selected_paper):
+            # Single paper: Display descriptive statistics as text
             avg_word_count = combined_df["total_tokens"].mean()
             num_questions = len(combined_df)
-            
+    
             # Summary statistics for readability and sentiment
-            stats = {}
-            cols_to_describe = [
+            stats = combined_df[[
                 "coleman_liau", "flesch_kincaid", "gunning_fog",
                 "compound_sentiment_score", "total_tokens"
-            ]
-            stats = df[cols_to_describe].describe()
-            
-            metrics.append(f"Average Word Count per Question: {avg_word_count:.2f}")
-            metrics.append(f"Total Number of Questions: {num_questions}")    
-            #count mean std min 25% 50% 75% max
-            metrics.append(f"Average (mean) Coleman-Liau score: {stats['coleman_liau']['mean']:.2f}")
-            metrics.append(f"Minimum Coleman-Liau score: {stats['coleman_liau']['min']:.2f}")
-            metrics.append(f"Maximum Coleman-Liau score: {stats['coleman_liau']['max']:.2f}")
-            metrics.append(f"Standard deviation (std) Coleman-Liau score: {stats['coleman_liau']['std']:.2f}")
-            metrics.append(f"Average (mean) Flesch-Kincaid score: {stats['flesch_kincaid']['mean']:.2f}")
-            metrics.append(f"Minimum Flesch-Kincaid score: {stats['flesch_kincaid']['min']:.2f}")
-            metrics.append(f"Maximum Flesch-Kincaid score: {stats['flesch_kincaid']['max']:.2f}")
-            metrics.append(f"Standard deviation (std) Flesch-Kincaid score: {stats['flesch_kincaid']['std']:.2f}")
-            metrics.append(f"Average (mean) Gunning Fog score: {stats['gunning_fog']['mean']:.2f}")
-            metrics.append(f"Minimum Gunning Fog score: {stats['gunning_fog']['min']:.2f}")
-            metrics.append(f"Maximum Gunning Fog score: {stats['gunning_fog']['max']:.2f}")
-            metrics.append(f"Standard deviation (std) Gunning Fog score: {stats['gunning_fog']['std']:.2f}")
-            metrics.append(f"Average (mean) Compound Sentiment score: {stats['compound_sentiment_score']['mean']:.2f}")
-            metrics.append(f"Minimum Compound Sentiment score: {stats['compound_sentiment_score']['min']:.2f}")
-            metrics.append(f"Maximum Compound Sentiment score: {stats['compound_sentiment_score']['max']:.2f}")
-            metrics.append(f"Standard deviation (std) Compound Sentiment score: {stats['compound_sentiment_score']['std']:.2f}")
-            metrics.append(f"Average (mean) token count: {stats['total_tokens']['mean']:.2f}")
-            metrics.append(f"Minimum token count: {stats['total_tokens']['min']:.2f}")
-            metrics.append(f"Maximum token count: {stats['total_tokens']['max']:.2f}")
-            metrics.append(f"Standard deviation (std) token count: {stats['total_tokens']['std']:.2f}")
+            ]].describe()
     
             return html.Div([
-                html.H4("Statistics for the Selected Paper",style={"color": "#34495e"}),
-                html.Ul([html.Li(metric) for metric in metrics])
+                html.H4("Statistics for the Selected Paper", style={"color": "#2c3e50"}),
+                html.P(f"Average Word Count per Question: {avg_word_count:.2f}"),
+                html.P(f"Total Number of Questions: {num_questions}"),
+                html.H5("Readability and Sentiment Statistics", style={"color": "#34495e"}),
+                html.Ul([
+                    html.Li(f"Average Coleman-Liau Score: {stats['coleman_liau']['mean']:.2f}"),
+                    html.Li(f"Average Flesch-Kincaid Score: {stats['flesch_kincaid']['mean']:.2f}"),
+                    html.Li(f"Average Gunning Fog Score: {stats['gunning_fog']['mean']:.2f}"),
+                    html.Li(f"Average Compound Sentiment Score: {stats['compound_sentiment_score']['mean']:.2f}"),
+                    html.Li(f"Average Token Count: {stats['total_tokens']['mean']:.2f}")
+                ], style={"lineHeight": "1.8"})
             ]), combined_df.to_dict("records")
-        else:
-            # Multiple papers: Aggregate metrics
-            avg_word_count = combined_df.groupby("year")["total_tokens"].mean().to_dict()
-            total_questions = combined_df.groupby("year").size().to_dict()
-            avg_coleman_liau = combined_df.groupby("year")["coleman_liau"].mean().to_dict()
-            avg_flesch_kincaid = combined_df.groupby("year")["flesch_kincaid"].mean().to_dict()
-            avg_gunning_fog = combined_df.groupby("year")["gunning_fog"].mean().to_dict()
-            
-            metrics.append("Average Coleman-Liau score by Year:")
-            for year, count in avg_coleman_liau.items():
-                metrics.append(f"  {year}: {count:.2f}")
-                
-            metrics.append("Average Flesch-Kincaid score by Year:")
-            for year, count in avg_flesch_kincaid.items():
-                metrics.append(f"  {year}: {count:.2f}")
     
-            metrics.append("Average Gunning Fog score by Year:")
-            for year, count in avg_gunning_fog.items():
-                metrics.append(f"  {year}: {count:.2f}")
-
-            metrics.append("Average Word Count per Question by Year:")
-            for year, count in avg_word_count.items():
-                metrics.append(f"  {year}: {count:.2f}")
-            
-            metrics.append("Total Number of Questions by Year:")
-            for year, total in total_questions.items():
-                metrics.append(f"  {year}: {total}")
+        else:
+            # Multiple papers: Create plots for aggregated metrics
+            avg_word_count = combined_df.groupby("year")["total_tokens"].mean().reset_index()
+            total_questions = combined_df.groupby("year").size().reset_index(name="count")
+            avg_coleman_liau = combined_df.groupby("year")["coleman_liau"].mean().reset_index()
+            avg_flesch_kincaid = combined_df.groupby("year")["flesch_kincaid"].mean().reset_index()
+            avg_gunning_fog = combined_df.groupby("year")["gunning_fog"].mean().reset_index()
+    
+            # Create individual plots
+            plots = [
+                dcc.Graph(
+                    id="coleman-liau-plot",
+                    figure={
+                        "data": [go.Scatter(
+                            x=avg_coleman_liau["year"],
+                            y=avg_coleman_liau["coleman_liau"],
+                            mode="lines+markers",
+                            name="Coleman-Liau Score"
+                        )],
+                        "layout": go.Layout(
+                            title="Coleman-Liau Score by Year",
+                            xaxis={"title": "Year"},
+                            yaxis={"title": "Coleman-Liau Score"},
+                            template="plotly_white"
+                        )
+                    }
+                ),
+                dcc.Graph(
+                    id="flesch-kincaid-plot",
+                    figure={
+                        "data": [go.Scatter(
+                            x=avg_flesch_kincaid["year"],
+                            y=avg_flesch_kincaid["flesch_kincaid"],
+                            mode="lines+markers",
+                            name="Flesch-Kincaid Score"
+                        )],
+                        "layout": go.Layout(
+                            title="Flesch-Kincaid Score by Year",
+                            xaxis={"title": "Year"},
+                            yaxis={"title": "Flesch-Kincaid Score"},
+                            template="plotly_white"
+                        )
+                    }
+                ),
+                dcc.Graph(
+                    id="gunning-fog-plot",
+                    figure={
+                        "data": [go.Scatter(
+                            x=avg_gunning_fog["year"],
+                            y=avg_gunning_fog["gunning_fog"],
+                            mode="lines+markers",
+                            name="Gunning Fog Score"
+                        )],
+                        "layout": go.Layout(
+                            title="Gunning Fog Score by Year",
+                            xaxis={"title": "Year"},
+                            yaxis={"title": "Gunning Fog Score"},
+                            template="plotly_white"
+                        )
+                    }
+                ),
+                dcc.Graph(
+                    id="word-count-plot",
+                    figure={
+                        "data": [go.Scatter(
+                            x=avg_word_count["year"],
+                            y=avg_word_count["total_tokens"],
+                            mode="lines+markers",
+                            name="Average Word Count"
+                        )],
+                        "layout": go.Layout(
+                            title="Average Word Count per Question by Year",
+                            xaxis={"title": "Year"},
+                            yaxis={"title": "Average Word Count"},
+                            template="plotly_white"
+                        )
+                    }
+                ),
+                dcc.Graph(
+                    id="total-questions-plot",
+                    figure={
+                        "data": [go.Bar(
+                            x=total_questions["year"],
+                            y=total_questions["count"],
+                            name="Total Questions"
+                        )],
+                        "layout": go.Layout(
+                            title="Total Number of Questions by Year",
+                            xaxis={"title": "Year"},
+                            yaxis={"title": "Total Questions"},
+                            template="plotly_white"
+                        )
+                    }
+                )
+            ]
     
             return html.Div([
-                html.H4("Summary Statistics for Selected Papers"),
-                html.Ul([html.Li(metric) for metric in metrics])
+                html.H4("Summary Statistics for Selected Papers", style={"color": "#2c3e50"}),
+                html.Div(plots, style={"display": "grid", "gridTemplateColumns": "1fr", "gap": "20px"})
             ]), combined_df.to_dict("records")
 
 
@@ -666,12 +883,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             fig.update_traces(textposition="outside")
 
             return html.Div([
-                html.H4("Intent Breakdown",style={"color": "#34495e"}),
+                html.H4("Intent Breakdown"),
                 html.P(
-                    """This plot shows the count for each type of question in the given exam paper. 
-                    The intent of a question has been decided by training a Bidirectional and Auto-Regressive Transformer
-                    model on a hand-crafted dataset of questions and their intent. Although early days, the results
-                    show promise (however should not be taken as absolute until more testing has been done)."""
+                    """This plot shows the count for each type of question in the given exam paper. """
                 ),
                 dcc.Graph(figure=fig),
                 intent_description
@@ -702,15 +916,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
             return html.Div([
                 toggle,
-                html.H4("Intent Trend Analysis",style={"color": "#34495e"}),
+                html.H4("Intent Trend Analysis"),
                 html.P(
                     """This plot shows the count for each type of question in the given exam paper. 
                     There are two options here; proportional, or count. Proportional ensures proportions are calculated 
                     for each year, making trends comparable despite varying question counts between papers, whereas Count 
-                    shows the actual count of the question intent types in each paper. 
-                    The intent of a question has been calculated by training a Bidirectional and Auto-Regressive Transformer
-                    model on a hand-crafted dataset of questions and their intent. Although early days, the results
-                    show promise (however should not be taken as absolute until more testing has been done)."""
+                    shows the actual count of the question intent types in each paper."""
                 ),
                 dcc.Graph(id="intent-trend-graph"),
                 
@@ -750,17 +961,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
            )
    
            return html.Div([
-               html.H4("Sentiment Trend for Single Year",style={"color": "#34495e"}),
+               html.H4("Sentiment Trend for Single Year"),
                html.P(
-                   """This plot shows the sentiment score for each question in the given exam paper.
-                   Sentiment, in this sense, is a number between -1 and +1, with -1 being negative, +1 being 
-                   positive, and 0 being neutral. Although it should be noted that sentiment does take into
-                   account the length of a piece of text when calculating the sentiment score, thus, shorter (i.e. more
-                   abrupt texts, can adjust the score into the negative. As modern texts do tend to be shorter for
-                   accessibility reasons their sentiment score will be lower than their older equivalents. 
-                   This doesn't necessarily mean they are negative, just that they are more direct."""
+                   """This plot shows the sentiment score for each question in the given exam paper."""
                ),
-               dcc.Graph(figure=fig)
+               dcc.Graph(figure=fig),
+               sentiment_description
            ]), combined_df.to_dict("records")
    
        else:
@@ -777,17 +983,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
            fig.update_traces(mode="lines+markers")
 
            return html.Div([
-               html.H4("Sentiment Trend Over Time",style={"color": "#34495e"}),
+               html.H4("Sentiment Trend Over Time"),
                html.P(
-                   """This plot shows the overall average sentiment score for each question in the given exam papers over time.
-                   Sentiment, in this sense, is a number between -1 and +1, with -1 being negative, +1 being 
-                   positive, and 0 being neutral. Although it should be noted that sentiment does take into
-                   account the length of a piece of text when calculating the sentiment score, thus, shorter (i.e. more
-                   abrupt texts, can adjust the score into the negative. As modern texts do tend to be shorter for
-                   accessibility reasons their sentiment score will be lower than their older equivalents. 
-                   This doesn't necessarily mean they are negative, just that they are more direct."""
+                   """This plot shows the overall average sentiment score for each question in the given exam papers over time."""
                ),
-               dcc.Graph(figure=fig)
+               dcc.Graph(figure=fig),
+               sentiment_description
            ]), combined_df.to_dict("records")
                    
     elif tab_name == "sentence_length_trend":
@@ -809,11 +1010,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             fig.update_traces(mode="lines+markers")
 
             return html.Div([
-                html.H4("Question Length Trend for Single Year",style={"color": "#34495e"}),
+                html.H4("Question Length Trend for Single Year"),
                 html.P(
                     """This shows the length of each question (in words) throughout the paper."""
                 ),
-                dcc.Graph(figure=fig)
+                dcc.Graph(figure=fig),
+                question_length_description,
             ]), combined_df.to_dict("records")
 
         else:
@@ -831,11 +1033,12 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             fig.update_traces(mode="lines+markers")
 
             return html.Div([
-                html.H4("Average Question Length Per Year",style={"color": "#34495e"}),
+                html.H4("Average Question Length Per Year"),
                 html.P(
                     """This shows the average length of each question (in words) throughout each paper over the years."""
                 ),
-                dcc.Graph(figure=fig)
+                dcc.Graph(figure=fig),
+                question_length_description,
             ]), combined_df.to_dict("records")
         
     elif tab_name == "topics":
@@ -859,7 +1062,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         #formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
            
         return html.Div([
-            html.H4("Named Entities in the filtered results",style={"color": "#34495e"}),
+            html.H4("Named Entities in the filtered results"),
             html.P(
                 """This shows the frequency of named entities (people and places) for the filtered
                 results. The larger a word appears in the wordcloud below, the more frequent it is.
@@ -869,7 +1072,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             ),
             html.Div([
                 html.Div([
-                    html.H4("Word Cloud of Named Entities",style={"color": "#34495e"}),
+                    html.H4("Word Cloud of Named Entities"),
                     DashWordcloud(
                         id="cloud",
                         list=result,
@@ -890,8 +1093,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 ]),
             ], style={'display': 'flex', 'flex-direction': 'row'}),
             html.Div([
-                html.H4("", id="report",style={"color": "#34495e"}),
-                dcc.Graph(id="word-usage-plot"),
+                html.H4("", id="report"),
+                dcc.Graph(id="word-usage-plot", style={"display": "none"}),
+                named_entity_description,
                 ])    
         ]), combined_df.to_dict("records")
     
@@ -934,7 +1138,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             
         
             return html.Div([
-                html.H4("Readability Trend for Single Year",style={"color": "#34495e"}),
+                html.H4("Readability Trend for Single Year"),
                 html.P(
                     """This plot shows the readability indices for each question in the given exam paper. 
                     The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
@@ -976,7 +1180,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
             return html.Div([
                 
-                html.H4("Readability Trend Over Time",style={"color": "#34495e"}),
+                html.H4("Readability Trend Over Time"),
                 html.P(
                     """This plot shows the readability indices (Coleman-Liau, Flesch-Kincaid, Gunning Fog) over time. """
                 ),
@@ -1028,7 +1232,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
             # Return the table as part of the "Questions" tab content
             return html.Div([
-                html.H4("Questions for the Selected Paper",style={"color": "#34495e"}),
+                html.H4("Questions for the Selected Paper"),
                 html.P("Below is each question in the selected paper:"),
                 html.Table(table_header + [table_body], style={"width": "100%", "border": "1px solid black"})
             ]), None
@@ -1051,6 +1255,7 @@ def update_output_div(item):
     
 @app.callback(
     Output("word-usage-plot", "figure"),
+    Output("word-usage-plot", "style"),
     [
         Input("cloud", "click"),
         State("combined-data", "data"),  # Retrieve stored data (list of dictionaries)
@@ -1096,7 +1301,7 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
     # Add markers for better visualization
     fig.update_traces(mode="lines+markers")
 
-    return fig
+    return fig, {"display": "block"}
 
 
 # Function to generate word cloud image
