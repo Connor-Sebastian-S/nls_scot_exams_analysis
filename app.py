@@ -509,6 +509,7 @@ app.layout = dbc.Container(
                             dcc.Tabs(
                                 id="tabs",
                                 value="introduction",
+                                className="tab-container",
                                 children=[
                                     dcc.Tab(label="Introduction", value="introduction", style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px"},
                                             selected_style={"display": "flex", "alignItems": "center", "justifyContent": "center", "height": "50px", "backgroundColor": "#f0f0f0", "color": "#2c3e50", "fontWeight": "bold"}),
