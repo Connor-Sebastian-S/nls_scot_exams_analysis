@@ -89,12 +89,11 @@ notable_events = [
 ]
            
 readability_explanation = html.Div([
-    html.H4("Understanding Readability Metrics in the Scottish Education System"),
+    html.H4("Understanding Readability Metrics in Scottish Exams", style={"color": "#34495e"}),
     html.P("This section provides an explanation of the three readability indices used in the analysis: "
-           "Coleman-Liau Index, Flesch-Kincaid Grade Level, and Gunning Fog Index. Each metric offers insight into text complexity, "
-           "and you can analyse them either as raw values or as proportional contributions."),
+           "Coleman-Liau Index, Flesch-Kincaid Grade Level, and Gunning Fog Index."),
 
-    html.H5("1. Coleman-Liau Index (CLI)"),
+    html.H5("1. Coleman-Liau Index (CLI)", style={"color": "#34495e"}),
     html.Div([
         html.Span("The Coleman-Liau Index estimates readability based on letter count per 100 words and sentence length. The formula is:"),
         html.Div("CLI = 0.0588 × L - 0.296 × S - 15.8", className="math"),
@@ -105,14 +104,14 @@ readability_explanation = html.Div([
         html.P("A higher score indicates greater complexity, aligning with the Scottish school level required to understand the text.")
     ]),
 
-    html.H5("2. Flesch-Kincaid Grade Level (FKGL)"),
+    html.H5("2. Flesch-Kincaid Grade Level (FKGL)", style={"color": "#34495e"}),
     html.Div([
         html.Span("The Flesch-Kincaid Grade Level evaluates readability based on words per sentence and syllables per word. The formula is:"),
         html.Div("FKGL = 0.39 × (words/sentence) + 11.8 × (syllables/word) - 15.59", className="math"),
         html.P("A higher score suggests a more advanced education level is required to comprehend the text.")
     ]),
 
-    html.H5("3. Gunning Fog Index (GFI)"),
+    html.H5("3. Gunning Fog Index (GFI)", style={"color": "#34495e"}),
     html.Div([
         html.Span("The Gunning Fog Index measures readability using sentence length and complex words. The formula is:"),
         html.Div("GFI = 0.4 × [(words/sentences) + 100 × (complex words/words)]", className="math"),
@@ -121,7 +120,7 @@ readability_explanation = html.Div([
     
     html.Hr(),
 
-    html.H5("Readability Score Interpretation in the Scottish Education System"),
+    html.H5("Readability Score Interpretation in the Scottish Education System",style={"color": "#34495e"}),
     html.Table([
         html.Thead(html.Tr([
             html.Th("Score Range"), html.Th("Coleman-Liau Index (CLI)"), html.Th("Flesch-Kincaid Grade Level (FKGL)"), html.Th("Gunning Fog Index (GFI)"), html.Th("Scottish Education Level")
@@ -135,57 +134,52 @@ readability_explanation = html.Div([
         ])
     ], style={'width': '100%', 'border': '1px solid black', 'textAlign': 'center', 'marginTop': '20px'}),
 
-    html.P("By using the readability scores above, you can estimate the education level required to understand the text."),
-    
-    
+    html.P("By using the readability scores above, you can estimate the education level required to understand the text.")   
 ])
 
+intent_description = html.Div([
+    html.H4("Intent Classification Model", style={"color": "#34495e"}),
 
+    html.P("""
+        This tab showcases qfine-tuned DistilBERT model, designed to classify the intent behind exam questions.
+        The system analyses each question's content and determines its intent category with high accuracy.
+    """, style={"lineHeight": "1.6"}),
 
-# Additional toggle explanation (conditionally included only for multiple papers)
-toggle_explanation = html.Div([
-    html.Hr(),
-    html.Table([
-        html.Thead(html.Tr([
-            html.Th("Metric"), html.Th("What it Measures"), html.Th("Raw Score Interpretation (Scottish System)"), html.Th("Proportional Interpretation")
-        ])),
-        html.Tbody([
-            html.Tr([
-                html.Td("Coleman-Liau Index"),
-                html.Td("Letter count & sentence length"),
-                html.Td("Equivalent to Scottish school level (e.g., S3 for Fourth Level - BGE)"),
-                html.Td("Contribution based on letter density")
-            ]),
-            html.Tr([
-                html.Td("Flesch-Kincaid Grade Level"),
-                html.Td("Words per sentence & syllables per word"),
-                html.Td("Equivalent to Scottish school level (e.g., S6 for Advanced Higher)"),
-                html.Td("Impact of syllabic complexity")
-            ]),
-            html.Tr([
-                html.Td("Gunning Fog Index"),
-                html.Td("Sentence length & complex words"),
-                html.Td("Years of education needed (e.g., S4 for National 4/5)"),
-                html.Td("Proportion of long/complex words")
-            ])
+    html.H5("How It Works", style={"color": "#34495e"}),
+    html.Ol([
+        html.Li([
+            html.Strong("Dataset Preparation:"),
+            " A labelled dataset, consisting of questions and their corresponding intent categories, is used to train the model. ",
+            "The dataset is split into training and validation sets to ensure robust performance."
+        ]),
+        html.Li([
+            html.Strong("Text Tokenisation:"),
+            " Each question is converted into a numerical format using a pre-trained tokenizer from the DistilBERT model. ",
+            "This ensures that text data is formatted appropriately for processing by the machine learning model."
+        ]),
+        html.Li([
+            html.Strong("Model Fine-Tuning:"),
+            " The DistilBERT model is fine-tuned on the dataset, adapting its understanding of language to the specific task of intent classification. ",
+            "Techniques like learning rate optimisation and regular evaluation maximise performance."
+        ]),
+        html.Li([
+            html.Strong("Inference:"),
+            " After training, the model can analyse unseen questions and predict their intent with precision."
         ])
-    ], style={'width': '100%', 'border': '1px solid black', 'textAlign': 'left', 'marginTop': '20px'}),
-    
-    html.Hr(),
-    
-    html.H5("Interpreting the Toggle Options"),
-    dcc.Markdown(r"""
-        - **Raw Score Mode:** Displays the absolute readability levels directly in terms of the Scottish education system (e.g., S4 for National 4/5).
-        - **Proportional Mode:** Shows how each metric contributes to the overall complexity, useful for comparing trends over time.
+    ]),
 
-        By switching between these options, you can gain insights into which factors contribute most to a text’s difficulty over time.
+    html.H5("What This Model Does", style={"color": "#34495e"}),
+    html.P("""
+        The model assigns an intent category to questions, such as 'explain', 'describe', or 'evaluate'.
     """),
-    
-    
+
+    html.H5("About DistilBERT", style={"color": "#34495e"}),
+    html.P("""
+        DistilBERT is a lightweight version of the BERT model, designed to retain the language understanding capabilities of its predecessor while being faster and more efficient. 
+        It is ideal for applications requiring limited computational resources or fast response times.
+    """),
+
 ])
-
-
-
 def parse_directory(data_dir):
     directory_info = {}
     for year in os.listdir(data_dir):
@@ -223,7 +217,7 @@ app.layout = dbc.Container(
             dbc.Col(
                 html.H1(
                     "Scottish Exams - Linguistical Analysis Dashboard",
-                    style={"textAlign": "center"}
+                    style={"textAlign": "center", "color": "#34495e"}
                 ),
                 width=12
             ),
@@ -244,7 +238,7 @@ app.layout = dbc.Container(
                                     {"label": year, "value": year} for year in directory_info.keys()
                                 ] + [{"label": "All Years", "value": "all"}],
                                 placeholder="Select a Year",
-                                style={"width": "100%"}
+                                style={"width": "100%", "color": "#34495e"}
                             ),
                             html.Label("Select Level:"),
                             dcc.Dropdown(
@@ -255,7 +249,7 @@ app.layout = dbc.Container(
                                     for level in set(l for levels in directory_info.values() for l in levels)
                                 ],
                                 placeholder="Select a Level",
-                                style={"width": "100%"}
+                                style={"width": "100%", "color": "#34495e"}
                             ),
                             html.Label("Select Subject:"),
                             dcc.Dropdown(
@@ -272,7 +266,7 @@ app.layout = dbc.Container(
                                     )
                                 ],
                                 placeholder="Select a Subject",
-                                style={"width": "100%"}
+                                style={"width": "100%", "color": "#34495e"}
                             ),
                             html.Label("Select Paper: (Optional)"),
                             dcc.Dropdown(
@@ -282,10 +276,10 @@ app.layout = dbc.Container(
                                     {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 6)
                                 ] + [{"label": "All Papers", "value": "all"}],
                                 placeholder="Select a Paper",
-                                style={"width": "100%", "marginBottom": "15px"}
+                                style={"width": "100%", "marginBottom": "15px", "color": "#34495e"}
                             ),
                             
-                            html.H4("Notable Events in Education"),
+                            html.H4("Notable Events in Education", style = { "color": "#34495e"}),
                             html.P("The numbers correspond to the yellow labels on any plots"),
                             html.Ul([html.Li(f"{l+1} = {event['year']}: {event['event']}") for l, event in enumerate(notable_events)]),
                         ],
@@ -304,11 +298,11 @@ app.layout = dbc.Container(
                                 children=[
                                     dcc.Tab(label="Introduction", value="introduction", className=".custom-tab"),
                                     dcc.Tab(label="Statistics", value="statistics", className=".custom-tab"),
-                                    dcc.Tab(label="Intent Trend", value="intent_trend", className=".custom-tab"),
-                                    dcc.Tab(label="Compound Sentiment Trend", value="sentiment_trend", className=".custom-tab"),
-                                    dcc.Tab(label="Question Length Trend", value="sentence_length_trend", className=".custom-tab"),
+                                    dcc.Tab(label="Intent", value="intent_trend", className=".custom-tab"),
+                                    dcc.Tab(label="Sentiment", value="sentiment_trend", className=".custom-tab"),
+                                    dcc.Tab(label="Question Length", value="sentence_length_trend", className=".custom-tab"),
                                     dcc.Tab(label="Question Topics", value="topics", className=".custom-tab"),
-                                    dcc.Tab(label="Complexity Trends", value="complexity", className=".custom-tab"),
+                                    dcc.Tab(label="Complexity", value="complexity", className=".custom-tab"),
                                     dcc.Tab(label="Questions", value="questions", className=".custom-tab"),
                                 ],
                                 style={
@@ -418,7 +412,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         ]
 
         return html.Div([
-                    html.H4("Welcome to the Scottish Examination Analysis Dashboard"),
+                    html.H4("Welcome to the Scottish Examination Analysis Dashboard",style={"color": "#34495e"}),
                     html.P(
                         """This dashboard allows for one to interact with analysis results on Scottish exam papers.
                                Currently a work in progress, at the time of writing there are a selection of papers from both
@@ -426,9 +420,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                levels have been converted to their modern CfE equivalent to simplify analysis for the end user."""
                     ),
                     html.P("At the moment we can analyse the following subjects in the database, with the following count per level:"),
-                    html.H5("Subjects:"),
+                    html.H5("Subjects:",style={"color": "#34495e"}),
                     html.Ul(div_elements),
-                    html.H5("Levels:"),
+                    html.H5("Levels:",style={"color": "#34495e"}),
                     html.Ul(div_elements_levels),
 
                     html.P("And inspect the following metrics:"),
@@ -468,7 +462,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                         for that particular subject (for example paper 1, paper 2 for Higher History 2024)."""
                     ),
                     
-                    html.H3("Scottish Exam Grades Through the Years"),
+                    html.H3("Scottish Exam Grades Through the Years",style={"color": "#34495e"}),
                         html.P(""""To make the filtering above easier for the user (that's you!) I first had to understand
                                     how levels in secondary schools had changed over the years so that I could effectively
                                     make a system to map any of the old-style levels to their modern equivalents under the current
@@ -612,7 +606,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             metrics.append(f"Standard deviation (std) token count: {stats['total_tokens']['std']:.2f}")
     
             return html.Div([
-                html.H4("Statistics for the Selected Paper"),
+                html.H4("Statistics for the Selected Paper",style={"color": "#34495e"}),
                 html.Ul([html.Li(metric) for metric in metrics])
             ]), combined_df.to_dict("records")
         else:
@@ -672,14 +666,15 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             fig.update_traces(textposition="outside")
 
             return html.Div([
-                html.H4("Intent Breakdown"),
+                html.H4("Intent Breakdown",style={"color": "#34495e"}),
                 html.P(
                     """This plot shows the count for each type of question in the given exam paper. 
                     The intent of a question has been decided by training a Bidirectional and Auto-Regressive Transformer
                     model on a hand-crafted dataset of questions and their intent. Although early days, the results
                     show promise (however should not be taken as absolute until more testing has been done)."""
                 ),
-                dcc.Graph(figure=fig)
+                dcc.Graph(figure=fig),
+                intent_description
             ]), combined_df.to_dict("records")
 
         else:
@@ -707,7 +702,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
             return html.Div([
                 toggle,
-                html.H4("Intent Trend Analysis"),
+                html.H4("Intent Trend Analysis",style={"color": "#34495e"}),
                 html.P(
                     """This plot shows the count for each type of question in the given exam paper. 
                     There are two options here; proportional, or count. Proportional ensures proportions are calculated 
@@ -720,7 +715,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 dcc.Graph(id="intent-trend-graph"),
                 
                 
-                dcc.Store(id="intent-trend-data", data=intent_trend.to_dict("records"))
+                dcc.Store(id="intent-trend-data", data=intent_trend.to_dict("records")),
+                
+                intent_description
             ]), combined_df.to_dict("records")
         
     elif tab_name == "sentiment_trend":
@@ -753,7 +750,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
            )
    
            return html.Div([
-               html.H4("Sentiment Trend for Single Year"),
+               html.H4("Sentiment Trend for Single Year",style={"color": "#34495e"}),
                html.P(
                    """This plot shows the sentiment score for each question in the given exam paper.
                    Sentiment, in this sense, is a number between -1 and +1, with -1 being negative, +1 being 
@@ -780,7 +777,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
            fig.update_traces(mode="lines+markers")
 
            return html.Div([
-               html.H4("Sentiment Trend Over Time"),
+               html.H4("Sentiment Trend Over Time",style={"color": "#34495e"}),
                html.P(
                    """This plot shows the overall average sentiment score for each question in the given exam papers over time.
                    Sentiment, in this sense, is a number between -1 and +1, with -1 being negative, +1 being 
@@ -812,7 +809,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             fig.update_traces(mode="lines+markers")
 
             return html.Div([
-                html.H4("Question Length Trend for Single Year"),
+                html.H4("Question Length Trend for Single Year",style={"color": "#34495e"}),
                 html.P(
                     """This shows the length of each question (in words) throughout the paper."""
                 ),
@@ -834,7 +831,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             fig.update_traces(mode="lines+markers")
 
             return html.Div([
-                html.H4("Average Question Length Per Year"),
+                html.H4("Average Question Length Per Year",style={"color": "#34495e"}),
                 html.P(
                     """This shows the average length of each question (in words) throughout each paper over the years."""
                 ),
@@ -842,8 +839,6 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             ]), combined_df.to_dict("records")
         
     elif tab_name == "topics":
-        
-        
         
         all_entities = " ".join(combined_df["named_entities"].dropna())
 
@@ -864,7 +859,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         #formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
            
         return html.Div([
-            html.H4("Named Entities in the filtered results"),
+            html.H4("Named Entities in the filtered results",style={"color": "#34495e"}),
             html.P(
                 """This shows the frequency of named entities (people and places) for the filtered
                 results. The larger a word appears in the wordcloud below, the more frequent it is.
@@ -874,7 +869,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             ),
             html.Div([
                 html.Div([
-                    html.H4("Word Cloud of Named Entities"),
+                    html.H4("Word Cloud of Named Entities",style={"color": "#34495e"}),
                     DashWordcloud(
                         id="cloud",
                         list=result,
@@ -895,7 +890,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 ]),
             ], style={'display': 'flex', 'flex-direction': 'row'}),
             html.Div([
-                html.H4("", id="report"),
+                html.H4("", id="report",style={"color": "#34495e"}),
                 dcc.Graph(id="word-usage-plot"),
                 ])    
         ]), combined_df.to_dict("records")
@@ -939,7 +934,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             
         
             return html.Div([
-                html.H4("Readability Trend for Single Year"),
+                html.H4("Readability Trend for Single Year",style={"color": "#34495e"}),
                 html.P(
                     """This plot shows the readability indices for each question in the given exam paper. 
                     The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
@@ -981,7 +976,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
             return html.Div([
                 
-                html.H4("Readability Trend Over Time"),
+                html.H4("Readability Trend Over Time",style={"color": "#34495e"}),
                 html.P(
                     """This plot shows the readability indices (Coleman-Liau, Flesch-Kincaid, Gunning Fog) over time. """
                 ),
@@ -1033,7 +1028,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
             # Return the table as part of the "Questions" tab content
             return html.Div([
-                html.H4("Questions for the Selected Paper"),
+                html.H4("Questions for the Selected Paper",style={"color": "#34495e"}),
                 html.P("Below is each question in the selected paper:"),
                 html.Table(table_header + [table_body], style={"width": "100%", "border": "1px solid black"})
             ]), None
