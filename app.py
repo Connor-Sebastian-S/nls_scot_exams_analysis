@@ -1608,28 +1608,44 @@ def load_csv(selected_year, selected_level, selected_subject, selected_paper):
 
     # Determine file paths
     file_paths = []
+    if selected_year and selected_level and selected_paper and selected_subject and selected_paper != "all" and selected_year != "all":
+        # Handle specific year, level, paper, and subject
+        paper_path = os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
+        if os.path.exists(paper_path):
+            file_paths.append(paper_path)
+        
     if selected_year and selected_year != "all":
+        # Handle a specific year
         year_dir = directory_info.get(selected_year, {})
         if selected_level in year_dir:
             if selected_paper and selected_paper != "all":
-                file_paths = [
-                    os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
-                ]
+                # Load specific paper for the year
+                paper_path = os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
+                if os.path.exists(paper_path):
+                    file_paths.append(paper_path)
             else:
-                # Load all papers
+                # Load all papers for the year
                 for paper in year_dir[selected_level]:
                     paper_path = os.path.join(DATA_DIR, selected_year, selected_level, paper, f"{selected_subject}.csv")
-                    file_paths.append(paper_path)
+                    if os.path.exists(paper_path):
+                        file_paths.append(paper_path)
     else:
-        # Load all years, levels, and papers
+        # Handle "all years"
         for year, levels in directory_info.items():
             for level, papers in levels.items():
-                if selected_level == level:
-                    for paper, files in papers.items():
-                        paper_path = os.path.join(DATA_DIR, year, level, paper, f"{selected_subject}.csv")
-                        if (os.path.isfile(paper_path)):
+                if level == selected_level:
+                    if selected_paper and selected_paper != "all":
+                        # Load specific paper across all years
+                        paper_path = os.path.join(DATA_DIR, year, level, selected_paper, f"{selected_subject}.csv")
+                        if os.path.exists(paper_path):
                             file_paths.append(paper_path)
-                        
+                    else:
+                        # Load all papers across all years
+                        for paper, subjects in papers.items():
+                            if selected_subject in subjects:
+                                paper_path = os.path.join(DATA_DIR, year, level, paper, f"{selected_subject}.csv")
+                                if os.path.exists(paper_path):
+                                    file_paths.append(paper_path)
     dataframes = []
     for path in file_paths:
         try:
