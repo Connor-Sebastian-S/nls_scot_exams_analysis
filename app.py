@@ -28,6 +28,7 @@ import seaborn as sns
 from io import StringIO
 from scipy.stats import linregress
 from sklearn.cluster import KMeans
+import plotly.graph_objects as go
 
 
 # Initialize Dash app
@@ -394,7 +395,7 @@ wcs_visualisation = html.Div([
 
 linear_regression_description = html.Div([
     html.H4("Linear Regression Analysis"),
-    html.P("This visualization illustrates the relationship between the years and the corresponding weighted composite scores. The plot includes:"),
+    html.P("This visualisation illustrates the relationship between the years and the corresponding weighted composite scores. The plot includes:"),
     html.Ul([
         html.Li("A scatter plot showing the weighted composite scores for each year."),
         html.Li("A linear regression line fitted to the data to model the trend."),
@@ -421,7 +422,19 @@ linear_regression_description = html.Div([
     ]),
     html.P("This analysis provides insights into temporal trends in the complexity of exam questions and highlights patterns that might reflect historical or systemic changes in their structure.")
 ])
-           
+   
+un_trend_desc = html.Div([
+    html.H4("Trend Component"),
+    html.P("The trend component shows the long-term movement in composite scores over time. It represents the underlying pattern of change, smoothing out short-term fluctuations and noise."),
+    html.P("This visualization is useful for identifying:"),
+    html.Ul([
+        html.Li("Overall increases, decreases, or stability in composite scores over the years."),
+        html.Li("Significant shifts or transitions in complexity trends."),
+        html.Li("Long-term patterns that may reflect historical, educational, or structural changes.")
+    ]),
+    html.P("By focusing on the trend, we can better understand the general direction and evolution of exam complexity without being distracted by irregularities or short-term variations.")
+])
+        
 def parse_directory(data_dir):
     directory_info = {}
     for year in os.listdir(data_dir):
@@ -1340,18 +1353,19 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     elif tab_name == "comparative":
         print("comparative")
         return html.Div([
-            html.H4("Comparative Analysis"),
-            html.P(
-                """This plot visualizes the evolution of the composite scores over time to 
-                identify patterns, significant changes, or correlations in complexity metrics."""
-            ),
-            dcc.Graph(id="ca_report", style={"display": "none"}),
+            html.H4("Weighted Comparative Analysis"),
             wcs_visualisation,
             html.Script("renderKatex();"),
-            dcc.Graph(id="ca_linreg", style={"display": "none"}),
+            dcc.Graph(id="ca_report", style={"display": "none"}),
+                        
             linear_regression_description,
             html.Script("renderKatex();"),
-            #dcc.Graph(id="ca_clusters", style={"display": "none"}),
+            dcc.Graph(id="ca_linreg", style={"display": "none"}),            
+            
+            un_trend_desc,
+            html.Script("renderKatex();"),
+            dcc.Graph(id="ca_ts1", style={"display": "none"}),
+            
         ]), combined_df.to_dict("records")
 
                 
@@ -1360,8 +1374,8 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     Output("ca_report", "style"),  
     Output("ca_linreg", "figure"),
     Output("ca_linreg", "style"),
-    #Output("ca_clusters", "figure"),
-    #Output("ca_clusters", "style"),
+    Output("ca_ts1", "figure"),
+    Output("ca_ts1", "style"),
     [
     Input("level-dropdown", "value"),
     Input("subject-dropdown", "value"),
@@ -1443,6 +1457,7 @@ def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_p
         weighted_composite_score_df = weighted_composite_score.reset_index()
         weighted_composite_score_df.columns = ['year', 'score']  # Rename columns for clarity
 
+          
         # Plot using Plotly Express
         fig = px.line(
             weighted_composite_score_df,
@@ -1499,9 +1514,37 @@ def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_p
             template="plotly_white",
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
+        
+        def time_series(_df):
+            from statsmodels.tsa.seasonal import seasonal_decompose
+            
+            # Ensure the index is datetime or a regular numeric sequence (like years)
+            _df.index = pd.to_datetime(_df.index, format="%Y")
+            
+            # Perform decomposition
+            decomposition = seasonal_decompose(_df, model="additive", period=1)
+            
+            # Extract components
+            trend = decomposition.trend
+            seasonal = decomposition.seasonal
+            residual = decomposition.resid
+            
+
+            # Create the original time series plot
+            original_fig = go.Figure()
+            original_fig.add_trace(go.Scatter(x=df_grouped_by_year.index, y=df_grouped_by_year, mode='lines', name='Original'))
+            
+            # Create the trend plot
+            trend_fig = go.Figure()
+            trend_fig.add_trace(go.Scatter(x=trend.index, y=trend, mode='lines', name='Trend', line=dict(color='green')))
+            
+
+            return trend_fig
 
 
-        return fig, {"display": "block"}, lin_reg_fig, {"display": "block"}
+        trend_fig = time_series(df_grouped_by_year)
+        
+        return fig, {"display": "block"}, lin_reg_fig, {"display": "block"}, trend_fig, {"display": "block"}
 
     #return None, {"display": "none"}
         
