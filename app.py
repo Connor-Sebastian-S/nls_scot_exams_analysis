@@ -392,7 +392,35 @@ wcs_visualisation = html.Div([
     html.Hr(),
 ])
 
-
+linear_regression_description = html.Div([
+    html.H4("Linear Regression Analysis"),
+    html.P("This visualization illustrates the relationship between the years and the corresponding weighted composite scores. The plot includes:"),
+    html.Ul([
+        html.Li("A scatter plot showing the weighted composite scores for each year."),
+        html.Li("A linear regression line fitted to the data to model the trend."),
+        html.Li("Statistical details such as the slope, intercept, and the coefficient of determination ((R^2)).")
+    ]),
+    html.P("Linear regression models the data using the equation:"),
+    html.Div("y = m × x + c", className="math"),
+    html.P([
+        "Here, ",
+        html.I("y"),
+        " represents the weighted composite score, ",
+        html.I("m"),
+        " is the slope of the line, and ",
+        html.I("c"),
+        " is the y-intercept."
+    ]),
+    html.P("The slope (m) indicates the average yearly change in the weighted composite score, and the y-intercept (c) represents the estimated composite score when the year is zero (not typically meaningful but part of the model)."),
+    html.P("The coefficient of determination (R²) measures how well the linear model explains the variability of the scores. A value close to 1 indicates a strong fit, while a value near 0 suggests a weak relationship."),
+    html.P("Key takeaways from the regression plot:"),
+    html.Ul([
+        html.Li("The direction and steepness of the trend over time (positive or negative slope)."),
+        html.Li("How well the data aligns with the trend line, as indicated by the scatter of points around the line."),
+        html.Li("Whether significant deviations or patterns exist, such as periods where the trend changes.")
+    ]),
+    html.P("This analysis provides insights into temporal trends in the complexity of exam questions and highlights patterns that might reflect historical or systemic changes in their structure.")
+])
            
 def parse_directory(data_dir):
     directory_info = {}
@@ -509,17 +537,34 @@ app.layout = dbc.Container(
                             dcc.Tabs(
                                 id="tabs",
                                 value="introduction",
-                                className="tab-container",
-                                children=[
-                                    dcc.Tab(label="Intro", value="introduction"),
-                                    dcc.Tab(label="Stats", value="statistics"),
-                                    dcc.Tab(label="Intent", value="intent_trend"),
-                                    dcc.Tab(label="Sentiment", value="sentiment_trend"),
-                                    dcc.Tab(label="Question Length", value="sentence_length_trend"),
-                                    dcc.Tab(label="Topics", value="topics"),
-                                    dcc.Tab(label="Complexity", value="complexity"),
-                                    dcc.Tab(label="Questions", value="questions"),
-                                    dcc.Tab(label="Comparative", value="comparative"),
+                                children=[    
+                                    dcc.Tab(label="Intro", value="introduction", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
+                                    dcc.Tab(label="Stats", value="statistics", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
+                                    dcc.Tab(label="Intent", value="intent_trend", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
+                                    dcc.Tab(label="Sentiment", value="sentiment_trend", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
+                                    dcc.Tab(label="Question Length", value="sentence_length_trend", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
+                                    dcc.Tab(label="Topics", value="topics", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
+                                    dcc.Tab(label="Complexity", value="complexity", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
+                                    dcc.Tab(label="Questions", value="questions", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
+                                    dcc.Tab(label="Comparative", value="comparative", 
+                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                 ],
                                 style={
                                     "marginBottom": "0px",  # Remove gap between tabs and content
@@ -1304,6 +1349,8 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             wcs_visualisation,
             html.Script("renderKatex();"),
             dcc.Graph(id="ca_linreg", style={"display": "none"}),
+            linear_regression_description,
+            html.Script("renderKatex();"),
             #dcc.Graph(id="ca_clusters", style={"display": "none"}),
         ]), combined_df.to_dict("records")
 
