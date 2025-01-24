@@ -1327,13 +1327,15 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     Input("level-dropdown", "value"),
     Input("subject-dropdown", "value"),
     Input("tabs", "value"),
+    Input("paper-dropdown", "value"),
     ]
 )
-def get_papers_in_subject(selected_level, selected_subject, tab_name):
+def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_paper):
     if tab_name == "comparative":
         print(selected_level)
         print(selected_subject)
-        combined_df = load_csv(selected_year = None, selected_paper = None, selected_level = selected_level, selected_subject = selected_subject)
+
+        combined_df = load_csv(selected_year = None, selected_paper = selected_paper, selected_level = selected_level, selected_subject = selected_subject)
         
         metrics_columns = [
             'coleman_liau',
