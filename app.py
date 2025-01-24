@@ -1453,16 +1453,7 @@ def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_p
         )
         # Add markers for better visualization
         fig.update_traces(mode="lines+markers")
-        
-        #Compare Metrics
-        #Analyze individual metrics alongside the composite scores to understand which metrics drive changes over time.
-        #Use heatmaps for the correlation matrix to visualize relationships.
-        # Heatmap for correlation matrix
-        plt.figure(figsize=(10, 8))
-        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f')
-        plt.title('Correlation Between Metrics Over Time')
-        plt.show()
-        
+                
         years = df_grouped_by_year.index.astype(int)
         values = df_grouped_by_year.values
         slope, intercept, r_value, p_value, std_err = linregress(years, df_grouped_by_year.values)
