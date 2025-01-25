@@ -533,8 +533,9 @@ app.layout = dbc.Container(
                                 placeholder="Select a Paper",
                                 style={"width": "100%", "marginBottom": "15px", }
                             ),
+
                             
-                            html.H4("Notable Events in Education", style = { }),
+                            html.H4("Notable Events in Education"),
                             html.P("The numbers correspond to the yellow labels on any plots"),
                             html.Ul([html.Li(f"{l+1} = {event['year']}: {event['event']}") for l, event in enumerate(notable_events)]),
                         ],
@@ -856,6 +857,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     
             return html.Div([
                 html.H4("Statistics for the Selected Paper", style={"color": "#2c3e50"}),
+                
+                # Button to trigger download
+                html.Button("Download as CSV", id="download-csv-btn"),
+                dcc.Download(id="download-csv"),
+            
+                html.Button("Download as Excel", id="download-excel-btn"),
+                dcc.Download(id="download-excel"),
+    
                 html.P(f"Average Word Count per Question: {avg_word_count:.2f}"),
                 html.P(f"Total Number of Questions: {num_questions}"),
                 html.H5("Readability and Sentiment Statistics", style={"color": "#34495e"}),
@@ -966,6 +975,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     
             return html.Div([
                 html.H4("Summary Statistics for Selected Papers", style={"color": "#2c3e50"}),
+                
+                # Button to trigger download
+                html.Button("Download as CSV", id="download-csv-btn"),
+                dcc.Download(id="download-csv"),
+            
+                html.Button("Download as Excel", id="download-excel-btn"),
+                dcc.Download(id="download-excel"),
+                
                 html.Div(plots, style={"display": "grid", "gridTemplateColumns": "1fr", "gap": "20px"})
             ]), combined_df.to_dict("records")
 
@@ -1673,6 +1690,30 @@ def update_intent_trend_chart(yaxis_choice, intent_trend_data):
             bgcolor="yellow"
         )
     return fig
+
+
+# Callback to download CSV
+@app.callback(
+    Output("download-csv", "data"),
+    Input("download-csv-btn", "n_clicks"),
+    State("combined-data", "data"),
+    prevent_initial_call=True
+)
+def download_csv(n_clicks, data):
+    data = pd.DataFrame(data)
+    return dcc.send_data_frame(data.to_csv, "data.csv")
+
+
+# Callback to download Excel
+@app.callback(
+    Output("download-excel", "data"),
+    Input("download-excel-btn", "n_clicks"),
+    State("combined-data", "data"),
+    prevent_initial_call=True
+)
+def download_excel(n_clicks, data):
+    data = pd.DataFrame(data)
+    return dcc.send_data_frame(data.to_excel, "data.xlsx", index=False)
 
 
 def load_csv(selected_year, selected_level, selected_subject, selected_paper):
