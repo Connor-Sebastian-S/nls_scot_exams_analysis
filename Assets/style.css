@@ -1,33 +1,33 @@
 h1 {
     font-family: "Poppins"; 
-    color: #34495e; 
+    color: #9ab9d9; 
     font-size: 35px;
     margin: 15px;
 }
 
 h2 {
     font-family: "Poppins"; 
-    color: #34495e; 
+    color: #9ab9d9; 
 }
 
 h3 {
     font-family: "Poppins"; 
-    color: #34495e; 
+    color: #9ab9d9; 
 }
 
 h4 {
     font-family: "Poppins"; 
-    color: #34495e; 
+    color: #9ab9d9; 
 }
 
 h5 {
     font-family: "Poppins"; 
-    color: #34495e; 
+    color: #9ab9d9; 
 }
 
 label {
     font-family: "Poppins"; 
-    color: #676768;
+    color: #9ab9d9;
     margin: 5px;
 }
 
@@ -91,3 +91,106 @@ label {
         flex-direction: column;
         margin-bottom: 0px;
     }
+    
+/* General table style */
+.dash-table-container {
+    background-color: #121212; /* Dark background for the table */
+    padding: 10px; /* Padding around the table */
+    border: 1px solid #444; /* Border to separate table area */
+}
+
+/* Header style */
+.dash-table-container .dash-header {
+    background-color: #1E1E1E; /* Darker background for the header */
+    color: #E0E0E0; /* Light text for the header */
+    font-weight: bold; /* Bold font for headers */
+    border-bottom: 1px solid #444; /* Bottom border for header separation */
+}
+
+/* Cell styles */
+.dash-table-container .dash-cell {
+    background-color: #121212; /* Main cell background */
+    color: #E0E0E0; /* Text color */
+    text-align: left; /* Align text to the left */
+    padding: 10px; /* Cell padding */
+    border-bottom: 1px solid #444; /* Border between rows */
+}
+
+/* Data cells */
+.dash-table-container .dash-data {
+    color: #B0B0B0; /* Slightly lighter text for data cells */
+    white-space: normal; /* Allow text wrapping */
+    height: auto; /* Auto-adjust height for wrapped text */
+}
+
+/* Alternate row styling */
+.dash-table-container .dash-row:nth-child(odd) {
+    background-color: #1E1E1E; /* Slightly lighter background for odd rows */
+}
+
+/* Highlight selected rows */
+.dash-table-container .dash-row.selected {
+    background-color: #333333;
+    color: #FFFFFF;
+}
+
+/* Style for focused rows */
+.dash-table-container .dash-row.active {
+    background-color: #2A2A2A;
+    color: #FFFFFF;
+}
+
+/* Filter box styles */
+.dash-table-container .dash-filter {
+    background-color: #1E1E1E; /* Background for filter boxes */
+    color: #E0E0E0; /* Text color for filters */
+    border: 1px solid #444; /* Border for filters */
+}
+
+/* General table style */
+.dash-spreadsheet-container {
+    background-color: #121212; /* Dark background for the table */
+    padding: 10px;
+    border: 1px solid #444;
+}
+
+/* Header style */
+.dash-spreadsheet .dash-header {
+    background-color: #1E1E1E;
+    color: #E0E0E0;
+    font-weight: bold;
+    border-bottom: 1px solid #444;
+}
+
+/* Data cells */
+.dash-spreadsheet .dash-cell {
+    background-color: #121212;
+    color: #E0E0E0;
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #444;
+}
+
+/* Alternate row styling */
+.dash-spreadsheet .dash-row:nth-child(odd) {
+    background-color: #1E1E1E;
+}
+
+/* Highlight selected rows */
+.dash-spreadsheet .dash-row--selected {
+    background-color: #333333;
+    color: #FFFFFF;
+}
+
+/* Highlight active rows */
+.dash-spreadsheet .dash-row--active {
+    background-color: #2A2A2A;
+    color: #FFFFFF;
+}
+
+/* Filter box styling */
+.dash-spreadsheet .dash-filter {
+    background-color: #1E1E1E;
+    color: #E0E0E0;
+    border: 1px solid #444;
+}

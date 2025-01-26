@@ -32,7 +32,7 @@ import plotly.graph_objects as go
 
 
 # Initialize Dash app
-app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.JOURNAL])
+app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.DARKLY])
 
 app.index_string = '''
 <!DOCTYPE html>
@@ -196,7 +196,7 @@ sentiment_description = html.Div([
         to perform this analysis.
     """, style={"lineHeight": "1.6"}),
 
-    html.H5("What Is Sentiment?", style={"color": "#34495e"}),
+    html.H5("What Is Sentiment?"),
     html.P("""
         Sentiment refers to the attitude, emotion, or tone conveyed by a piece of text. It can help us understand the writer's 
         perspective or the general mood of the content. For instance:
@@ -207,7 +207,7 @@ sentiment_description = html.Div([
         html.Li("A neutral sentiment represents text that is factual or without strong emotional undertones."),
     ]),
 
-    html.H5("How It Works", style={"color": "#34495e"}),
+    html.H5("How It Works"),
     html.Ol([
         html.Li([
             html.Strong("Tokenisation:"),
@@ -224,7 +224,7 @@ sentiment_description = html.Div([
         ])
     ]),
 
-    html.H5("Understanding Sentiment Analysis Results", style={"color": "#34495e"}),
+    html.H5("Understanding Sentiment Analysis Results"),
     html.P("""
         The Sentiment Intensity outputs four key scores that provide insights into the emotional tone of the text:
     """, style={"lineHeight": "1.6"}),
@@ -235,7 +235,7 @@ sentiment_description = html.Div([
         html.Li([html.Strong("Compound: "), "A single score between -1 and 1 that summarises the overall sentiment of the text, where -1 is very negative, 1 is very positive, and 0 is neutral."]),
     ]),
 
-    html.H5("Interpreting the Results", style={"color": "#34495e"}),
+    html.H5("Interpreting the Results"),
     html.P("""
         The compound score is the most useful for determining the overall sentiment. For example:
         """, style={"lineHeight": "1.6"}),
@@ -247,7 +247,7 @@ sentiment_description = html.Div([
 ])
 
 named_entity_description = html.Div([
-    html.H4("Named Entities and Word Clouds", style={}),
+    html.H4("Named Entities and Word Clouds"),
 
     html.H5("What Is a Named Entity?"),
     html.P("""
@@ -492,7 +492,7 @@ app.layout = dbc.Container(
                                 options=[
                                     {"label": year, "value": year} for year in directory_info.keys()
                                 ] + [{"label": "All Years", "value": "all"}],
-                                placeholder="Select a Year",
+                                placeholder="Year",
                                 style={"width": "100%", }
                             ),
                             html.Label("Select Level:"),
@@ -503,10 +503,10 @@ app.layout = dbc.Container(
                                     {"label": level, "value": level}
                                     for level in set(l for levels in directory_info.values() for l in levels)
                                 ],
-                                placeholder="Select a Level",
+                                placeholder="Level",
                                 style={"width": "100%", }
                             ),
-                            html.Label("Select Subject:"),
+                            html.Label("Subject:"),
                             dcc.Dropdown(
                                 id="subject-dropdown",
                                 className="customDropdown",
@@ -520,7 +520,7 @@ app.layout = dbc.Container(
                                         for s in subjects
                                     )
                                 ],
-                                placeholder="Select a Subject",
+                                placeholder="Subject",
                                 style={"width": "100%", }
                             ),
                             html.Label("Select Paper: (Optional)"),
@@ -530,7 +530,7 @@ app.layout = dbc.Container(
                                 options=[
                                     {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 6)
                                 ] + [{"label": "All Papers", "value": "all"}],
-                                placeholder="Select a Paper",
+                                placeholder="Paper",
                                 style={"width": "100%", "marginBottom": "15px", }
                             ),
 
@@ -553,31 +553,31 @@ app.layout = dbc.Container(
                                 value="introduction",
                                 children=[    
                                     dcc.Tab(label="Intro", value="introduction", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                     dcc.Tab(label="Stats", value="statistics", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                     dcc.Tab(label="Intent", value="intent_trend", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                     dcc.Tab(label="Sentiment", value="sentiment_trend", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                     dcc.Tab(label="Question Length", value="sentence_length_trend", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                     dcc.Tab(label="Topics", value="topics", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                     dcc.Tab(label="Complexity", value="complexity", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                     dcc.Tab(label="Questions", value="questions", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                     dcc.Tab(label="Comparative", value="comparative", 
-                                            style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                                             selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'}),
                                 ],
                                 style={
@@ -751,20 +751,25 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                                 {"name": "Modern Equivalent", "id": "Modern Equivalent"},
                             ],
                             data=exam_grades_data,
-                            style_table={'overflowX': 'auto'},
-                            style_cell={
-                                'textAlign': 'left',
-                                'padding': '10px',
-                                'fontFamily': 'Arial, sans-serif',
-                                'fontSize': '14px',
-                            },
-                            style_header={
-                                'backgroundColor': 'rgb(230, 230, 230)',
-                                'fontWeight': 'bold'
-                            },
-                            style_data={
-                                'border': '1px solid grey',
-                            },
+                            style_table={"backgroundColor": "#121212", "padding": "10px", "border": "1px solid #444"},
+        style_header={
+            "backgroundColor": "#1E1E1E",
+            "color": "#E0E0E0",
+            "fontWeight": "bold",
+            "borderBottom": "1px solid #444",
+        },
+        style_cell={
+            "backgroundColor": "#121212",
+            "color": "#E0E0E0",
+            "textAlign": "left",
+            "padding": "10px",
+            "borderBottom": "1px solid #444",
+        },
+        style_data_conditional=[
+            {"if": {"row_index": "odd"}, "backgroundColor": "#1E1E1E"},
+            {"if": {"state": "selected"}, "backgroundColor": "#333333", "color": "#FFFFFF"},
+            {"if": {"state": "active"}, "backgroundColor": "#2A2A2A", "color": "#FFFFFF"},
+        ],
                         )
                 ]), None
 
@@ -856,7 +861,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             ]].describe()
     
             return html.Div([
-                html.H4("Statistics for the Selected Paper", style={"color": "#2c3e50"}),
+                html.H4("Statistics for the Selected Paper"),
                 
                 # Button to trigger download
                 html.Button("Download as CSV", id="download-csv-btn"),
@@ -867,7 +872,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     
                 html.P(f"Average Word Count per Question: {avg_word_count:.2f}"),
                 html.P(f"Total Number of Questions: {num_questions}"),
-                html.H5("Readability and Sentiment Statistics", style={"color": "#34495e"}),
+                html.H5("Readability and Sentiment Statistics"),
                 html.Ul([
                     html.Li(f"Average Coleman-Liau Score: {stats['coleman_liau']['mean']:.2f}"),
                     html.Li(f"Average Flesch-Kincaid Score: {stats['flesch_kincaid']['mean']:.2f}"),
@@ -900,7 +905,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                             title="Coleman-Liau Score by Year",
                             xaxis={"title": "Year"},
                             yaxis={"title": "Coleman-Liau Score"},
-                            template="plotly_white"
+                            template = 'plotly_dark'
                         )
                     }
                 ),
@@ -917,7 +922,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                             title="Flesch-Kincaid Score by Year",
                             xaxis={"title": "Year"},
                             yaxis={"title": "Flesch-Kincaid Score"},
-                            template="plotly_white"
+                            template = 'plotly_dark'
                         )
                     }
                 ),
@@ -934,7 +939,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                             title="Gunning Fog Score by Year",
                             xaxis={"title": "Year"},
                             yaxis={"title": "Gunning Fog Score"},
-                            template="plotly_white"
+                            template="plotly_dark"
                         )
                     }
                 ),
@@ -951,7 +956,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                             title="Average Word Count per Question by Year",
                             xaxis={"title": "Year"},
                             yaxis={"title": "Average Word Count"},
-                            template="plotly_white"
+                            template="plotly_dark"
                         )
                     }
                 ),
@@ -967,14 +972,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                             title="Total Number of Questions by Year",
                             xaxis={"title": "Year"},
                             yaxis={"title": "Total Questions"},
-                            template="plotly_white"
+                            template="plotly_dark"
                         )
                     }
                 )
             ]
     
             return html.Div([
-                html.H4("Summary Statistics for Selected Papers", style={"color": "#2c3e50"}),
+                html.H4("Summary Statistics for Selected Papers"),
                 
                 # Button to trigger download
                 html.Button("Download as CSV", id="download-csv-btn"),
@@ -1003,6 +1008,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 intent_breakdown,
                 x="Intent",
                 y="Count",
+                template = 'plotly_dark',
                 title="Intent Breakdown for Single Year",
                 labels={"Intent": "Question Intent", "Count": "Number of Questions"},
                 text="Count",
@@ -1072,6 +1078,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
            fig = px.line(
                combined_df,
                x=combined_df.index,
+               template = 'plotly_dark',
                y="compound_sentiment_score",
                title="Compound Sentiment Score Trend for Single Year",
                labels={"index": "Question Index", "compound_sentiment_score": "Compound Sentiment Score"},
@@ -1103,6 +1110,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
            fig = px.line(
                sentiment_trend,
                x="year",
+               template = 'plotly_dark',
                y="compound_sentiment_score",
                title="Average Compound Sentiment Score Trend Over Time",
                labels={"year": "Year", "compound_sentiment_score": "Average Compound Sentiment Score"},
@@ -1129,6 +1137,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(x.split()))
             fig = px.line(
                 combined_df,
+                template = 'plotly_dark',
                 x=combined_df.index,
                 y="sentence_length",
                 title="Question Length Per Question for Single Year",
@@ -1154,6 +1163,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 sentence_length_trend,
                 x="year",
                 y="sentence_length",
+                template = 'plotly_dark',
                 title="Average Question Length Per Year",
                 labels={"year": "Year", "sentence_length": "Average Question Length (words)", "paper": "Paper"},
             )
@@ -1209,7 +1219,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                         # origin=[90, 0],
                         # fontFamily='Sans, serif',
                         color='random-light',
-                        backgroundColor='#ffffff',
+                        backgroundColor='#222222',
                         shuffle=True,
                         rotateRatio=0.5,
                         shrinkToFit=False,
@@ -1251,10 +1261,10 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             fig = px.line(
                 combined_df,
                 x=combined_df.index,
+                template = 'plotly_dark',
                 y=["coleman_liau", "flesch_kincaid", "gunning_fog", "average"],  # Include the average in the plot
                 title="Readability Index Trend for Single Year",
                 labels={"index": "Question Index", "value": "Readability Index"},
-                template="plotly_white",
             )
             fig.update_traces(mode="lines+markers")
     
@@ -1289,10 +1299,10 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             fig = px.line(
                 readability_trend,
                 x="year",
+                template = 'plotly_dark',
                 y=["coleman_liau", "flesch_kincaid", "gunning_fog", "average"],  # Include the average in the plot
                 title="Average Readability Index Trend Over Time",
                 labels={"year": "Year", "value": "Average Readability Index"},
-                template="plotly_white",
             )
             fig.update_traces(mode="lines+markers")
             # Add enhancements
@@ -1480,6 +1490,7 @@ def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_p
             weighted_composite_score_df,
             x='year',  # x-axis: year
             y='score',  # y-axis: score
+            template = 'plotly_dark',
             title="Weighted Composite Score Over Time",
             labels={"year": "Year", "score": "Weighted Composite Score"},
         )
@@ -1494,6 +1505,7 @@ def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_p
 
         # Create the plot
         lin_reg_fig = go.Figure()
+
         
         # Add scatter plot of the original data
         lin_reg_fig.add_trace(go.Scatter(
@@ -1528,7 +1540,7 @@ def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_p
             title="Linear Regression Visualisation",
             xaxis_title="Year",
             yaxis_title="Value",
-            template="plotly_white",
+            template = 'plotly_dark',
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
         
@@ -1553,6 +1565,7 @@ def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_p
             
             # Create the trend plot
             trend_fig = go.Figure()
+            trend_fig.update_layout(template = 'plotly_dark')
             trend_fig.add_trace(go.Scatter(x=trend.index, y=trend, mode='lines', name='Trend', line=dict(color='green')))
             
 
@@ -1620,6 +1633,7 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
         result,  # Use the DataFrame with 'year' and 'count'
         x="year",
         y="count",
+        template = 'plotly_dark',
         title=f"Occurrences of '{word[0]}' Over Time",
         labels={"year": "Year", "count": "Occurrences"},
     )
@@ -1663,6 +1677,7 @@ def update_intent_trend_chart(yaxis_choice, intent_trend_data):
     fig = px.area(
         intent_trend,
         x="year",
+        template = 'plotly_dark',
         y=yaxis_choice,
         color="intent",
         title=f"{yaxis_choice.capitalize()} of Intent Over Time",
