@@ -29,7 +29,7 @@ from io import StringIO
 from scipy.stats import linregress
 from sklearn.cluster import KMeans
 import plotly.graph_objects as go
-
+import ast
 
 # Initialize Dash app
 app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.DARKLY])
@@ -1180,22 +1180,52 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         
     elif tab_name == "topics":
         
-        all_entities = " ".join(combined_df["named_entities"].dropna())
+        #all_entities = " ".join(combined_df["named_entities"].dropna())
 
         # Split the string into words and counts
-        entries = re.findall(r'(\w+) \{(\d+)\}', all_entities)
+        #entries = re.findall(r'(\w+) \{(\d+)\}', all_entities)
         
         # Create a dictionary to aggregate counts for each word
-        word_counts = {}
-        for word, count in entries:
-            if word in word_counts:
-                word_counts[word] += int(count)
-            else:
-                word_counts[word] = int(count)
+        #word_counts = {}
+        #for word, count in entries:
+        #    if word in word_counts:
+        #        word_counts[word] += int(count)
+        #    else:
+        #        word_counts[word] = int(count)
 
         # Convert the dictionary to a 2D array
-        result = [[word, count] for word, count in word_counts.items()]
+        #result = [[word, count] for word, count in word_counts.items()]
         
+
+        #named_entities = combined_df['named_entities'].apply(convert_to_list)
+        
+        # Combine all 'named_entities' values into a single string
+        named_entities_combined = ''.join(combined_df['named_entities'].dropna())
+        
+        from collections import defaultdict
+        
+        result = []
+
+        #for l in named_entities_combined:
+        if named_entities_combined.strip():
+            # Regular expression to match each pattern ('a', 'b', c)
+            pattern = r"\('([^']+)', '([^']+)', (\d+)\)"
+            matches = re.findall(pattern, named_entities_combined)
+            
+            # Initialize a dictionary to store combined a and c values
+            combined = {}
+            
+            # Process each match
+            for a, b, c in matches:
+                c = int(c)  # Convert count to integer
+                if a not in combined:
+                    combined[a] = c
+                else:
+                    combined[a] += c  # Combine if a already exists, increment c
+            
+            # Convert dictionary to a list of tuples
+            result = [(key, value) for key, value in combined.items()]
+           
         #formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
            
         return html.Div([
@@ -1612,18 +1642,24 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
     combined_df = load_csv(selected_year = None, selected_paper = None, selected_level = selected_level, selected_subject = selected_subject)
     
     def count_word_in_year(named_entities, word):
-        if not isinstance(named_entities, str):
+        if not isinstance(named_entities, str) or not named_entities:
             return 0
-        # Use regex to find the word followed by its count in curly braces
-        matches = re.findall(fr'\b{word}\b\s*\{{(\d+)\}}', named_entities.lower())
-        # Convert counts to integers and sum them
-        return sum(int(count) for count in matches)
-    
-    # Group by 'year' and aggregate 'named_entities', ignoring empty rows
+        # Use regex to find occurrences of (WORD, TYPE, COUNT)
+        matches = re.findall(r"\('([^']+)',\s*'([^']+)',\s*(\d+)\)", named_entities.lower())
+        # Sum the counts for the word that matches the given word
+        return sum(int(count) for w, t, count in matches if w == word.lower())
+
+    # Add a column to verify if we have counts
+    combined_df['word_count'] = combined_df['named_entities'].apply(lambda x: count_word_in_year(x, word[0]))
+
+    # Check the new column to debug
+    #print(combined_df[['year', 'named_entities', 'word_count']])
+
+    # Group by 'year' and aggregate 'word_count' instead of 'named_entities'
     result = (
         combined_df.groupby("year", as_index=False)
-        .agg({"named_entities": lambda rows: sum(count_word_in_year(row, word[0].lower()) for row in rows)})
-        .rename(columns={"named_entities": "count"})
+        .agg({"word_count": "sum"})
+        .rename(columns={"word_count": "count"})
     )
     
     #print(result)
