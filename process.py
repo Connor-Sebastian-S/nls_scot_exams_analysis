@@ -178,9 +178,9 @@ def process_exam_text(file_path):
             return None
         
         level = lines[0].strip()
-        year = lines[1].strip()
+        year = re.sub(r'[^0-9]', '', lines[1].strip())
         subject = lines[2].strip()
-        paper = lines[3].strip()
+        paper = re.sub(r'[^0-9]', '', lines[3].strip())
 
         text_from_questions = " ".join(line.strip() for line in lines[3:])
         question_pattern = r'\d+\.\s*(?:\([a-z]\)\s*)?'
@@ -220,7 +220,7 @@ def Analyse_and_save_questions(metadata, output_file):
         return re.sub(r'\(\w\)', '', number)
 
     for q in metadata["questions"]:
-        main_question_number = clean_question_number(q[0])  # Clean main question number
+        #main_question_number = clean_question_number(q[0])  # Clean main question number
         main_question_text = re.split(question_pattern, q[1], maxsplit=1)[0].strip(')')
         
         # analyse main question
@@ -233,14 +233,14 @@ def Analyse_and_save_questions(metadata, output_file):
         sentiment_df = return_sentiment_df(lemmatised_tokens)
         intent_ = get_intent(main_question_text)
         
-        main_topics = extract_topics(main_question_text)
+        #main_topics = extract_topics(main_question_text)
 
         rows.append({
             "year": metadata["year"],
             "level": metadata["level"],
             "subject": metadata["subject"],
             "paper": metadata["paper"],
-            "question": main_question_number.rstrip('.'),
+            #"question": main_question_number.rstrip('.'),
             "text": main_question_text,
             "coleman_liau": main_score,
             "flesch_kincaid": flesch_kincaid_grade,
@@ -251,8 +251,8 @@ def Analyse_and_save_questions(metadata, output_file):
             "neutral_tokens": int(sentiment_df["neutral_tokens"].iloc[0]),
             "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0]),  
             "intent": intent_["label"],
-            "intent_certainty": intent_["score"],      
-            "named_entities": main_topics
+            "intent_certainty": intent_["score"]   
+            #"named_entities": main_topics
         })
 
         # analyse subquestions
@@ -260,7 +260,7 @@ def Analyse_and_save_questions(metadata, output_file):
         subquestion_markers = re.findall(question_pattern, q[1])
 
         for idx, subtext in enumerate(subquestions[1:]):  # Skip main question text
-            marker = subquestion_markers[idx].strip("()")  # Extract "a", "b", etc.
+            #marker = subquestion_markers[idx].strip("()")  # Extract "a", "b", etc.
             sub_score = textstat.coleman_liau_index(subtext.strip()) 
             sub_flesch_kincaid_grade = textstat.flesch_kincaid_grade(subtext.strip())
             sub_gunning_fog = textstat.gunning_fog(subtext.strip())
@@ -272,14 +272,14 @@ def Analyse_and_save_questions(metadata, output_file):
             questionText = subtext.strip()
             intent_ = get_intent(subtext)
             
-            _topics = extract_topics(main_question_text)
+            #_topics = extract_topics(main_question_text)
 
             rows.append({
                 "year": metadata["year"],
                 "level": metadata["level"],
                 "subject": metadata["subject"],
                 "paper": metadata["paper"],
-                "question": f"{main_question_number.rstrip('.')}{marker}",
+                #"question": f"{main_question_number.rstrip('.')}{marker}",
                 "text": questionText,
                 "coleman_liau": sub_score,
                 "flesch_kincaid": sub_flesch_kincaid_grade,
@@ -290,8 +290,8 @@ def Analyse_and_save_questions(metadata, output_file):
                 "neutral_tokens": int(sentiment_df["neutral_tokens"].iloc[0]),
                 "compound_sentiment_score": float(sentiment_df["compound_sentiment_score"].iloc[0]), 
                 "intent": intent_["label"],
-                "intent_certainty": intent_["score"],      
-                "named_entities": _topics
+                "intent_certainty": intent_["score"]      
+                #"named_entities": _topics
             })
                         
     # Write to CSV
@@ -304,8 +304,8 @@ def Analyse_and_save_questions(metadata, output_file):
             "coleman_liau", "flesch_kincaid", "gunning_fog",
             "total_tokens", "positive_tokens", "negative_tokens", "neutral_tokens", 
             "compound_sentiment_score", 
-            "intent", "intent_certainty",
-            "named_entities"
+            "intent", "intent_certainty"
+            #"named_entities"
         ])
         writer.writeheader()
         writer.writerows(rows)
@@ -321,8 +321,14 @@ def map_grade_to_modern_equivalent(level: str) -> str:
     Returns:
         str: The modern equivalent under CfE (e.g., "National 4", "Higher").
     """
+    
+    level = level.tolower()
     # Mapping of historical grades to modern equivalents
     mapping = {
+        "Honours": "Higher",
+        "Honors": "Higher",
+        "Honours Grade": "Higher",
+        "Honors Grade": "Higher",
         "Lower Grade": "National 4",
         "Second Grade": "Higher", #?
         "Intermediate Grade": "National 5",
@@ -378,9 +384,9 @@ def process_all_files(folder_path, output_dir):
 
 
 # directory containing exam text files
-folder_path = './data/'  
+folder_path = './input/output/'  
 # directory to save CSV files
-output_dir = './output/'     
+output_dir = './input/data/'     
 os.makedirs(output_dir, exist_ok=True)
         
 process_all_files(folder_path, output_dir)

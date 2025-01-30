@@ -1,0 +1,9 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1960,LOWER GRADE,ENGLISH,1,,Write a composition of about three pages in length on any one of the following subjects: ,7.39,7.2,8.9,8,0,0,8,0.0,reason,0.9657782316207886,"('three', 'NUMBER', 1)('one', 'NUMBER', 1)"
+1960,LOWER GRADE,ENGLISH,1,,The Garden in Spring and in Autumn.,3.26,0.1,2.8,3,0,0,3,0.0,argue,0.4020479321479797,"('Spring', 'DATE', 1)('Autumn', 'DATE', 1)"
+1960,LOWER GRADE,ENGLISH,1,,My First Play or My First Film or My First Football Match.,4.05,2.1,4.8,7,1,0,6,0.34,describe,0.2516620755195617,"('First', 'ORDINAL', 3)"
+1960,LOWER GRADE,ENGLISH,1,,“A policeman's lot is not a happy one.” Is this true?,-1.13,0.7,5.84,5,2,0,3,0.4967,other,0.8513544201850891,"('policeman', 'TITLE', 1)('one', 'NUMBER', 1)"
+1960,LOWER GRADE,ENGLISH,1,,"Describe a radio or a television programme which particularly appeals to you, and give reasons for your choice.",12.06,10.3,11.64,9,0,0,9,0.0,discuss,0.7598302960395813,
+1960,LOWER GRADE,ENGLISH,1,,The joy of possessing a new book or a new camera or a new dress or a new suit of clothes or a new bicycle or a new set of golf clubs or a new kit of tools or a new tennis racket.,1.82,14.2,18.13,23,1,0,22,0.5859,describe,0.6570515036582947,
+1960,LOWER GRADE,ENGLISH,1,,A story in which the outcome turns upon the toss of a coin.,2.36,2.5,5.2,6,0,0,6,0.0,reason,0.2856180965900421,
+1960,LOWER GRADE,ENGLISH,1,,Describe an incident in which Macavity might have taken part.,10.82,4.8,8.0,6,0,0,6,0.0,reason,0.7568436861038208,

@@ -1,0 +1,7 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1929,HIGHER GRADE,ENGLISH,1,,Write a composition on any one of the following: ,5.84,6.8,8.04,4,0,0,4,0.0,reason,0.9391793608665466,"('one', 'NUMBER', 1)"
+1929,HIGHER GRADE,ENGLISH,1,,Slang—its use and abuse.,4.35,3.7,1.6,3,0,1,2,-0.6369,argue,0.4507706761360168,
+1929,HIGHER GRADE,ENGLISH,1,,"“Play is a serious amusement.” Taking this as a text, discuss the value of games in general.",4.89,4.2,5.75,9,3,1,5,0.241,describe,0.2801685035228729,"('general', 'TITLE', 1)"
+1929,HIGHER GRADE,ENGLISH,1,,What is a Gentleman?,0.0,3.7,1.6,1,0,0,1,0.0,explain,0.9169763922691344,
+1929,HIGHER GRADE,ENGLISH,1,,Are the chances of adventure in the world growing greater or less?,7.93,4.4,4.8,6,4,0,2,0.276825,other,0.986621916294098,
+1929,HIGHER GRADE,ENGLISH,1,,What part has Scotland played in the development of the Empire?,8.97,6.4,8.04,5,1,0,4,0.34,compare,0.994474709033966,"('Scotland', 'COUNTRY', 1)"

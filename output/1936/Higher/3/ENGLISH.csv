@@ -1,0 +1,12 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1936,HIGHER GRADE,ENGLISH,3,,"Read the following passage through, and then answer the questions that follow it: ",6.71,7.2,5.2,6,0,0,6,0.0,reason,0.7551247477531433,
+1936,HIGHER GRADE,ENGLISH,3,,,-15.81,-15.7,0.0,0,0,0,0,0.0,compare,0.3079292476177215,
+1936,HIGHER GRADE,ENGLISH,3,,State briefly and in your own words the different interpretations of human history presented in the above passage.,13.34,10.3,9.42,9,0,0,9,0.0,describe,0.4746549427509308,
+1936,HIGHER GRADE,ENGLISH,3,,i) Which of these interpretations should be rejected and on what grounds?,10.83,6.8,11.47,3,0,1,2,-0.5106,other,0.8535005450248718,
+1936,HIGHER GRADE,ENGLISH,3,,ii) Which interpretation does the author seem to prefer? What argument and what illustrations does he adduce in support of his view?,10.01,6.4,9.85,10,1,1,8,0.0203499999999999,compare,0.7972947955131531,"('author', 'TITLE', 1)"
+1936,HIGHER GRADE,ENGLISH,3,,"Explain clearly the following phrases, as used in the passage: chequered by defeat, in obedience to a periodic law, a seeker after ideals, uncritical optimism, persistent sweep.",13.93,13.8,18.21,17,3,1,13,0.253025,reason,0.4235994517803192,
+1936,HIGHER GRADE,ENGLISH,3,,"Give the meaning and, if you can, the derivation of any five of the following words: uniformly, sequence, capricious, rational, negation, pessimism, anarchy, discernible, Hellenism, reflective.",17.58,17.0,22.71,16,0,1,15,-0.3612,describe,0.4385825097560882,"('five', 'NUMBER', 1)"
+1936,HIGHER GRADE,ENGLISH,3,,"Make a general analysis into clauses of the sentence ""Man, who is above all find it.""",6.38,7.2,8.9,7,1,0,6,0.0772,describe,0.4402160048484802,"('general', 'TITLE', 1)"
+1936,HIGHER GRADE,ENGLISH,3,,"What is the source of the metaphors in: march of human history, seeds of dissolution, cyclical revolution?",11.77,9.9,13.86,9,0,0,9,0.0,describe,0.342972993850708,"('march', 'DATE', 1)"
+1936,HIGHER GRADE,ENGLISH,3,,"Without omitting any of the words or changing their order, arrange the following passage in verse-form, add the proper stops and name the metre.",9.43,10.3,9.6,14,0,1,13,-0.296,describe,0.3592682182788849,
+1936,HIGHER GRADE,ENGLISH,3,,"Re-write the following in correct English, giving a reason for each correction.",6.86,10.3,8.13,7,1,0,6,0.34,reason,0.6679390072822571,"('English', 'NATIONALITY', 1)"

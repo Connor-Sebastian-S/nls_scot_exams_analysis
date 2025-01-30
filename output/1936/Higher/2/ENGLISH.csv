@@ -1,0 +1,7 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1936,HIGHER GRADE,ENGLISH,2,,"Write a Composition, not exceeding three foolscap pages in length, on any one of the following subjects: ",9.12,8.7,11.51,10,0,0,10,0.0,reason,0.958031952381134,"('three', 'NUMBER', 1)('one', 'NUMBER', 1)"
+1936,HIGHER GRADE,ENGLISH,2,,"""The iniquity of war.""",0.0,-2.3,1.6,2,0,1,1,-0.5994,describe,0.6713556051254272,"('war', 'CAUSE_OF_DEATH', 1)"
+1936,HIGHER GRADE,ENGLISH,2,,Happiness depends on temperament more than on surroundings.,17.36,10.0,13.2,4,1,0,3,0.5574,other,0.2917166948318481,
+1936,HIGHER GRADE,ENGLISH,2,,"""Some books are to be tasted, others to be swallowed, and some few to be chewed and digested.""",5.62,5.6,9.42,6,0,0,6,0.0,describe,0.3559300899505615,
+1936,HIGHER GRADE,ENGLISH,2,,The increasing use of machinery in modern times and our consequent gains and losses.,11.13,6.4,8.46,8,1,1,6,0.1042499999999999,describe,0.4615890383720398,
+1936,HIGHER GRADE,ENGLISH,2,,"Imagine yourself in the company of Chaucer’s pilgrims, or as a visitor to the Globe Theatre at the first performance of a Shakespeare play, or as a guest of Sir Walter Scott at Abbotsford. Write an account of your impressions.",9.11,8.7,11.0,19,2,0,17,0.28315,describe,0.5944443941116333,"('Chaucer', 'PERSON', 1)('first', 'ORDINAL', 1)('Walter Scott', 'PERSON', 1)('Abbotsford', 'CITY', 1)"

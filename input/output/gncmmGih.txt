@@ -1,0 +1,8 @@
+HONOURS
+(1904)
+HISTORY
+PAPER: 2
+1. Translate and analyze the provided Old English historical text.
+2. Parse italicized words in the translated passage.
+3. Trace the history of English dialects up to Burns’ time.
+4. Explain grammatical differences between Chaucer’s English and Modern English.

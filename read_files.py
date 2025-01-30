@@ -50,7 +50,7 @@ def process_all_text_files(input_dir, output_dir, move_dir):
             os.rename(input_file_path, pre + '')
 
 # Example usage
-input_directory = "./data/"  # Replace with your input directory path
-output_directory = "./data/"  # Replace with your output directory path
-move_directory = "./data/originals/"
+input_directory = "./input/"  # Replace with your input directory path
+output_directory = "./input/output/"  # Replace with your output directory path
+move_directory = "./input/originals/"
 process_all_text_files(input_directory, output_directory, move_directory)

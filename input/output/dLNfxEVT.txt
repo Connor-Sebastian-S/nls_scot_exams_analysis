@@ -1,0 +1,8 @@
+HIGHER GRADE
+1961
+ENGLISH
+PAPER 1
+1. Prove that the angle at the centre of a circle is twice any angle at the circumference standing on the same arc.
+2. Prove that the internal bisector of an angle of a triangle divides the opposite side in the ratio of the sides containing the angle bisected.
+3. Two circles with centres A and B and radii R and r respectively cut at C and D as shown in the accompanying diagram, and CD cuts AB produced at M. If AB is 2 units in length and BM 3 units, prove that R² – r² = 16. If, also, R² + r² = 10, find the value of R – r, and deduce the lengths of the radii of the circles.
+4. ABC and CBD are adjacent angles of sizes a° and b° respectively, a being greater than b, and BX is the bisector of the angle ABD. Calculate the size of the angle XBC in terms of a and b. N is a fixed point on a circle with centre O and radius 6 inches. ON is produced its own length to a point A. P is a point on the circle. State the locus of the mid-point of AP as P moves round the circle. Draw a straight line AB 2 inches long. Without using tables, construct an angle at A whose cosine is 2/5. State briefly the construction. In a triangle ABC, BC = 3.5 inches, angle ABC = 25°, and angle ACB = 53°. Calculate the length of AC.

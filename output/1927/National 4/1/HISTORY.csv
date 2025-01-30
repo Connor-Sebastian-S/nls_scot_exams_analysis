@@ -1,0 +1,2 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1927,LOWER GRADE,HISTORY,1,,"Explain the following expressions as they are used in History or in Geography: Divine Right of Kings, The Industrial Revolution, The Disruption, The Black Country, Monsoon Lands.",9.65,13.8,16.73,16,1,1,14,0.0980999999999999,discuss,0.8390163779258728,"('The', 'ORGANIZATION', 1)('Black', 'ORGANIZATION', 1)('Country', 'ORGANIZATION', 1)"

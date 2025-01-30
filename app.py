@@ -828,16 +828,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
     for path in file_paths:
         try: 
             df = pd.read_csv(path)
-            #df = read_csv_from_s3(S3_BUCKET, path)
-            # Extract paper and year
-            paper_number = os.path.basename(os.path.dirname(path))  # Full "Paper 1", "Paper 2"
+            paper_number = os.path.basename(os.path.dirname(path))
             df["paper"] = paper_number
             year = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(path))))
 
             df["year"] = int(year)
             dataframes.append(df)
         except Exception as e:
-            print(f"Error loading file {path}: {e}")  # Debugging
+            print(f"Error loading file {path}: {e}")
             return html.Div([f"Error loading file {path}: {e}"]), None
     
     combined_df = pd.concat(dataframes, ignore_index=True)
@@ -848,6 +846,22 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         num_files = len(file_paths)
         print(num_files)
         metrics = []
+        
+        # Define the regex pattern
+        #pattern = r"World War II"  # The phrase you are searching for
+
+        # Use .str.contains() with regex to search in the column
+        #matching_rows = combined_df[combined_df["text"].str.contains(pattern, regex=True, flags=re.IGNORECASE, na=False)]
+
+        # Get the index and corresponding value from another column
+        #if not matching_rows.empty:
+        #    for idx, row in matching_rows.iterrows():
+        #        print(f"Match found at index {idx}:")
+        #        print(f"Value in column2: {row['year']}")
+        #else:
+        #    print("No match found.")
+    
+    
     
         if (selected_year and selected_level and selected_subject and selected_paper):
             # Single paper: Display descriptive statistics as text
@@ -891,7 +905,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             avg_gunning_fog = combined_df.groupby("year")["gunning_fog"].mean().reset_index()
     
             # Create individual plots
-            plots = [
+            stat_plots = [
                 dcc.Graph(
                     id="coleman-liau-plot",
                     figure={
@@ -988,7 +1002,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 html.Button("Download as Excel", id="download-excel-btn"),
                 dcc.Download(id="download-excel"),
                 
-                html.Div(plots, style={"display": "grid", "gridTemplateColumns": "1fr", "gap": "20px"})
+                html.Div(stat_plots, style={"display": "grid", "gridTemplateColumns": "1fr", "gap": "20px"})
             ]), combined_df.to_dict("records")
 
 
@@ -1004,7 +1018,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             intent_breakdown = combined_df["intent"].value_counts().reset_index()
             intent_breakdown.columns = ["Intent", "Count"]
 
-            fig = px.bar(
+            intent_fig = px.bar(
                 intent_breakdown,
                 x="Intent",
                 y="Count",
@@ -1013,14 +1027,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 labels={"Intent": "Question Intent", "Count": "Number of Questions"},
                 text="Count",
             )
-            fig.update_traces(textposition="outside")
+            intent_fig.update_traces(textposition="outside")
 
             return html.Div([
                 html.H4("Intent Breakdown"),
                 html.P(
                     """This plot shows the count for each type of question in the given exam paper. """
                 ),
-                dcc.Graph(figure=fig),
+                dcc.Graph(figure=intent_fig),
                 intent_description
             ]), combined_df.to_dict("records")
 
@@ -1030,14 +1044,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             unique_intents = sorted(combined_df["intent"].dropna().unique())
             full_index = pd.MultiIndex.from_product([unique_years, unique_intents], names=["year", "intent"])
 
-            grouped = combined_df.groupby(["year", "intent"]).size()
+            intent_grouped = combined_df.groupby(["year", "intent"]).size()
             intent_trend = (
-                grouped.reindex(full_index, fill_value=0)
+                intent_grouped.reindex(full_index, fill_value=0)
                 .reset_index(name="count")
             )
             intent_trend["proportion"] = intent_trend.groupby("year")["count"].transform(lambda x: x / x.sum() if x.sum() > 0 else 0)
 
-            toggle = dcc.RadioItems(
+            intent_toggle = dcc.RadioItems(
                 id="yaxis-toggle-local",
                 options=[
                     {"label": "Proportion", "value": "proportion"},
@@ -1048,7 +1062,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             )
 
             return html.Div([
-                toggle,
+                intent_toggle,
                 html.H4("Intent Trend Analysis"),
                 html.P(
                     """This plot shows the count for each type of question in the given exam paper. 
@@ -1072,21 +1086,21 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
    
        if num_files == 1 or combined_df['year'].nunique() == 1:
            # Single CSV: Show trend over the course of questions
-           combined_df = combined_df.sort_index()  # Ensure questions are in order
+           sentiment_combined_df = combined_df.sort_index()  # Ensure questions are in order
            avg_sentiment = combined_df["compound_sentiment_score"].mean()
    
-           fig = px.line(
-               combined_df,
-               x=combined_df.index,
+           sentiment_fig = px.line(
+               sentiment_combined_df,
+               x=sentiment_combined_df.index,
                template = 'plotly_dark',
                y="compound_sentiment_score",
                title="Compound Sentiment Score Trend for Single Year",
                labels={"index": "Question Index", "compound_sentiment_score": "Compound Sentiment Score"},
            )
-           fig.update_traces(mode="lines+markers")
+           sentiment_fig.update_traces(mode="lines+markers")
    
            # Add horizontal average line
-           fig.add_hline(
+           sentiment_fig.add_hline(
                y=avg_sentiment,
                line_dash="dash",
                line_color="red",
@@ -1099,7 +1113,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                html.P(
                    """This plot shows the sentiment score for each question in the given exam paper."""
                ),
-               dcc.Graph(figure=fig),
+               dcc.Graph(figure=sentiment_fig),
                sentiment_description
            ]), combined_df.to_dict("records")
    
@@ -1107,7 +1121,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
            # Multiple CSVs: Show trend over time by averaging scores
            sentiment_trend = combined_df.groupby("year")["compound_sentiment_score"].mean().reset_index()
    
-           fig = px.line(
+           sentiment_fig = px.line(
                sentiment_trend,
                x="year",
                template = 'plotly_dark',
@@ -1115,14 +1129,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                title="Average Compound Sentiment Score Trend Over Time",
                labels={"year": "Year", "compound_sentiment_score": "Average Compound Sentiment Score"},
            )
-           fig.update_traces(mode="lines+markers")
+           sentiment_fig.update_traces(mode="lines+markers")
 
            return html.Div([
                html.H4("Sentiment Trend Over Time"),
                html.P(
                    """This plot shows the overall average sentiment score for each question in the given exam papers over time."""
                ),
-               dcc.Graph(figure=fig),
+               dcc.Graph(figure=sentiment_fig),
                sentiment_description
            ]), combined_df.to_dict("records")
                    
@@ -1134,32 +1148,34 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
 
         if num_files == 1 or combined_df['year'].nunique() == 1:
             # Single Paper: Sentence length per question
-            combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(x.split()))
-            fig = px.line(
-                combined_df,
+            sentence_length_cf = combined_df
+            sentence_length_cf["sentence_length"] = sentence_length_cf["text"].apply(lambda x: len(x.split()))
+            sentence_length_fig = px.line(
+                sentence_length_cf,
                 template = 'plotly_dark',
                 x=combined_df.index,
                 y="sentence_length",
                 title="Question Length Per Question for Single Year",
                 labels={"index": "Question Index", "sentence_length": "Question Length (words)"},
             )
-            fig.update_traces(mode="lines+markers")
+            sentence_length_fig.update_traces(mode="lines+markers")
 
             return html.Div([
                 html.H4("Question Length Trend for Single Year"),
                 html.P(
                     """This shows the length of each question (in words) throughout the paper."""
                 ),
-                dcc.Graph(figure=fig),
+                dcc.Graph(figure=sentence_length_fig),
                 question_length_description,
             ]), combined_df.to_dict("records")
 
         else:
             # Multiple Papers: Average sentence length per year
-            combined_df["sentence_length"] = combined_df["text"].apply(lambda x: len(str(x).split()))
-            sentence_length_trend = combined_df.groupby(["year", "paper"])["sentence_length"].mean().reset_index()
+            sentence_length_cf = combined_df
+            sentence_length_cf["sentence_length"] = sentence_length_cf["text"].apply(lambda x: len(str(x).split()))
+            sentence_length_trend = sentence_length_cf.groupby(["year", "paper"])["sentence_length"].mean().reset_index()
 
-            fig = px.line(
+            sentence_length_fig = px.line(
                 sentence_length_trend,
                 x="year",
                 y="sentence_length",
@@ -1167,14 +1183,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 title="Average Question Length Per Year",
                 labels={"year": "Year", "sentence_length": "Average Question Length (words)", "paper": "Paper"},
             )
-            fig.update_traces(mode="lines+markers")
+            sentence_length_fig.update_traces(mode="lines+markers")
 
             return html.Div([
                 html.H4("Average Question Length Per Year"),
                 html.P(
                     """This shows the average length of each question (in words) throughout each paper over the years."""
                 ),
-                dcc.Graph(figure=fig),
+                dcc.Graph(figure=sentence_length_fig),
                 question_length_description,
             ]), combined_df.to_dict("records")
         
@@ -1209,14 +1225,14 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         #for l in named_entities_combined:
         if named_entities_combined.strip():
             # Regular expression to match each pattern ('a', 'b', c)
-            pattern = r"\('([^']+)', '([^']+)', (\d+)\)"
-            matches = re.findall(pattern, named_entities_combined)
+            topics_pattern = r"\('([^']+)', '([^']+)', (\d+)\)"
+            topics_matches = re.findall(topics_pattern, named_entities_combined)
             
             # Initialize a dictionary to store combined a and c values
             combined = {}
             
             # Process each match
-            for a, b, c in matches:
+            for a, b, c in topics_matches:
                 c = int(c)  # Convert count to integer
                 if a not in combined:
                     combined[a] = c
@@ -1224,7 +1240,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     combined[a] += c  # Combine if a already exists, increment c
             
             # Convert dictionary to a list of tuples
-            result = [(key, value) for key, value in combined.items()]
+            topics_result = [(key, value) for key, value in combined.items()]
            
         #formatted_entries = [f"Named Entity: {word}: Count: {count}" for word, count in result]
            
@@ -1242,7 +1258,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     html.H4("Word Cloud of Named Entities"),
                     DashWordcloud(
                         id="cloud",
-                        list=result,
+                        list=topics_result,
                         width=600, height=400,
                         gridSize=10,
                         # weightFactor=2,
@@ -1278,29 +1294,27 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
         
         if num_files == 1 or combined_df['year'].nunique() == 1:
             # Single CSV: Show trend over the course of questions
-            combined_df = combined_df.sort_index()  # Ensure questions are in order
+            complexity_cf = combined_df
+            complexity_cf = complexity_cf.sort_index()  # Ensure questions are in order
         
             avg_coleman_liau = combined_df["coleman_liau"].mean()
             avg_flesch_kincaid = combined_df["flesch_kincaid"].mean()
             avg_gunning_fog = combined_df["gunning_fog"].mean()
             
             # Calculate the average of the three readability indices for each row
-            combined_df['average'] = combined_df[["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean(axis=1)
+            complexity_cf['average'] = complexity_cf[["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean(axis=1)
 
-        
-            fig = px.line(
-                combined_df,
+            complexity_fig = px.line(
+                complexity_cf,
                 x=combined_df.index,
                 template = 'plotly_dark',
                 y=["coleman_liau", "flesch_kincaid", "gunning_fog", "average"],  # Include the average in the plot
                 title="Readability Index Trend for Single Year",
                 labels={"index": "Question Index", "value": "Readability Index"},
             )
-            fig.update_traces(mode="lines+markers")
-    
-            
-            fig.add_hline(y=10, line_dash="dash", line_color="black", annotation_text="S4 Threshold", annotation_position="top left")
-            fig.add_hline(y=12, line_dash="dash", line_color="black", annotation_text="S5 Threshold", annotation_position="top left")
+            complexity_fig.update_traces(mode="lines+markers")
+            complexity_fig.add_hline(y=10, line_dash="dash", line_color="black", annotation_text="S4 Threshold", annotation_position="top left")
+            complexity_fig.add_hline(y=12, line_dash="dash", line_color="black", annotation_text="S5 Threshold", annotation_position="top left")
 
             
         
@@ -1311,7 +1325,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                     The Coleman-Liau Index, Flesch-Kincaid, and Gunning Fog indices are readability tests designed to gauge the complexity of a text.
                     The higher the index, the more difficult the text is to read."""
                 ),
-                dcc.Graph(figure=fig),
+                dcc.Graph(figure=complexity_fig),
                 
                 readability_explanation,
                 html.Script("renderKatex();"),
@@ -1326,7 +1340,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             readability_trend['average'] = readability_trend[["coleman_liau", "flesch_kincaid", "gunning_fog"]].mean(axis=1)
             
             # Create the plot with the three existing indices and the new average line
-            fig = px.line(
+            complexity_fig = px.line(
                 readability_trend,
                 x="year",
                 template = 'plotly_dark',
@@ -1334,16 +1348,9 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 title="Average Readability Index Trend Over Time",
                 labels={"year": "Year", "value": "Average Readability Index"},
             )
-            fig.update_traces(mode="lines+markers")
-            # Add enhancements
-            #fig.update_traces(mode="lines+markers", hovertemplate="<b>Year:</b> %{x}<br><b>Value:</b> %{y:.2f}<extra></extra>")
-            # fig.update_layout(
-            #     font=dict(size=14),
-            #     legend=dict(title="Metrics", orientation="h", x=0.5, xanchor="center"),
-            #     xaxis=dict(tickangle=45),
-            # )
-            fig.add_hline(y=10, line_dash="dash", line_color="black", annotation_text="S4 Threshold", annotation_position="top left")
-            fig.add_hline(y=12, line_dash="dash", line_color="black", annotation_text="S5 Threshold", annotation_position="top left")
+            complexity_fig.update_traces(mode="lines+markers")
+            complexity_fig.add_hline(y=10, line_dash="dash", line_color="black", annotation_text="S4 Threshold", annotation_position="top left")
+            complexity_fig.add_hline(y=12, line_dash="dash", line_color="black", annotation_text="S5 Threshold", annotation_position="top left")
 
             return html.Div([
                 
@@ -1351,7 +1358,7 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
                 html.P(
                     """This plot shows the readability indices (Coleman-Liau, Flesch-Kincaid, Gunning Fog) over time. """
                 ),
-                dcc.Graph(figure=fig),
+                dcc.Graph(figure=complexity_fig),
 
                 readability_explanation,   
                 html.Script("renderKatex();"),
@@ -1375,33 +1382,33 @@ def render_tab_content(tab_name, selected_year, selected_level, selected_subject
             df = pd.read_csv(paper_path)
     
             # Display a table of questions and metadata
-            columns_to_display = [
+            questions_columns_to_display = [
                 {"name": "Question Text", "id": "text"},
             ]
-            data_to_display = df[["text"]].to_dict("records")
+            questions_data_to_display = df[["text"]].to_dict("records")
     
             # Create an HTML table for the questions data
-            table_header = [
+            questions_table_header = [
                 html.Thead(html.Tr([
                     html.Th("Question Text")
                 ]))
             ]
             
             # Table rows
-            table_rows = [
+            questions_table_rows = [
                 html.Tr([
                     html.Td(str(_+1) + ': ' + row["text"])
                 ])
                 for _, row in df.iterrows()
             ]
             
-            table_body = html.Tbody(table_rows)
+            questions_table_body = html.Tbody(questions_table_rows)
 
             # Return the table as part of the "Questions" tab content
             return html.Div([
                 html.H4("Questions for the Selected Paper"),
                 html.P("Below is each question in the selected paper:"),
-                html.Table(table_header + [table_body], style={"width": "100%", "border": "1px solid black"})
+                html.Table(questions_table_header + [questions_table_body], style={"width": "100%", "border": "1px solid black"})
             ]), None
     
         except Exception as e:
@@ -1635,9 +1642,12 @@ def update_output_div(item):
 def plot_word_usage(word, combined_data, selected_level, selected_subject):
     if not word or not combined_data:
         return {}
+    
+
 
     # Convert the stored data back into a DataFrame
     #combined_df = pd.DataFrame(combined_data)
+    
 
     combined_df = load_csv(selected_year = None, selected_paper = None, selected_level = selected_level, selected_subject = selected_subject)
     
@@ -1646,11 +1656,13 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
             return 0
         # Use regex to find occurrences of (WORD, TYPE, COUNT)
         matches = re.findall(r"\('([^']+)',\s*'([^']+)',\s*(\d+)\)", named_entities.lower())
+
         # Sum the counts for the word that matches the given word
         return sum(int(count) for w, t, count in matches if w == word.lower())
 
     # Add a column to verify if we have counts
-    combined_df['word_count'] = combined_df['named_entities'].apply(lambda x: count_word_in_year(x, word[0]))
+    combined_df['word_count'] = combined_df['text'].apply(lambda x: count_word_in_year(x, word[0]))
+
 
     # Check the new column to debug
     #print(combined_df[['year', 'named_entities', 'word_count']])

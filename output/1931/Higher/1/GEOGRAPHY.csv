@@ -1,0 +1,7 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1931,HIGHER GRADE,GEOGRAPHY,1,,"Analyze the map of the Scottish Highlands: contour interval, gradient calculation, watershed delineation, mountain forms.",14.91,13.9,16.67,12,0,0,12,0.0,reason,0.9936257600784302,"('Scottish', 'NATIONALITY', 1)"
+1931,HIGHER GRADE,GEOGRAPHY,1,,Discuss rainfall data’s limitations and seasonal distribution examples.,17.85,15.9,18.2,7,0,1,6,-0.296,reason,0.9932417273521424,
+1931,HIGHER GRADE,GEOGRAPHY,1,,"Describe Scottish Highland vegetation influenced by climate, relief, soil, and human modification.",14.76,15.1,14.8,10,1,0,9,0.4767,discuss,0.5354011654853821,"('Scottish', 'NATIONALITY', 1)"
+1931,HIGHER GRADE,GEOGRAPHY,1,,Explain map-based position-finding using distant landmarks.,19.72,18.6,9.07,6,1,0,5,0.0772,reason,0.9795677661895752,
+1931,HIGHER GRADE,GEOGRAPHY,1,,"Contrast Scotland’s eastern/western coastlines, sea-inlet types, islands, and harbors.",16.36,11.5,3.6,8,0,0,8,0.0,discuss,0.993224799633026,"('Scotland', 'COUNTRY', 1)"
+1931,HIGHER GRADE,GEOGRAPHY,1,,"Detail a geographical excursion’s objectives, route, and observations.",13.9,15.9,23.2,6,0,0,6,0.0,argue,0.9921039342880248,

@@ -1,0 +1,15 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1931,HIGHER GRADE,ENGLISH,2,,Read the following passage through and then answer the questions that follow it: ,6.71,7.2,5.2,6,0,0,6,0.0,reason,0.7597597241401672,
+1931,HIGHER GRADE,ENGLISH,2,,What does Milton regard as the special advantages of having a permanent General Council and the disadvantages of successive parliaments?,16.36,14.6,18.0,10,3,1,6,0.1258999999999999,describe,0.8139156699180603,"('Milton', 'PERSON', 1)('General', 'ORGANIZATION', 1)('Council', 'ORGANIZATION', 1)"
+1931,HIGHER GRADE,ENGLISH,2,,Give a general grammatical analysis of the passage.,11.56,11.1,13.2,5,0,0,5,0.0,reason,0.9416542053222656,"('general', 'TITLE', 1)"
+1931,HIGHER GRADE,ENGLISH,2,,Expand the phrases into clauses.,9.6,2.9,2.0,3,1,0,2,0.3182,reason,0.9655200242996216,
+1931,HIGHER GRADE,ENGLISH,2,,Point out metaphors.,7.32,0.9,1.2,2,0,0,2,0.0,reason,0.459739089012146,
+1931,HIGHER GRADE,ENGLISH,2,,Explain phrases and derivations.,17.4,9.6,11.6,3,0,0,3,0.0,reason,0.9891435503959656,
+1931,HIGHER GRADE,ENGLISH,2,,Read the following verses and answer: ,6.57,4.5,2.4,4,0,0,4,0.0,reason,0.5337233543395996,
+1931,HIGHER GRADE,ENGLISH,2,,Summarize Keats’s lines.,13.12,5.6,14.53,3,0,0,3,0.0,reason,0.9128273725509644,"('Keats', 'PERSON', 1)"
+1931,HIGHER GRADE,ENGLISH,2,,Identify the Scriptural episode.,17.4,9.6,11.6,3,0,0,3,0.0,reason,0.9409872889518738,"('Scriptural', 'MISC', 1)('episode', 'MISC', 1)"
+1931,HIGHER GRADE,ENGLISH,2,,Explain line,1.3,2.9,0.8,2,0,0,2,0.0,describe,0.4109323918819427,
+1931,HIGHER GRADE,ENGLISH,2,,"Define ""woof"" and ""texture."" ",15.68,1.3,1.6,3,0,0,3,0.0,discuss,0.5740220546722412,
+1931,HIGHER GRADE,ENGLISH,2,,Analyze metre.,4.2,2.9,0.8,2,0,0,2,0.0,reason,0.736458420753479,
+1931,HIGHER GRADE,ENGLISH,2,,Correct faulty sentences.,14.31,5.6,1.2,3,1,1,1,-0.1205,describe,0.5302286744117737,
+1931,HIGHER GRADE,ENGLISH,2,,"Define terms: Mock-heroic, euphony, journalese, spoonerism, rhetorical question.",19.82,14.7,13.2,8,0,0,8,0.0,reason,0.9483952522277832,

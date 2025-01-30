@@ -1,0 +1,17 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1937,HIGHER GRADE,ENGLISH,2,,Read the passage carefully and answer the following questions: ,9.35,8.0,3.6,6,1,0,5,0.128,reason,0.6874979734420776,
+1937,HIGHER GRADE,ENGLISH,2,,State briefly in your own words,4.28,-1.5,2.4,3,0,0,3,0.0,describe,0.5581836104393005,
+1937,HIGHER GRADE,ENGLISH,2,,"the distinction here made between a natural and an artificial education, and",12.75,10.3,18.13,5,1,0,4,0.3612,discuss,0.802720844745636,
+1937,HIGHER GRADE,ENGLISH,2,,i) how the one ought to be related to the other.,0.5,2.9,4.4,3,0,0,3,0.0,describe,0.5446137189865112,"('one', 'NUMBER', 1)"
+1937,HIGHER GRADE,ENGLISH,2,,"What, stripped of metaphor, are",7.28,0.5,2.0,2,0,0,2,0.0,compare,0.9424852728843688,
+1937,HIGHER GRADE,ENGLISH,2,,"the physical,",1.3,8.8,20.8,1,0,0,1,0.0,compare,0.4207121431827545,
+1937,HIGHER GRADE,ENGLISH,2,,"i) the mental,",-6.26,0.9,1.2,1,0,0,1,0.0,describe,0.3994277715682983,
+1937,HIGHER GRADE,ENGLISH,2,,"ii) the moral characteristics, as here defined, of the liberally educated man?",12.28,9.2,11.47,7,0,0,7,0.0,other,0.5333401560783386,
+1937,HIGHER GRADE,ENGLISH,2,,Under what figure is,1.45,3.7,1.6,1,0,0,1,0.0,compare,0.8702232241630554,
+1937,HIGHER GRADE,ENGLISH,2,,"Nature represented in lines 1-5, and",7.18,4.5,9.07,4,0,0,4,0.0,argue,0.5071132183074951,"('1', 'NUMBER', 1)('-', 'NUMBER', 1)('5', 'NUMBER', 1)"
+1937,HIGHER GRADE,ENGLISH,2,,"i) the intellect in lines 27-31, and how, in each case, is the figure carried out?",4.52,6.0,8.9,6,1,0,5,0.4588,describe,0.7450239062309265,"('27', 'DATE', 1)('-', 'DATE', 1)('31', 'DATE', 1)"
+1937,HIGHER GRADE,ENGLISH,2,,"Make a general analysis into clauses of the sentence ""That man, I think... capable of.""",7.65,8.0,8.67,8,2,0,6,0.2294999999999999,describe,0.5423458218574524,"('general', 'TITLE', 1)"
+1937,HIGHER GRADE,ENGLISH,2,,"Explain the following: compulsory legislation, preliminary symptoms, fundamental truths, stunted ascetic, tender conscience.",29.1,19.0,20.58,12,1,0,11,0.3182,reason,0.7055343389511108,
+1937,HIGHER GRADE,ENGLISH,2,,"Give the derivation of any five of the following words: compulsory, disobedience, crime, intervenes, preliminary, symptoms, mechanism, logic, gossamers, tender, beauty.",20.3,15.0,19.83,16,1,1,14,0.0217999999999999,discuss,0.7282397150993347,"('five', 'NUMBER', 1)"
+1937,HIGHER GRADE,ENGLISH,2,,"Punctuate the following passage correctly and rewrite it as two stanzas of rhyming verse. Put the following sentence into reported speech. What is the origin of the following idioms: To kill the fatted calf, a Judas kiss, a Herculean task, to cross the Rubicon, the Slough of Despond?",9.69,8.4,8.07,28,2,1,25,-0.0640333333333333,discuss,0.2961836457252502,"('two', 'NUMBER', 1)('Herculean', 'MISC', 1)"
+1937,HIGHER GRADE,ENGLISH,2,,"Explain and exemplify: heroic couplet, inversion, malapropism, colloquialism, rhetorical question.",15.19,20.2,24.0,9,1,0,8,0.5574,reason,0.937990665435791,

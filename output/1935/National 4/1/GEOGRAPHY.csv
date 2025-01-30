@@ -1,0 +1,9 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1935,LOWER GRADE,GEOGRAPHY,1,,"Label physical features (Chiltern Hills, River Nith, etc.), mark counties/towns, show railways, and indicate chalk/limestone areas on the provided map.",15.19,7.2,8.0,17,0,0,17,0.0,discuss,0.7709788084030151,"('Chiltern', 'LOCATION', 1)('Hills', 'LOCATION', 1)('River Nith', 'PERSON', 1)"
+1935,LOWER GRADE,GEOGRAPHY,1,,"Label Indian Ocean features (Pamirs, Zambezi, etc.), mark towns/regions, highlight monsoon/desert zones, and note export ports on the map.",14.08,7.0,3.8,16,1,0,15,0.34,discuss,0.6150110363960266,"('Indian', 'NATIONALITY', 1)('Pamirs', 'ORGANIZATION', 1)('Zambezi', 'CITY', 1)"
+1935,LOWER GRADE,GEOGRAPHY,1,,"Draw a contoured map of a hypothetical isthmus with plateau, river, and coastal plain.",9.97,7.6,8.46,9,0,0,9,0.0,reason,0.8258680105209351,"('river', 'TITLE', 1)"
+1935,LOWER GRADE,GEOGRAPHY,1,,Explain equatorial vs. Arctic daylight variation.,16.94,9.2,7.87,6,0,0,6,0.0,describe,0.5568445920944214,"('Arctic', 'MISC', 1)('daylight', 'TIME', 1)"
+1935,LOWER GRADE,GEOGRAPHY,1,,Describe coastal types and their formation causes.,13.01,3.7,8.51,5,0,0,5,0.0,reason,0.9473656415939332,
+1935,LOWER GRADE,GEOGRAPHY,1,,Account for the Sahara Desert’s existence.,11.83,6.8,9.07,4,0,0,4,0.0,reason,0.7226223945617676,"('Sahara', 'LOCATION', 1)('Desert', 'LOCATION', 1)"
+1935,LOWER GRADE,GEOGRAPHY,1,,Analyze Australia/South Africa’s natural vegetation regions.,19.72,16.3,15.73,6,1,0,5,0.3612,reason,0.9891531467437744,"('Australia', 'COUNTRY', 1)('South', 'COUNTRY', 1)('Africa', 'COUNTRY', 1)"
+1935,LOWER GRADE,GEOGRAPHY,1,,Summarize a travel book’s geographical insights.,17.09,10.4,15.73,5,0,0,5,0.0,reason,0.9064470529556274,

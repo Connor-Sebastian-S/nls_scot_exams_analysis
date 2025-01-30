@@ -1,0 +1,28 @@
+year,level,subject,paper,question,text,coleman_liau,flesch_kincaid,gunning_fog,total_tokens,positive_tokens,negative_tokens,neutral_tokens,compound_sentiment_score,intent,intent_certainty,named_entities
+1955,LOWER GRADE,ENGLISH,2,,Read through the passage printed above and then answer the following questions on it: ,7.71,6.4,5.6,6,0,0,6,0.0,reason,0.7781709432601929,
+1955,LOWER GRADE,ENGLISH,2,,Express in your own words the meaning of each of the following phrases as they are used in the passage: with profound respect; restored the Scottish monarchy; thoughts wisely and boldly for his country's deliverance.,12.66,14.6,15.14,17,4,0,13,0.39985,describe,0.786922037601471,"('Scottish', 'NATIONALITY', 1)"
+1955,LOWER GRADE,ENGLISH,2,,Suggest single words which might have been used in place of the following phrases: remained alive; falling down; broken to pieces; a little while ago; winding sheet. Give an alternative phrase for one after another.,11.25,6.6,8.14,22,1,2,19,-0.0826666666666666,describe,0.3100820481777191,"('one', 'NUMBER', 1)"
+1955,LOWER GRADE,ENGLISH,2,,"Form adjectives from fragment, sepulchre, monument, respect; a noun from inter; and a verb from tomb.",11.42,7.2,8.9,10,1,0,9,0.4767,discuss,0.6281314492225647,
+1955,LOWER GRADE,ENGLISH,2,,"Give a general analysis of the sentence: ""So orders were sent... profound respect.""",10.37,8.4,8.28,8,2,0,6,0.27695,describe,0.5378671288490295,"('general', 'TITLE', 1)"
+1955,LOWER GRADE,ENGLISH,2,,Why was the exact place of burial forgotten?,6.45,5.2,3.2,4,0,1,3,-0.2263,explain,0.9936635494232178,
+1955,LOWER GRADE,ENGLISH,2,,"What led to the discovery, and why was the identity of the skeleton certain?",7.42,6.4,11.31,5,1,0,4,0.2732,explain,0.9929585456848145,
+1955,LOWER GRADE,ENGLISH,2,,What were the memories which made the spectators weep? Point out in the passage two other signs of Scottish admiration for Bruce.,9.49,5.2,8.04,11,1,1,9,-0.0147999999999999,compare,0.3426332771778106,"('two', 'NUMBER', 1)('Scottish', 'NATIONALITY', 1)('Bruce', 'PERSON', 1)"
+1955,LOWER GRADE,ENGLISH,2,,"Tell briefly, in the first person, the story of the discovery, as it might have been recounted by one of the workmen.",6.96,8.3,12.44,10,0,0,10,0.0,describe,0.2778679132461548,"('first', 'ORDINAL', 1)('one', 'NUMBER', 1)"
+1955,LOWER GRADE,ENGLISH,2,,Suggest a title for the passage.,4.28,2.1,2.4,3,0,0,3,0.0,reason,0.7392024397850037,
+1955,LOWER GRADE,ENGLISH,2,,"Write a short letter acknowledging the receipt of a catalogue which you have asked a large general store to send to you, and expressing your appreciation of the contents.",8.89,12.2,15.74,14,1,0,13,0.5106,reason,0.8891053795814514,"('general', 'TITLE', 1)"
+1955,LOWER GRADE,ENGLISH,2,,Write an account of one of the following: ,0.4,4.1,3.2,4,0,0,4,0.0,reason,0.959448516368866,"('one', 'NUMBER', 1)"
+1955,LOWER GRADE,ENGLISH,2,,Shylock’s plan for revenge;,8.7,1.3,1.6,3,0,2,1,-0.5017,compare,0.4357646405696869,
+1955,LOWER GRADE,ENGLISH,2,,Rosalind's adventures in Arden;,14.5,9.6,11.6,3,1,0,2,0.3182,argue,0.5439577698707581,"('Rosalind', 'PERSON', 1)('Arden', 'CITY', 1)"
+1955,LOWER GRADE,ENGLISH,2,,the plot against Malvolio;,8.7,1.3,1.6,2,0,0,2,0.0,describe,0.3684319257736206,"('Malvolio', 'PERSON', 1)"
+1955,LOWER GRADE,ENGLISH,2,,the conspiracy against Julius Caesar;,15.4,7.6,18.0,3,0,1,2,-0.5267,describe,0.4213116466999054,"('conspiracy', 'CRIMINAL_CHARGE', 1)('Julius Caesar', 'PERSON', 1)"
+1955,LOWER GRADE,ENGLISH,2,,the fencing-match in “Hamlet”;,10.15,7.2,1.6,2,0,0,2,0.0,describe,0.5044117569923401,
+1955,LOWER GRADE,ENGLISH,2,,the murder of Duncan;,1.45,-2.3,1.6,2,0,1,1,-0.6908,describe,0.5638839602470398,"('murder', 'CRIMINAL_CHARGE', 1)('Duncan', 'PERSON', 1)"
+1955,LOWER GRADE,ENGLISH,2,,the triumph of Prospero.,5.8,3.7,1.6,2,1,0,1,0.4767,argue,0.3561323285102844,"('Prospero', 'PERSON', 1)"
+1955,LOWER GRADE,ENGLISH,2,,Choose one poem which describes a journey ,6.24,2.5,2.8,5,0,0,5,0.0,other,0.2466342747211456,"('one', 'NUMBER', 1)"
+1955,LOWER GRADE,ENGLISH,2,,"y land or sea), or a desperate fight, or a shipwreck, or a beautiful scene. Give the author’s name, outline the content of the poem, and bring out any points in it which have interested you.",5.97,6.8,8.31,16,2,2,12,0.075325,discuss,0.3718642592430115,"('author', 'TITLE', 1)"
+1955,LOWER GRADE,ENGLISH,2,,"Taking any novel which you have enjoyed reading, show how the author gives his story a happy ending, or a sad ending, as the case may be.",6.73,10.3,10.8,14,3,1,10,0.231,describe,0.5417922735214233,"('author', 'TITLE', 1)"
+1955,LOWER GRADE,ENGLISH,2,,Describe in your own words an incident full of excitement or danger from a prose book ,8.38,6.0,11.4,8,1,1,6,-0.0163999999999999,discuss,0.7496269345283508,
+1955,LOWER GRADE,ENGLISH,2,,"ovel, biography, or book of adventure) which you have read.",7.92,3.7,4.0,5,1,0,4,0.3182,discuss,0.3718767762184143,
+1955,LOWER GRADE,ENGLISH,2,,"Select two passages, one showing ",10.2,5.2,2.0,5,0,0,5,0.0,reason,0.4469783008098602,"('two', 'NUMBER', 1)('one', 'NUMBER', 1)"
+1955,LOWER GRADE,ENGLISH,2,,"the more humorous side, and one showing",6.56,3.7,8.51,4,1,0,3,0.3818,discuss,0.3878376483917236,"('one', 'NUMBER', 1)"
+1955,LOWER GRADE,ENGLISH,2,,the more serious side of one of the following writers: Chaucer; Addison; Goldsmith; Burns; Lamb. Write a very brief account of the content of the passages and say why you think your choice is a good one.,7.78,7.0,9.56,20,1,1,18,0.1816,describe,0.4733512699604034,"('one', 'NUMBER', 2)('Chaucer', 'ORGANIZATION', 1)('Addison', 'PERSON', 1)('Goldsmith', 'PERSON', 1)('Burns', 'PERSON', 1)"
