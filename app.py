@@ -493,7 +493,7 @@ app.layout = dbc.Container(
                                     {"label": year, "value": year} for year in directory_info.keys()
                                 ] + [{"label": "All Years", "value": "all"}],
                                 placeholder="Year",
-                                style={"width": "100%", }
+                                #style={"width": "100%", }
                             ),
                             html.Label("Select Level:"),
                             dcc.Dropdown(
@@ -504,7 +504,7 @@ app.layout = dbc.Container(
                                     for level in set(l for levels in directory_info.values() for l in levels)
                                 ],
                                 placeholder="Level",
-                                style={"width": "100%", }
+                                #style={"width": "100%", }
                             ),
                             html.Label("Subject:"),
                             dcc.Dropdown(
@@ -521,7 +521,7 @@ app.layout = dbc.Container(
                                     )
                                 ],
                                 placeholder="Subject",
-                                style={"width": "100%", }
+                                #style={"width": "100%", }
                             ),
                             html.Label("Select Paper: (Optional)"),
                             dcc.Dropdown(
@@ -531,7 +531,7 @@ app.layout = dbc.Container(
                                     {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 6)
                                 ] + [{"label": "All Papers", "value": "all"}],
                                 placeholder="Paper",
-                                style={"width": "100%", "marginBottom": "15px", }
+                                #style={"width": "100%", "marginBottom": "15px", }
                             ),
 
                             
