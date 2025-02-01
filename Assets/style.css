@@ -143,13 +143,58 @@ label {
 .Select-control {
     background-color: rgb(25, 25, 25) !important;
     color:white;
-  }
-  
-.Select-menu-outer {
-    background-color: rgb(25, 25, 25);
-    color: white;
-}
+}  
 
 .Select-value-label {
     color: white !important;
 }
+
+.Select-menu-outer {
+    background-color: rgb(25, 25, 25);
+    color: white;
+}    
+
+#year-dropdown .Select-value-label {
+    color: rgb(37, 224, 37) !important;
+}    
+#year-dropdown .Select-control {
+    background-color: red !important;
+    color:white;
+  }   
+#year-dropdown .Select-menu-outer {
+    background-color: rgb(25, 25, 25);
+    color: white;
+}  
+#level-dropdown .Select-value-label {
+    color: rgb(37, 224, 37) !important;
+}    
+#level-dropdown .Select-control {
+    background-color: red !important;
+    color:white;
+  }   
+#level-dropdown .Select-menu-outer {
+    background-color: rgb(25, 25, 25);
+    color: white;
+} 
+#subject-dropdown .Select-value-label {
+    color: rgb(37, 224, 37) !important;
+}    
+#subject-dropdown .Select-control {
+    background-color: red !important;
+    color:white;
+  }   
+#subject-dropdown .Select-menu-outer {
+    background-color: rgb(25, 25, 25);
+    color: white;
+} 
+#paper-dropdown .Select-value-label {
+    color: rgb(37, 224, 37) !important;
+}    
+#paper-dropdown .Select-control {
+    background-color: red !important;
+    color:white;
+  }   
+#paper-dropdown .Select-menu-outer {
+    background-color: rgb(25, 25, 25);
+    color: white;
+} 
