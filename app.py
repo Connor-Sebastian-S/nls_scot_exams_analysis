@@ -488,7 +488,7 @@ app.layout = dbc.Container(
                             html.Label("Select Year (Optional):"),
                             dcc.Dropdown(
                                 id="year-dropdown",
-                                #className="customDropdown",
+                                className="customDropdown",
                                 options=[
                                     {"label": year, "value": year} for year in directory_info.keys()
                                 ] + [{"label": "All Years", "value": "all"}],
@@ -498,7 +498,7 @@ app.layout = dbc.Container(
                             html.Label("Select Level:"),
                             dcc.Dropdown(
                                 id="level-dropdown",
-                                #className="customDropdown",
+                                className="customDropdown",
                                 options=[
                                     {"label": level, "value": level}
                                     for level in set(l for levels in directory_info.values() for l in levels)
@@ -509,7 +509,7 @@ app.layout = dbc.Container(
                             html.Label("Subject:"),
                             dcc.Dropdown(
                                 id="subject-dropdown",
-                                #className="customDropdown",
+                                className="customDropdown",
                                 options=[
                                     {"label": subj, "value": subj}
                                     for subj in set(
@@ -526,7 +526,7 @@ app.layout = dbc.Container(
                             html.Label("Select Paper: (Optional)"),
                             dcc.Dropdown(
                                 id="paper-dropdown",
-                                #className="customDropdown",
+                                className="customDropdown",
                                 options=[
                                     {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 6)
                                 ] + [{"label": "All Papers", "value": "all"}],
