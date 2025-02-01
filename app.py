@@ -493,7 +493,8 @@ app.layout = dbc.Container(
                                     {"label": year, "value": year} for year in directory_info.keys()
                                 ] + [{"label": "All Years", "value": "all"}],
                                 placeholder="Year",
-                                style={"width": "100%", "color": "#E0E0E0"}
+                                style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                             ),
                             html.Label("Select Level:"),
                             dcc.Dropdown(
@@ -504,7 +505,8 @@ app.layout = dbc.Container(
                                     for level in set(l for levels in directory_info.values() for l in levels)
                                 ],
                                 placeholder="Level",
-                                style={"width": "100%", "color": "#E0E0E0"}
+                                style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                             ),
                             html.Label("Subject:"),
                             dcc.Dropdown(
@@ -521,7 +523,8 @@ app.layout = dbc.Container(
                                     )
                                 ],
                                 placeholder="Subject",
-                                style={"width": "100%", "color": "#E0E0E0"}
+                                style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center'},
                             ),
                             html.Label("Select Paper: (Optional)"),
                             dcc.Dropdown(
@@ -531,7 +534,8 @@ app.layout = dbc.Container(
                                     {"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 6)
                                 ] + [{"label": "All Papers", "value": "all"}],
                                 placeholder="Paper",
-                                style={"width": "100%", "marginBottom": "15px", "color": "#E0E0E0"}
+                                style={'color':'#9ab9d9','display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center',"marginBottom": "15px"},
+                                            selected_style={'display':'grid','text-align': 'center','align-items': 'center', 'justify-content': 'center', "marginBottom": "15px"},
                             ),
 
                             
