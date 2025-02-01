@@ -33,7 +33,7 @@ import ast
 
 # Initialize Dash app
 app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.DARKLY])
-
+app.scripts.config.serve_locally = True
 app.index_string = '''
 <!DOCTYPE html>
 <html>
