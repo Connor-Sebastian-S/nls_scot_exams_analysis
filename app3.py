@@ -746,9 +746,10 @@ def render_tab_content(selected_year, selected_level, selected_subject, selected
             
             if named_entities_combined.strip():
                 # Regular expression to match each pattern ('a', 'b', c)
-                topics_pattern = r"([\w\s]+)\s*\{(\d+)\}"
+                topics_pattern = r"\s*([\w\s]+)\s*\{(\d+)\}"
 
-                topics_matches = re.findall(topics_pattern, named_entities_combined)
+
+                topics_matches = re.findall(topics_pattern, named_entities_combined.strip(), re.IGNORECASE)
                 combined = {}
                 
                 print(topics_matches)
@@ -1113,7 +1114,7 @@ def render_tab_content(selected_year, selected_level, selected_subject, selected
         if named_entities_combined.strip():
             # Regular expression to match each pattern ('a', 'b', c)
             topics_pattern = r"\('([^']+)', '([^']+)', (\d+)\)"
-            topics_matches = re.findall(topics_pattern, named_entities_combined)
+            topics_matches = re.findall(topics_pattern, named_entities_combined.strip(), re.IGNORECASE)
             combined = {}
             
             # Process each match
@@ -1474,34 +1475,35 @@ def plot_word_usage(word, combined_data, selected_level, selected_subject):
     
     combined_df = load_csv(selected_year = None, selected_paper = None, selected_level = selected_level, selected_subject = selected_subject)
     
+    # Function to count instances of a specific word
     def count_word_in_year(named_entities, word):
         if not isinstance(named_entities, str) or not named_entities:
             return 0
-        # Use regex to find occurrences of (WORD, TYPE, COUNT)
-        matches = re.findall(r"\('([^']+)',\s*'([^']+)',\s*(\d+)\)", named_entities.lower())
+        
+        print(word[0])
+        
+        word = word[0]
 
-        # Sum the counts for the word that matches the given word
-        return sum(int(count) for w, t, count in matches if w == word.lower())
+        # Use regex to find occurrences of "word {count}"
+        pattern = rf"\s*{re.escape(word)}\s*\{{(\d+)\}}"
 
-    # Add a column to verify if we have counts
-    combined_df['word_count'] = combined_df['text'].apply(lambda x: count_word_in_year(x, word[0]))
-
-
-    # Check the new column to debug
-    #print(combined_df[['year', 'named_entities', 'word_count']])
-
-    # Group by 'year' and aggregate 'word_count' instead of 'named_entities'
-    result = (
-        combined_df.groupby("year", as_index=False)
-        .agg({"word_count": "sum"})
-        .rename(columns={"word_count": "count"})
-    )
+        matches = re.findall(pattern, named_entities.strip(), re.IGNORECASE)
     
-    #print(result)
+        # Sum the extracted counts
+        return sum(int(count) for count in matches)
+    
+    # Apply function to count instances per row
+    combined_df["count"] = combined_df["named_entities"].apply(lambda x: count_word_in_year(x, word))
+    
+    # Group by year and sum counts
+    word_counts_per_year = combined_df.groupby("year")["count"].sum().reset_index()
+    
+        
+    print(word_counts_per_year)
     
     # Create a line plot using the aggregated DataFrame
     fig = px.line(
-        result,  # Use the DataFrame with 'year' and 'count'
+        word_counts_per_year,  # Use the DataFrame with 'year' and 'count'
         x="year",
         y="count",
         template = 'plotly_dark',
