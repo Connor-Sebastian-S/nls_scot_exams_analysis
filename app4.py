@@ -509,7 +509,7 @@ app.layout = dbc.Container(
                 dbc.Col(
                     html.Div(
                         [
-                            html.Label("Select Year (Optional):"),
+                            html.Label("Select Year (Optional):", style={"color": "000000"}),
                             dcc.Dropdown(
                                 id="year-dropdown",
                                 #className="customDropdown",
@@ -518,7 +518,7 @@ app.layout = dbc.Container(
                                 ] + [{"label": "All Years", "value": "all"}],
                                 placeholder="Year"
                             ),
-                            html.Label("Select Level:"),
+                            html.Label("Select Level:", style={"color": "000000"}),
                             dcc.Dropdown(
                                 id="level-dropdown",
                                 #className="customDropdown",
@@ -528,7 +528,7 @@ app.layout = dbc.Container(
                                 ],
                                 placeholder="Level"
                             ),
-                            html.Label("Subject:"),
+                            html.Label("Subject:", style={"color": "000000"}),
                             dcc.Dropdown(
                                 id="subject-dropdown",
                                 #className="customDropdown",
@@ -544,7 +544,7 @@ app.layout = dbc.Container(
                                 ],
                                 placeholder="Subject"
                             ),
-                            html.Label("Select Paper: (Optional)"),
+                            html.Label("Select Paper: (Optional)", style={"color": "000000"}),
                             dcc.Dropdown(
                                 id="paper-dropdown",
                                 #className="customDropdown",
