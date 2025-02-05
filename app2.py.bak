@@ -1,0 +1,893 @@
+import os
+import pandas as pd
+import dash
+from dash import dcc, html, Input, Output, dash_table
+import plotly.express as px
+import dash_bootstrap_components as dbc
+import numpy as np
+import os
+import pandas as pd
+from dash import dcc, html, Input, Output, State, dash_table
+import dash
+import plotly.express as px
+from collections import Counter
+import re
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+#from wordcloud import WordCloud
+from dash_holoniq_wordcloud import DashWordcloud
+import matplotlib.pyplot as plt
+import base64
+from io import BytesIO
+import re
+import pandas as pd
+import plotly.graph_objs as go
+from sklearn.decomposition import PCA
+import seaborn as sns
+from io import StringIO
+from scipy.stats import linregress
+from sklearn.cluster import KMeans
+import plotly.graph_objects as go
+import ast
+
+# Initialize Dash app
+app = dash.Dash(__name__, suppress_callback_exceptions=True,  external_stylesheets=[dbc.themes.DARKLY])
+app.scripts.config.serve_locally = True
+app.index_string = '''
+<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.2/katex.min.css">
+        <style>
+            .math {
+                font-size: 1.2rem; /* Adjust font size for visibility */
+                font-weight: bold; /* Make the equation bold */
+                color: #003366; /* Add a distinctive color (dark blue in this case) */
+                background-color: #f2f4f7; /* Light background for contrast */
+                padding: 5px 10px; /* Add padding around the equations */
+                border-radius: 5px; /* Rounded corners for aesthetics */
+                display: inline-block; /* Ensure equations are inline-block */
+                margin: 10px 0; /* Add spacing above and below */
+            }
+        </style>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.2/katex.min.js"></script>
+        <script>
+            function renderKatex() {
+                document.querySelectorAll('.math').forEach(function (el) {
+                    katex.render(el.textContent, el, {throwOnError: false});
+                });
+            }
+            document.addEventListener('DOMContentLoaded', renderKatex);
+            document.addEventListener('DOMSubtreeModified', renderKatex);
+        </script>
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+'''
+
+app.title = "Scottish Examination Analysis Dashboard"
+server = app.server
+
+DATA_DIR = "output"
+
+#{"Year": , "event": ""},
+notable_events = [
+]
+           
+readability_explanation = html.Div([])
+
+intent_description = html.Div([])
+          
+sentiment_description = html.Div([])
+
+named_entity_description = html.Div([])
+   
+question_length_description = html.Div([])
+
+wcs_visualisation = html.Div([])
+   
+un_trend_desc = html.Div([])
+        
+def parse_directory(data_dir):
+    directory_info = {}
+    for year in os.listdir(data_dir):
+        year_path = os.path.join(data_dir, year)
+        if os.path.isdir(year_path):
+            directory_info[year] = {}
+            for level in os.listdir(year_path):
+                level_path = os.path.join(year_path, level)
+                if os.path.isdir(level_path):
+                    directory_info[year][level] = {}
+                    for paper in os.listdir(level_path):  # Handle paper subfolders
+                        paper_path = os.path.join(level_path, paper)
+                        if os.path.isdir(paper_path):
+                            # Extract subject file names (without .csv extensions)
+                            subjects = [
+                                os.path.splitext(file)[0]
+                                for file in os.listdir(paper_path)
+                                if file.endswith(".csv")
+                            ]
+                            directory_info[year][level][paper] = subjects  # Keep "Paper 1", "Paper 2" as keys
+    return directory_info
+
+directory_info = parse_directory(DATA_DIR)
+
+import os
+import pandas as pd
+import dash
+from dash import dcc, html, Input, Output, dash_table
+import plotly.express as px
+import dash_bootstrap_components as dbc
+import numpy as np
+import re
+from dash import State
+from collections import Counter
+from dash_holoniq_wordcloud import DashWordcloud
+import plotly.graph_objs as go
+from scipy.stats import linregress
+
+# Initialize Dash app with dark theme
+app = dash.Dash(__name__, suppress_callback_exceptions=True, external_stylesheets=[dbc.themes.DARKLY])
+app.scripts.config.serve_locally = True
+app.title = "Scottish Examination Analysis Dashboard"
+server = app.server
+
+# Directory containing CSV files
+DATA_DIR = "output"
+
+notable_events = [
+    {"year": 1918, "event": "Education (Scotland) Act introduced"},
+    {"year": 1947, "event": "Education (Scotland) Act passed"},
+    {"year": 1962, "event": "Introduction of O-Grades"},
+    {"year": 1986, "event": "Standard Grades introduced"},
+    {"year": 2013, "event": "Curriculum for Excellence introduced"},
+]
+
+# (Keep all your existing helper functions and variables here until the layout section)
+
+# ======================
+# Enhanced Single-Page Layout
+# ======================
+
+app.layout = dbc.Container(
+    [
+        dcc.Store(id="selected-year", data=None),
+        dcc.Store(id='combined-data', data=None),
+        
+        # Header Section
+        dbc.Row(
+            dbc.Col(
+                html.Div(
+                    [
+                        html.H1(
+                            "Scottish Exams Linguistic Analysis",
+                            className="display-4 mb-3",
+                            style={
+                                'color': '#4B79A1',
+                                'fontWeight': '700',
+                                'textShadow': '2px 2px 4px rgba(0,0,0,0.3)'
+                            }
+                        ),
+                        html.P(
+                            "Comprehensive Analysis of Examination Content Over Time",
+                            className="lead",
+                            style={'color': '#8BAAAD', 'fontSize': '1.25rem'}
+                        )
+                    ],
+                    className="text-center py-5"
+                ),
+                width=12
+            )
+        ),
+
+        # Filters Section
+        dbc.Row(
+            dbc.Col(
+                html.Div(
+                    [
+                        dbc.Card(
+                            dbc.CardBody(
+                                [
+                                    dbc.Row(
+                                        [
+                                            dbc.Col(
+                                                [
+                                                    html.Label("Select Year:", className="filter-label"),
+                                                    dcc.Dropdown(
+                                                        id="year-dropdown",
+                                                        options=[{"label": y, "value": y} for y in directory_info.keys()] + [{"label": "All Years", "value": "all"}],
+                                                        placeholder="Year",
+                                                        className="filter-dropdown"
+                                                    )
+                                                ],
+                                                md=3
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    html.Label("Select Level:", className="filter-label"),
+                                                    dcc.Dropdown(
+                                                        id="level-dropdown",
+                                                        options=[{"label": l, "value": l} for l in set(l for levels in directory_info.values() for l in levels)],
+                                                        placeholder="Level",
+                                                        className="filter-dropdown"
+                                                    )
+                                                ],
+                                                md=3
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    html.Label("Select Subject:", className="filter-label"),
+                                                    dcc.Dropdown(
+                                                        id="subject-dropdown",
+                                                        options=[{"label": s, "value": s} for s in set(s for levels in directory_info.values() for papers in levels.values() for subjects in papers.values() for s in subjects)],
+                                                        placeholder="Subject",
+                                                        className="filter-dropdown"
+                                                    )
+                                                ],
+                                                md=3
+                                            ),
+                                            dbc.Col(
+                                                [
+                                                    html.Label("Select Paper:", className="filter-label"),
+                                                    dcc.Dropdown(
+                                                        id="paper-dropdown",
+                                                        options=[{"label": f"Paper {i}", "value": f"{i}"} for i in range(1, 6)] + [{"label": "All Papers", "value": "all"}],
+                                                        placeholder="Paper",
+                                                        className="filter-dropdown"
+                                                    )
+                                                ],
+                                                md=3
+                                            )
+                                        ],
+                                        className="mb-4"
+                                    )
+                                ]
+                            ),
+                            className="filter-card mb-5"
+                        )
+                    ]
+                ),
+                width=12
+            )
+        ),
+
+        # Main Content Sections
+        html.Div(
+            [
+                # Statistics Section
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H2("📈 Core Metrics", className="section-title mb-4"),
+                            dcc.Loading(
+                                id="loading-stats",
+                                type="circle",
+                                children=html.Div(id="stats-content")
+                            )
+                        ]
+                    ),
+                    className="content-card mb-5"
+                ),
+
+                # Intent Analysis Section
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H2("🎯 Question Intent Analysis", className="section-title mb-4"),
+                            dcc.Loading(
+                                id="loading-intent",
+                                type="circle",
+                                children=html.Div(id="intent-content")
+                            )
+                        ]
+                    ),
+                    className="content-card mb-5"
+                ),
+
+                # Sentiment Analysis Section
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H2("😊 Sentiment Analysis", className="section-title mb-4"),
+                            dcc.Loading(
+                                id="loading-sentiment",
+                                type="circle",
+                                children=html.Div(id="sentiment-content")
+                            )
+                        ]
+                    ),
+                    className="content-card mb-5"
+                ),
+
+                # Question Length Section
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H2("📏 Question Length Analysis", className="section-title mb-4"),
+                            dcc.Loading(
+                                id="loading-length",
+                                type="circle",
+                                children=html.Div(id="length-content")
+                            )
+                        ]
+                    ),
+                    className="content-card mb-5"
+                ),
+
+                # Topics Section
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H2("🔍 Topic Analysis", className="section-title mb-4"),
+                            dcc.Loading(
+                                id="loading-topics",
+                                type="circle",
+                                children=html.Div(id="topics-content")
+                            )
+                        ]
+                    ),
+                    className="content-card mb-5"
+                ),
+
+                # Complexity Analysis Section
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H2("🧠 Complexity Analysis", className="section-title mb-4"),
+                            dcc.Loading(
+                                id="loading-complexity",
+                                type="circle",
+                                children=html.Div(id="complexity-content")
+                            )
+                        ]
+                    ),
+                    className="content-card mb-5"
+                ),
+
+                # Comparative Analysis Section
+                dbc.Card(
+                    dbc.CardBody(
+                        [
+                            html.H2("📊 Comparative Trends", className="section-title mb-4"),
+                            dcc.Loading(
+                                id="loading-comparative",
+                                type="circle",
+                                children=html.Div(id="comparative-content")
+                            )
+                        ]
+                    ),
+                    className="content-card mb-5"
+                )
+            ]
+        )
+    ],
+    fluid=True,
+    style={
+        'background': '#0F2027',
+        'color': '#E0E0E0',
+        'minHeight': '100vh',
+        'padding': '2rem'
+    }
+)
+
+# Add custom CSS
+app.clientside_callback(
+    """
+    function(_) {
+        const styles = `
+            .filter-card {
+                background: rgba(32, 38, 46, 0.8) !important;
+                border-radius: 15px !important;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(75, 121, 161, 0.3) !important;
+            }
+            
+            .content-card {
+                background: rgba(32, 38, 46, 0.8) !important;
+                border-radius: 15px !important;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(75, 121, 161, 0.3) !important;
+                transition: transform 0.3s ease;
+            }
+            
+            .content-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 32px rgba(75, 121, 161, 0.2);
+            }
+            
+            .section-title {
+                color: #4B79A1 !important;
+                border-bottom: 2px solid #4B79A1;
+                padding-bottom: 0.5rem;
+            }
+            
+            .filter-label {
+                color: #8BAAAD !important;
+                font-weight: 500 !important;
+                margin-bottom: 0.5rem;
+            }
+            
+            .filter-dropdown .Select-control {
+                background: rgba(32, 38, 46, 0.7) !important;
+                border: 1px solid #4B79A1 !important;
+                border-radius: 8px !important;
+                color: #E0E0E0 !important;
+            }
+        `;
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = styles;
+        document.head.appendChild(styleSheet);
+        return '';
+    }
+    """,
+    Output('dummy-output', 'children'),
+    Input('dummy-input', 'children')
+)
+
+# ======================
+# Modified Callbacks
+# ======================
+
+# Update all content sections simultaneously
+@app.callback(
+    [
+        Output("stats-content", "children"),
+        Output("intent-content", "children"),
+        Output("sentiment-content", "children"),
+        Output("length-content", "children"),
+        Output("topics-content", "children"),
+        Output("complexity-content", "children"),
+        Output("comparative-content", "children"),
+        Output("combined-data", "data")
+    ],
+    [
+        Input("year-dropdown", "value"),
+        Input("level-dropdown", "value"),
+        Input("subject-dropdown", "value"),
+        Input("paper-dropdown", "value")
+    ]
+)
+def update_all_content(selected_year, selected_level, selected_subject, selected_paper):
+    # (Keep your existing data loading logic here)
+    
+    # Return content for all sections
+    return (
+        stats_content,  # From your original stats logic
+        intent_content,  # From your original intent logic
+        sentiment_content,  # From your original sentiment logic
+        length_content,  # From your original length logic
+        topics_content,  # From your original topics logic
+        complexity_content,  # From your original complexity logic
+        comparative_content,  # From your original comparative logic
+        combined_df.to_dict("records")
+    )
+# (Keep all callbacks and remaining code the same)
+                
+@app.callback(
+    Output("ca_report", "figure"),
+    Output("ca_report", "style"),  
+    Output("ca_linreg", "figure"),
+    Output("ca_linreg", "style"),
+    Output("ca_ts1", "figure"),
+    Output("ca_ts1", "style"),
+    [
+    Input("level-dropdown", "value"),
+    Input("subject-dropdown", "value"),
+    Input("tabs", "value"),
+    Input("paper-dropdown", "value"),
+    ]
+)
+def get_papers_in_subject(selected_level, selected_subject, tab_name, selected_paper):
+    if tab_name == "comparative":
+        print(selected_level)
+        print(selected_subject)
+
+        combined_df = load_csv(selected_year = None, selected_paper = selected_paper, selected_level = selected_level, selected_subject = selected_subject)
+        
+        metrics_columns = [
+            'coleman_liau',
+            'flesch_kincaid',
+            'gunning_fog',
+            'total_tokens',
+            'negative_tokens',
+            'positive_tokens',
+            'neutral_tokens',
+            'compound_sentiment_score'
+        ]
+        
+        # Calculate min and max for each metric
+        min_values = combined_df[metrics_columns].min()
+        max_values = combined_df[metrics_columns].max()
+        
+        # Normalize each column (metric) using min-max scaling
+        normalized_df = (combined_df[metrics_columns] - min_values) / (max_values - min_values)
+        
+        # Define the weights for each metric
+        weights = {
+            'coleman_liau': 0.25,
+            'flesch_kincaid': 0.25,
+            'gunning_fog': 0.25,
+            'total_tokens': 0.15,
+            'negative_tokens': 0.025,
+            'positive_tokens': 0.025,
+            'neutral_tokens': 0.025,
+            'compound_sentiment_score': 0.025
+        }
+        
+        # Convert weights to a numpy array to facilitate multiplication
+        weights_array = np.array([weights[col] for col in metrics_columns])
+        
+        # Apply the weights to each normalized column
+        weighted_normalized_df = normalized_df * weights_array
+        
+        # Calculate the composite score by summing the weighted values for each row
+        combined_df['composite_score'] = weighted_normalized_df.sum(axis=1)
+        
+        # Display the composite scores for verification
+        #print("DataFrame with Composite Scores:\n", combined_df[['year', 'composite_score']].head())
+        
+        # Group by 'year' and calculate the average composite score for each year
+        df_grouped_by_year = combined_df.groupby('year')['composite_score'].mean()
+        
+        # Display the average composite scores per year
+        #print("Average Composite Scores by Year:\n", df_grouped_by_year)
+        
+        # Group by 'year' to calculate the mean of each metric
+        df_grouped_by_year_metrics = combined_df.groupby('year')[metrics_columns].mean()
+        
+        # Calculate the correlation between the metrics over time
+        correlation_matrix = df_grouped_by_year_metrics.corr()
+        
+        # Display the correlation matrix
+        #print("Correlation Matrix:\n", correlation_matrix)
+        
+        # Calculate the weighted composite score for each year using the weights
+        weighted_composite_score = (df_grouped_by_year_metrics * weights_array).sum(axis=1)
+        
+        # Display the weighted composite score by year
+        #print("Weighted Composite Score by Year:\n", weighted_composite_score)
+
+        # Convert the Series to a DataFrame
+        weighted_composite_score_df = weighted_composite_score.reset_index()
+        weighted_composite_score_df.columns = ['year', 'score']  # Rename columns for clarity
+
+          
+        # Plot using Plotly Express
+        fig = px.line(
+            weighted_composite_score_df,
+            x='year',  # x-axis: year
+            y='score',  # y-axis: score
+            template = 'plotly_dark',
+            title="Weighted Composite Score Over Time",
+            labels={"year": "Year", "score": "Weighted Composite Score"},
+        )
+        # Add markers for better visualization
+        fig.update_traces(mode="lines+markers")
+                
+        years = df_grouped_by_year.index.astype(int)
+        values = df_grouped_by_year.values
+        slope, intercept, r_value, p_value, std_err = linregress(years, df_grouped_by_year.values)
+        print(f"Trend Line: y = {slope:.4f}x + {intercept:.4f} (R²={r_value**2:.4f}, p={p_value:.4e})")
+        regression_line = slope * years + intercept
+
+        # Create the plot
+        lin_reg_fig = go.Figure()
+
+        
+        # Add scatter plot of the original data
+        lin_reg_fig.add_trace(go.Scatter(
+            x=years,
+            y=values.flatten(),
+            mode='markers',
+            name='Original Data',
+            marker=dict(size=8, color='blue')
+        ))
+        
+        # Add regression line
+        lin_reg_fig.add_trace(go.Scatter(
+            x=years,
+            y=regression_line,
+            mode='lines',
+            name='Regression Line',
+            line=dict(color='red', width=2)
+        ))
+        
+        # Add annotations for regression statistics
+        lin_reg_fig.add_annotation(
+            x=years[len(years) // 2],
+            y=max(values.flatten()),
+            text=f"Slope: {slope:.4f}<br>Intercept: {intercept:.4f}<br>R²: {r_value**2:.4f}",
+            showarrow=False,
+            font=dict(size=12, color="black"),
+            align="left"
+        )
+        
+        # Update layout
+        lin_reg_fig.update_layout(
+            title="Linear Regression Visualisation",
+            xaxis_title="Year",
+            yaxis_title="Value",
+            template = 'plotly_dark',
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+        
+        def time_series(_df):
+            from statsmodels.tsa.seasonal import seasonal_decompose
+            
+            # Ensure the index is datetime or a regular numeric sequence (like years)
+            _df.index = pd.to_datetime(_df.index, format="%Y")
+            
+            # Perform decomposition
+            decomposition = seasonal_decompose(_df, model="additive", period=1)
+            
+            # Extract components
+            trend = decomposition.trend
+            seasonal = decomposition.seasonal
+            residual = decomposition.resid
+            
+
+            # Create the original time series plot
+            original_fig = go.Figure()
+            original_fig.add_trace(go.Scatter(x=df_grouped_by_year.index, y=df_grouped_by_year, mode='lines', name='Original'))
+            
+            # Create the trend plot
+            trend_fig = go.Figure()
+            trend_fig.update_layout(template = 'plotly_dark')
+            trend_fig.add_trace(go.Scatter(x=trend.index, y=trend, mode='lines', name='Trend', line=dict(color='green')))
+            
+
+            return trend_fig
+
+
+        trend_fig = time_series(df_grouped_by_year)
+        
+        return fig, {"display": "block"}, lin_reg_fig, {"display": "block"}, trend_fig, {"display": "block"}
+
+    #return None, {"display": "none"}
+        
+       
+
+
+@app.callback(
+    Output(component_id='report', component_property='children'),
+    Input(component_id='cloud', component_property='click')
+)
+def update_output_div(item):
+    if item == None:
+        return ''
+    
+    return f'Frequency of "{item[0]}" over time'.format(item)
+
+    
+@app.callback(
+    Output("word-usage-plot", "figure"),
+    Output("word-usage-plot", "style"),
+    [
+        Input("cloud", "click"),
+        State("combined-data", "data"),  # Retrieve stored data (list of dictionaries)
+        Input("level-dropdown", "value"),
+        Input("subject-dropdown", "value"),
+    ]
+)
+def plot_word_usage(word, combined_data, selected_level, selected_subject):
+    if not word or not combined_data:
+        return {}
+    
+
+
+    # Convert the stored data back into a DataFrame
+    #combined_df = pd.DataFrame(combined_data)
+    
+
+    combined_df = load_csv(selected_year = None, selected_paper = None, selected_level = selected_level, selected_subject = selected_subject)
+    
+    def count_word_in_year(named_entities, word):
+        if not isinstance(named_entities, str) or not named_entities:
+            return 0
+        # Use regex to find occurrences of (WORD, TYPE, COUNT)
+        matches = re.findall(r"\('([^']+)',\s*'([^']+)',\s*(\d+)\)", named_entities.lower())
+
+        # Sum the counts for the word that matches the given word
+        return sum(int(count) for w, t, count in matches if w == word.lower())
+
+    # Add a column to verify if we have counts
+    combined_df['word_count'] = combined_df['text'].apply(lambda x: count_word_in_year(x, word[0]))
+
+
+    # Check the new column to debug
+    #print(combined_df[['year', 'named_entities', 'word_count']])
+
+    # Group by 'year' and aggregate 'word_count' instead of 'named_entities'
+    result = (
+        combined_df.groupby("year", as_index=False)
+        .agg({"word_count": "sum"})
+        .rename(columns={"word_count": "count"})
+    )
+    
+    #print(result)
+    
+    # Create a line plot using the aggregated DataFrame
+    fig = px.line(
+        result,  # Use the DataFrame with 'year' and 'count'
+        x="year",
+        y="count",
+        template = 'plotly_dark',
+        title=f"Occurrences of '{word[0]}' Over Time",
+        labels={"year": "Year", "count": "Occurrences"},
+    )
+    
+    # Add markers for better visualization
+    fig.update_traces(mode="lines+markers")
+
+    return fig, {"display": "block"}
+
+
+# Function to generate word cloud image
+def generate_wordcloud(word_counts):
+    wordcloud = DashWordcloud(
+        list=word_counts,
+        width=600, height=400,
+        gridSize=16,
+        # weightFactor=2,
+        # origin=[90, 0],
+        # fontFamily='Sans, serif',
+        color='#f0f0c0',
+        backgroundColor='#001f00',
+        shuffle=False,
+        rotateRatio=0.5,
+        shrinkToFit=False,
+        shape='circle',
+        hover=True)
+    return wordcloud
+
+
+# Callback for dynamic toggle
+@app.callback(
+    Output("intent-trend-graph", "figure"),
+    [
+        Input("yaxis-toggle-local", "value"),
+        Input("intent-trend-data", "data"),
+    ]
+)
+def update_intent_trend_chart(yaxis_choice, intent_trend_data):
+    intent_trend = pd.DataFrame(intent_trend_data)
+
+    fig = px.area(
+        intent_trend,
+        x="year",
+        template = 'plotly_dark',
+        y=yaxis_choice,
+        color="intent",
+        title=f"{yaxis_choice.capitalize()} of Intent Over Time",
+        labels={"year": "Year", yaxis_choice: f"{yaxis_choice.capitalize()} of Questions", "intent": "Intent"},
+        line_group="intent",
+        custom_data=["count"],
+    )
+    fig.update_traces(
+        hovertemplate=(
+            "<b>Year:</b> %{x}<br>"
+            "<b>Proportion:</b> %{y:.2%}<br>"
+            "<b>Count:</b> %{customdata}<br>"
+        )
+    )
+    # Add annotations for notable events
+    for l, event in enumerate(notable_events):
+        fig.add_annotation(
+            x=event["year"],
+            y=0,
+            text=str(l+1),
+            showarrow=True,
+            arrowhead=2,
+            ax=-50,
+            ay=-30,
+            bgcolor="yellow"
+        )
+    return fig
+
+
+# Callback to download CSV
+@app.callback(
+    Output("download-csv", "data"),
+    Input("download-csv-btn", "n_clicks"),
+    State("combined-data", "data"),
+    prevent_initial_call=True
+)
+def download_csv(n_clicks, data):
+    data = pd.DataFrame(data)
+    return dcc.send_data_frame(data.to_csv, "data.csv")
+
+
+# Callback to download Excel
+@app.callback(
+    Output("download-excel", "data"),
+    Input("download-excel-btn", "n_clicks"),
+    State("combined-data", "data"),
+    prevent_initial_call=True
+)
+def download_excel(n_clicks, data):
+    data = pd.DataFrame(data)
+    return dcc.send_data_frame(data.to_excel, "data.xlsx", index=False)
+
+
+def load_csv(selected_year, selected_level, selected_subject, selected_paper):
+    if not (selected_level and selected_subject):
+        return html.Div(["Please select at least Level and Subject to load file paths."])
+
+    # Determine file paths
+    file_paths = []
+    if selected_year and selected_level and selected_paper and selected_subject and selected_paper != "all" and selected_year != "all":
+        # Handle specific year, level, paper, and subject
+        paper_path = os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
+        if os.path.exists(paper_path):
+            file_paths.append(paper_path)
+        
+    if selected_year and selected_year != "all":
+        # Handle a specific year
+        year_dir = directory_info.get(selected_year, {})
+        if selected_level in year_dir:
+            if selected_paper and selected_paper != "all":
+                # Load specific paper for the year
+                paper_path = os.path.join(DATA_DIR, selected_year, selected_level, selected_paper, f"{selected_subject}.csv")
+                if os.path.exists(paper_path):
+                    file_paths.append(paper_path)
+            else:
+                # Load all papers for the year
+                for paper in year_dir[selected_level]:
+                    paper_path = os.path.join(DATA_DIR, selected_year, selected_level, paper, f"{selected_subject}.csv")
+                    if os.path.exists(paper_path):
+                        file_paths.append(paper_path)
+    else:
+        # Handle "all years"
+        for year, levels in directory_info.items():
+            for level, papers in levels.items():
+                if level == selected_level:
+                    if selected_paper and selected_paper != "all":
+                        # Load specific paper across all years
+                        paper_path = os.path.join(DATA_DIR, year, level, selected_paper, f"{selected_subject}.csv")
+                        if os.path.exists(paper_path):
+                            file_paths.append(paper_path)
+                    else:
+                        # Load all papers across all years
+                        for paper, subjects in papers.items():
+                            if selected_subject in subjects:
+                                paper_path = os.path.join(DATA_DIR, year, level, paper, f"{selected_subject}.csv")
+                                if os.path.exists(paper_path):
+                                    file_paths.append(paper_path)
+    dataframes = []
+    for path in file_paths:
+        try:
+            df = pd.read_csv(path)
+            #print (path)
+            # Extract paper and year
+            paper_number = os.path.basename(os.path.dirname(path))  # Full "Paper 1", "Paper 2"
+            df["paper"] = paper_number
+            #print (paper_number)
+            year = os.path.basename(os.path.dirname(os.path.dirname(os.path.dirname(path))))
+            #print (year)
+            df["year"] = int(year)
+            dataframes.append(df)
+        except Exception as e:
+            print(f"Error loading file {path}: {e}")  # Debugging
+            return html.Div([f"Error loading file {path}: {e}"]), None
+    
+    combined_df = pd.concat(dataframes, ignore_index=True)
+    combined_df = combined_df.drop_duplicates()       
+    return combined_df
+
+# Run the app
+if __name__ == "__main__":
+    app.run_server(debug=False)
+    #app.run(host='0.0.0.0', port=8050)
